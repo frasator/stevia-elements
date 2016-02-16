@@ -114,41 +114,7 @@
         userDataChanged: function(neo, old) {
             var me = this;
             if (this.userData) {
-                var projectIds = [];
-                for (var i = 0; i < this.userData.projects.length; i++) {
-                    var p = this.userData.projects[i];
-                    projectIds.push(p.id);
-                }
-                var projects = [];
-                OpencgaManager.projects.studies({
-                    id: projectIds.join(','),
-                    query: {
-                        sid: Cookies("bioinfo_sid")
-                    },
-                    request: {
-                        success: function(response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
-                                for (var i = 0; i < response.response.length; i++) {
-                                    var r = response.response[i];
-                                    me.userData.projects[i].studies = r.result;
-                                    projects.push(me.userData.projects[i]);
-                                }
-                                /* update projects property*/
-                                me.projects = projects;
-                            } else {
-                                console.log(response.error);
-                                console.log(response.response[0].errorMsg);
-                            }
-                            me.loading = false;
-                        },
-                        error: function() {
-                            console.log('Server error, try again later.');
-                            me.loading = false;
-                        }
-                    }
-                });
             } else {
-                this.set('projects', []);
                 console.log("no user data")
             }
         },

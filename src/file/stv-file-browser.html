@@ -1,0 +1,484 @@
+<link rel="import" href="stv-file-upload.html">
+<link rel="import" href="stv-folder-list.html">
+<link rel="import" href="stv-file-preview.html">
+
+
+<dom-module id="stv-file-browser">
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            /*left: 0;*/
+            /*right: 0;*/
+            /*margin: 0px auto 0px auto;*/
+            height: 100%;
+            transition: all 0.2s;
+            background-color: inherit;
+            width: 600px;
+            height: 400px;
+        }
+
+        #topbar,
+        #botbar {
+            box-sizing: border-box;
+            height: 30px;
+            line-height: 30px;
+            padding: 0 7px;
+            background-color: var(--light-secondary-color);
+        }
+
+        #topbar {
+            border-bottom: 1px solid rgba(130, 130, 130, 0.4);
+        }
+
+        #botbar {
+            border-top: 1px solid rgba(130, 130, 130, 0.4);
+        }
+
+        #main {
+            position: relative;
+            height: calc(100% - 60px);
+        }
+
+        #mainmenu {
+            position: absolute;
+            box-sizing: border-box;
+            width: 175px;
+            height: 100%;
+            border-right: 1px solid rgba(130, 130, 130, 0.4);
+        }
+
+        #mainmenubar {
+            box-sizing: border-box;
+            background-color: rgba(125, 125, 125, 0.1);
+            padding: 3px 7px;
+            height: 30px;
+            border-bottom: 1px solid rgba(125, 125, 125, 0.5);
+        }
+
+        #mainmenucontent {
+            height: calc(100% - 30px);
+            overflow-y: auto;
+        }
+
+        #maincontent {
+            position: absolute;
+            left: 175px;
+            top: 0;
+            width: calc(100% - 175px);
+            height: 100%;
+            white-space: nowrap;
+        }
+
+        #maininfo {
+            box-sizing: border-box;
+            width: 150px;
+            height: 100%;
+            border-left: 1px solid rgba(130, 130, 130, 0.4);
+            ;
+            word-wrap: break-word;
+        }
+
+        #breadcrums {
+            box-sizing: border-box;
+            padding-left: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #breadcrums > span.clickable:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        stv-folder-list {
+            height: 100%;
+        }
+
+        stv-file-upload {
+            box-sizing: border-box;
+            background-color: #fafafa;
+            padding: 20px 30px;
+        }
+
+        .bar > div {
+            margin-right: 5px;
+        }
+
+        .wrapped-text {
+            white-space: pre-wrap;
+        }
+    </style>
+    <template>
+        <div id="topbar" class="horizontal layout center">
+            <div id="breadcrums" class="flex">
+                <b>/</b>
+                <template is="dom-repeat" items="{{folders}}">
+                    <span class="clickable" on-click="handleBreadcrumClick" folder="{{item}}">{{item.name}}</span>
+                    <b>/</b>
+                </template>
+
+            </div>
+            <div hidden$="{{!loading}}">
+                <i class="fa fa-circle-o-notch fa-spin"></i>
+            </div>
+        </div>
+
+        <div id="main" class="flex">
+            <div id="mainmenu">
+                <div id="mainmenubar" class="horizontal layout">
+                    <div class="bar horizontal layout flex">
+                    </div>
+                    <div class="bar horizontal layout">
+                    </div>
+                </div>
+                <div id="mainmenucontent">
+                    <!-- TREE -->
+                </div>
+            </div>
+            <div id="maincontent">
+                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="refreshFolderFiles" on-previewfile="handlePreviewFile" folder="{{folder}}"
+                files="{{files}}" mode="{{mode}}" disable-icon-view="{{disableIconView}}">
+                </stv-folder-list>
+            </div>
+        </div>
+
+
+        <div id="botbar" class="horizontal layout center">
+            <div class="flex"></div>
+            <div hidden$="{{!checkFileModeOk(mode,selectedFile)}}" class="stv-btn stv-btn-shdw" style="width:100px;" on-click="handleFileModeOk">
+                OK
+            </div>
+            <content id="customButtons" select=".custom-button"></content>
+        </div>
+
+        <stv-panel modal movable closable hidden id="uploadFilePanel">
+            <div class="header">
+                <i class="fa fa-cloud-upload"></i> &nbsp; Upload file
+            </div>
+            <stv-file-upload class="container" id="uploadFile" on-file-uploaded="handleFileUploaded" selected-folder="{{folder}}" bioformats="{{bioformats}}"></stv-file-upload>
+        </stv-panel>
+
+
+        <stv-panel modal closable hidden id="filePreviewPanel">
+            <div class="header">
+                <i class="fa fa-eye"></i> File Preview
+            </div>
+            <stv-file-preview class="container" id="filePreview"></stv-file-preview>
+            <!--<div class="container">-->
+            <!--<code class="wrapped-text">{{contentData}}</code>-->
+            <!--</div>-->
+        </stv-panel>
+
+    </template>
+
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-file-browser",
+        properties: {
+            userData: {
+                type: Object,
+                observer: 'userDataChanged'
+            },
+            folder: {
+                type: Object,
+                notify: true
+            },
+            selectedFile: {
+                type: Object,
+                notify: true,
+                value: function() {
+                    return null;
+                }
+            },
+            folders: {
+                type: Array,
+                notify: true,
+                value: function() {
+                    return []
+                }
+            },
+            files: {
+                type: Array,
+                notify: true
+            },
+            bioformats: {
+                type: Array,
+                value: function() {
+                    return [];
+                },
+                notify: true
+            },
+            showHidden: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+            disableIconView: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+            contentData: {
+                type: String,
+                value: ""
+            },
+            mode: {
+                type: String,
+                reflectToAttribute: true,
+                value: ""
+            },
+            enableSelectOk: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+            loading: {
+                type: Boolean,
+                value: false
+            },
+            enableAutoIndex: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            }
+        },
+        userDataChanged: function(neo, old) {
+            console.log(neo);
+            if (neo) {
+                this._setInitialSelection();
+            }
+        },
+        ready: function() {
+            var me = this;
+            if (this._parentPanel != null) {
+                this._parentPanel.addEventListener('hidden', function(e) {
+                    if (e.detail == false) {
+                        me._setInitialSelection();
+                    }
+                });
+            }
+            var els = this.$.botbar.querySelectorAll('.custom-button');
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i];
+                el.setAttribute('hidden', '');
+            }
+        },
+        checkFileModeOk: function(mode, selectedFile) {
+            if (this.enableSelectOk == true) {
+                if (mode === 'file' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FILE') {
+                    return true;
+                }
+                if (mode === 'folder' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FOLDER') {
+                    return true;
+                }
+            }
+            return false;
+        },
+        handleFileModeOk: function(e) {
+            this._parentPanel.hidden = true;
+            this.fire('ok-click');
+        },
+        _setInitialSelection: function() {
+            if (this._parentPanel != null && this._parentPanel.hidden === false) {
+                this.folder = (this.folder) ? this.folder : this.userData.home;
+                this.refreshFolderFiles();
+            }
+        },
+        handleFileSelect: function(e) {
+            this.selectedFile = e.detail;
+            this._checkCustomButtons();
+        },
+        handleFileSelect: function(e) {
+            this.selectedFile = e.detail;
+            this._checkCustomButtons();
+        },
+        handleOpenFolder: function(e) {
+            var me = this;
+            this.folder = e.detail;
+            this.push('folders', this.folder);
+            this.files = [];
+            this.refreshFolderFiles();
+        },
+        refreshFolderFiles: function() {
+            var me = this;
+            this.loading = true;
+            this._getFilesInFolder(this.folder._id, function(files) {
+                me.files = files;
+                me.loading = false;
+                //                console.log(files);
+            });
+        },
+        handleBreadcrumClick: function(e) {
+            var me = this;
+            this.folder = e.currentTarget.folder;
+
+            while (this.folder !== this.folders[this.folders.length - 1]) {
+                this.pop('folders');
+            }
+            this.files = [];
+            this.refreshFolderFiles();
+        },
+        handleBackFolder: function(e) {
+            var me = this;
+            this.pop('folders');
+            this.files = [];
+            if (this.folders.length > 0) {
+                this.set('folder', this.folders[this.folders.length - 1]);
+            }else{
+                this.set('folder', this.userData.home);
+            }
+            this.refreshFolderFiles();
+        },
+
+        handleUploadFile: function(e) {
+            this.$.uploadFilePanel.hidden = !this.$.uploadFilePanel.hidden;
+        },
+        handleFileUploaded: function(e) {
+            this.refreshFolderFiles();
+            this.$.uploadFilePanel.hidden = true;
+        },
+        handleLoading: function(e) {
+            this.fire("loading")
+        },
+        reset: function() {
+            this.set('selectedFile', undefined);
+            this.set('folder', undefined);
+            this.set('folders', []);
+            this.set('files', []);
+            this.set('contentData', '');
+            this.set('loading', false);
+        },
+
+        /* Private methods */
+        computeAngleIcon: function(el) {
+            if (el) {
+                return false;
+            }
+            return true;
+        },
+        _getFilesInFolder: function(folderId, callback) {
+            var me = this;
+            var files;
+
+            var bfList = [];
+            if (this.bioformats > 0) {
+                var bfList = ['NONE'];
+                for (var i = 0; i < this.bioformats.length; i++) {
+                    var bf = this.bioformats[i];
+                    bfList.push(bf.value);
+                }
+            }
+
+            var query = {
+                sid: Cookies('bioinfo_sid'),
+                //                    status:'READY,STAGED,MISSING',
+                status: 'READY',
+                type: 'FILE,FOLDER'
+            };
+
+            if (bfList > 0 && (this.mode === 'file' || this.mode === 'folder')) {
+                query.bioformat = bfList.join(',');
+            }
+
+            SteviaManager.files.list({
+                id: folderId,
+                query: query,
+                request: {
+                    async: true,
+                    success: function(response) {
+                        // console.log(response);
+                        if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
+                            files = me._filterFiles(response.response[0].results);
+                            //                            files = response.response[0].result;
+                            callback(files);
+                        } else {
+                            console.log(response.response[0].errorMsg);
+                        }
+                    },
+                    error: function() {
+                        console.log('Server error, try again later.');
+                    }
+                }
+            });
+        },
+        _filterFiles: function(files) {
+            var bfList = [];
+            for (var i = 0; i < this.bioformats.length; i++) {
+                var bf = this.bioformats[i];
+                bfList.push(bf.value);
+            }
+
+            files.sort(function(a, b) {
+                return b.created_at.localeCompare(a.created_at);
+            });
+            var filesFiltered = [];
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                // console.log(file.name + ' ' + file.id);
+                // console.log(file);
+                if (
+                    // file.bioformat == 'ALIGNMENT' &&
+                    (
+                        file.name.charAt(0) == '.' ||
+                        // file.name == 'command_line.sh' ||
+                        file.name.indexOf('sge_err.job') != -1 ||
+                        file.name.indexOf('sge_out.job') != -1
+                        // Utils.endsWith(file.name, '.annot.json.gz') ||
+                        // Utils.endsWith(file.name, '.file.json.gz') ||
+                        // Utils.endsWith(file.name, '.variants.stats.json.gz') ||
+                        // Utils.endsWith(file.name, '.source.stats.json.gz') ||
+                        // Utils.endsWith(file.name, '.bam.bai') ||
+                        // Utils.endsWith(file.name, '.bam.coverage.json.gz') ||
+                        // Utils.endsWith(file.name, '.bam.mean-coverage.json.gz') ||
+                        // Utils.endsWith(file.name, '.snappy') ||
+                        // (file.bioformat == 'VARIANT' && file.format == 'AVRO')
+                    )
+                ) {
+                    continue;
+                }
+
+                if (this.mode == 'folder') {
+                    if (file.type != 'FOLDER') {
+                        continue;
+                    }
+                } else if (this.mode == 'file' && bfList.length > 0) {
+                    if (file.type == 'FILE' && bfList.indexOf(file.bioformat) == -1) {
+                        continue;
+                    }
+                }
+
+                filesFiltered.push(file);
+            }
+            return filesFiltered;
+        },
+        handlePreviewFile: function(e) {
+            this.$.filePreviewPanel.show();
+            this.$.filePreview.file = this.selectedFile;
+        },
+        _checkCustomButtons: function() {
+            var els = this.$.botbar.querySelectorAll('.custom-button');
+            for (var i = 0; i < els.length; i++) {
+                var el = els[i];
+                var found = false;
+                var exts = el.getAttribute('file-ext').split(',');
+                for (var j = 0; j < exts.length; j++) {
+                    var ext = exts[j];
+                    if (Utils.endsWithIgnoreCase(this.selectedFile.name, ext)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    el.removeAttribute('hidden');
+                } else {
+                    el.setAttribute('hidden', '');
+                }
+            }
+
+        }
+    });
+</script>

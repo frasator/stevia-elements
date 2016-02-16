@@ -96,7 +96,7 @@
             if (this.$.form.checkValidity()) {
                 this.message = 'Processing request...';
                 this.loading = true;
-                OpencgaManager.users.resetPassword({
+                SteviaManager.users.resetPassword({
                     id: this.user,
                     query: {
                         email: this.email

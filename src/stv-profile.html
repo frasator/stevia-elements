@@ -98,7 +98,7 @@
             this.message = '';
 
             if (this.$.formPassword.checkValidity() && (this.password === this.passwordCheck)) {
-                OpencgaManager.users.updatePassword({
+                SteviaManager.users.updatePassword({
                     id: Cookies('bioinfo_user'),
                     query: {
                         password: CryptoJS.SHA1(this.oldpassword).toString(),
@@ -125,7 +125,7 @@
             this.message = '';
 
             if (this.$.formEmail.checkValidity()) {
-                OpencgaManager.users.updateEmail({
+                SteviaManager.users.updateEmail({
                     id: Cookies('bioinfo_user'),
                     query: {
                         nemail: this.email,

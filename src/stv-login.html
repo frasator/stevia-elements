@@ -34,7 +34,8 @@
             color: var(--dark-primary-color);
             float: right;
         }
-        .right{
+
+        .right {
             float: right;
         }
 
@@ -52,8 +53,8 @@
             </div>
         </div>
         <form id="form" vertical layout on-keypress="handleFormKey">
-            <label class="stv">User</label>
-            <input class="stv" type="text" value="{{user::input}}" required pattern="[a-zA-Z0-9]+">
+            <label class="stv">E-mail</label>
+            <input class="stv" type="email" value="{{email::input}}" required>
 
             <span hidden$={{hideSignup}} class="shortcut" on-click="handleSignup">Create new user...</span>
             <br>
@@ -80,7 +81,7 @@
     Polymer({
         is: "stv-login",
         properties: {
-            user: {
+            email: {
                 type: String,
                 value: ''
             },
@@ -116,31 +117,32 @@
         },
         handleForm: function(e) {
             this.message = '';
+            this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
             if (this.$.form.checkValidity()) {
                 this._login();
             }
         },
-        handleAnonymous:function(){
+        handleAnonymous: function() {
             this.fire('anonymous');
         },
         _login: function() {
             var me = this;
-            console.log(this.user)
-            console.log(this.password)
-
-            OpencgaManager.users.login({
-                id: this.user,
+            // console.log(this.email)
+            // console.log(this.password)
+            SteviaManager.users.login({
+                id: this.email,
                 query: {
+                    // password: this.password
                     password: CryptoJS.SHA1(this.password).toString()
                 },
                 request: {
                     success: function(response) {
-                        Cookies.set('bioinfo_sid', response.response[0].result[0].sessionId);
-                        Cookies.set('bioinfo_user', response.response[0].result[0].userId);
+                        Cookies.set('bioinfo_sid', response.response[0].results[0].id);
+                        Cookies.set('bioinfo_user', me.email);
                         me.fire('login', {
                             status: true
                         });
-                        me.user = null;
+                        me.email = null;
                         me.password = null;
                     },
                     error: function(response) {
@@ -148,7 +150,7 @@
                         Cookies.expire('bioinfo_sid');
                         Cookies.expire('bioinfo_user');
                         me.message = response.error.split(":")[1];
-                        if(response.errorEvent){
+                        if (response.errorEvent) {
                             me.message = 'Server error, try again later.';
                         }
                     }

@@ -20,6 +20,7 @@
         "fontawesome": "*",
         "cookies-js": "~1.1.0",
         "crypto-js": "3.1.6",
-        "pako": "~0.2.8"
+        "pako": "~0.2.8",
+        "client-line-navigator": "git://github.com/anpur/client-line-navigator"
     }
 }

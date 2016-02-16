@@ -1,0 +1,108 @@
+<dom-module id="stv-folder-list-item">
+    <style>
+        :host {
+            position: relative;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        :host:hover {
+            background-color: #ddd;
+        }
+
+        :host[selected] {
+            background-color: #ccc;
+        }
+
+        .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .icon {
+            padding: 0 5px 0 2px;
+        }
+
+        .creationDate {
+            color: #444;
+            width: 80px;
+            text-align: center;
+        }
+
+        #status {
+            color: #444;
+            width: 80px;
+            text-transform: capitalize;
+            text-align: center;
+        }
+
+        .fa-cog {
+            color: var(--default-primary-color);
+        }
+
+        .huge-icon {
+            font-size: 30px;
+            font-weight: lighter !important;
+            margin: 2px;
+            padding: 10px;
+            height: 25px;
+        }
+
+        .icon-mode-elem {
+            padding: 0 5px 0 2px;
+            width: 60px;
+            text-align: center;
+        }
+    </style>
+    <template>
+        <div class="horizontal layout">
+            <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
+                <div class="horizontal layout flex">
+                    <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
+                    <div class="name flex" title$="{{file.name}}">{{file.name}}</div>
+                </div>
+                <div class="creationDate">{{computeDate(file)}}</div>
+            </template>
+            <template is="dom-if" if="{{computeViewMode(viewMode, 'icon')}}">
+                <div class="vertical layout flex icon-mode-elem" title$="{{file.name}}">
+                    <div class="icon huge-icon"><i class$="{{computeIcon(file)}}"></i></div>
+                    <div class="name flex">{{file.name}}</div>
+                </div>
+            </template>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-folder-list-item",
+        properties: {
+            file: {
+                type: Object,
+                notify: true
+            },
+            viewMode: {
+                type: String,
+                value: 'list',
+                reflectToAttribute: true
+            }
+        },
+        computeDate: function(file) {
+            var date = new Date(Date.parse(file.created_at));
+            return date.toLocaleString("en-us", {
+                month: "short"
+            }) + " " + date.getDate() + ", " + date.getFullYear();
+        },
+        computeIcon: function(file) {
+            var iconMap = {
+                "FOLDER": 'fa fa-folder',
+                "FILE": 'fa fa-file-o'
+            };
+
+            return iconMap[file.type];
+        },
+        computeViewMode: function(viewMode, value) {
+            return viewMode == value;
+        }
+    });
+</script>

@@ -1,0 +1,344 @@
+<link rel="import" href="stv-file-bioformat.html">
+<link rel="import" href="../validator/stv-validator.html">
+
+<dom-module id="stv-file-upload">
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            padding: 20px 30px;
+        }
+
+        stv-file-bioformat {
+            height: 150px;
+        }
+
+        .uploadbar {
+            margin-top: 5px;
+            position: relative;
+            height: 20px;
+            border: 1px solid #d3d3d3;
+            background-color: white;
+            line-height: 20px;
+        }
+
+        .uploadprogress {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+            background-color: #eaeaea;
+            /*margin-top: 10px;*/
+        }
+
+        .uploadtext {
+            position: absolute;
+            text-align: center;
+            top: 0px;
+            left: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+        .filename {
+            word-break: break-all;
+        }
+
+        .right {
+            padding-left: 30px;
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            width: 440px;
+        }
+
+        #validator {
+            border: 1px solid var(--divider-color);
+        }
+    </style>
+    <template>
+        <div class="horizontal layout">
+            <div class="vertical layout left">
+                <div>
+                    <div>
+                        <label class="stv">File path:</label>
+                        <div>
+                            /
+                            <span>{{selectedFolder.name}}</span>
+                        </div>
+                        <br>
+                    </div>
+                    <div hidden$="{{hideBioformats}}">
+                        <label class="stv">Bioformat:</label>
+                        <stv-file-bioformat id="bioformatSelect" bioformats="{{bioformats}}" on-selected-bioformat-change="handleSelectedBioformatChange"></stv-file-bioformat>
+                    </div>
+                </div>
+                <br>
+
+                <form id="form">
+                    <div class="stv-btn stv-btn-shdw" on-click="handleBrowseClick" pattern="[a-zA-Z0-9_-]+">
+                        <span>Choose file...</span>
+                    </div>
+                    <br>
+                    <label class="stv">Selected file name:</label>
+
+                    <div class="filename">{{fileName}}</div>
+
+                    <input type="file" hidden id="fileInput" required on-change="handleInputChange" disabled$="{{uploading}}">
+
+                    <br>
+
+                    <div class="stv-btn stv-btn-shdw" on-click="handleValidate">Upload</div>
+                </form>
+                <br>
+
+                <div class="uploadbar" hidden$="{{!uploading}}">
+                    <div id="progressBar" class="uploadprogress"></div>
+                    <div class="uploadtext">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        <span>{{percentProgress}}</span> %
+                    </div>
+                    <br>
+                </div>
+                <span>{{message}}</span>
+            </div>
+
+            <div hidden$="{{hideValidationLog}}" class="right vertical layout">
+                <label class="stv">File validation log:</label>
+                <stv-validator id="validator" bioformats="{{bioformats}}" on-end="handleValidatorEnd"></stv-validator>
+            </div>
+
+        </div>
+
+    </template>
+
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-file-upload",
+        properties: {
+            fileName: {
+                type: String,
+                value: 'None'
+            },
+            selectedFolder: {
+                type: Object,
+                observer: "selectedFolderChanged"
+            },
+            bioformats: {
+                type: Array,
+                value: function() {
+                    return [];
+                }
+            },
+            uploading: {
+                type: Boolean,
+                value: false
+            },
+            percentProgress: {
+                type: Number,
+                value: 0,
+                observer: 'percentProgressChanged'
+            },
+            message: {
+                type: String,
+                value: ''
+            },
+            hideBioformats: {
+                type: Boolean,
+                value: false
+            },
+            status: {
+                type: String,
+                value: 'validation'
+            },
+            hideValidationLog: {
+                type: Boolean,
+                value: true,
+                observer: 'hideValidationLogChanged'
+            }
+        },
+        ready: function(e) {
+            var me = this;
+            if (this.bioformats.length == 0) {
+                /*** Check number of bioformats in order to show the bioformat chooser ***/
+                // console.log("No bioformats selected")
+                this.checkBioformats();
+            }
+
+            if (this._parentPanel) {
+                this._parentPanel.addEventListener("close", function(e) {
+                    me.status = "validation";
+                    me.$.validator.reset();
+                });
+            }
+        },
+        checkBioformats: function() {
+            var numberOfBioformats = 0;
+            var bioformatIdx;
+            for (var i = 0; i < this.bioformats.length; i++) {
+                var format = this.bioformats[i];
+                if (format.key) {
+                    numberOfBioformats++;
+                    bioformatIdx = i;
+                }
+            }
+            if (numberOfBioformats == 1) {
+                this.hideBioformats = true;
+                this.selectedBioformat = this.bioformats[bioformatIdx];
+                if (this.selectedBioformat.validator != null) {
+                    this.hideValidationLog = false;
+                }
+            }
+            if (numberOfBioformats == 0) {
+                this.hideBioformats = true;
+                this.selectedBioformat = {
+                    value: 'NONE',
+                    text: 'NONE'
+                };
+                this.hideValidationLog = true;
+            }
+        },
+        handleSelectedBioformatChange: function(e) {
+            if (this.$.bioformatSelect.selectedBioformat != null && this.$.bioformatSelect.selectedBioformat.validator != null) {
+                this.hideValidationLog = false;
+            } else {
+                this.hideValidationLog = true;
+            }
+        },
+        hideValidationLogChanged: function(e) {
+            if (this._parentPanel) {
+                this._parentPanel._center();
+            }
+        },
+        handleBrowseClick: function(e) {
+            if (this.uploading == false) {
+                this.$.fileInput.click();
+            }
+        },
+        handleInputChange: function() {
+            if (this.uploading == false) {
+
+                var inputFile = this.$.fileInput.files[0];
+                this.fileName = inputFile.name
+
+                this.status = "validation";
+            }
+        },
+
+        handleForm: function() {
+            var me = this;
+            if (this.uploading == false) {
+
+                /* Check bioformat */
+                var selBioformat;
+                if (this.$.bioformatSelect.selectedBioformat != null) {
+                    selBioformat = this.$.bioformatSelect.selectedBioformat;
+                }
+                if (this.selectedBioformat != null) {
+                    selBioformat = this.selectedBioformat;
+                }
+                if (selBioformat == null) {
+                    alert("Please select a bioformat");
+                    return;
+                }
+
+                var folder = "";
+                if (this.selectedFolder != null) {
+                    folder = this.selectedFolder.path;
+                }
+                if (this.$.form.checkValidity()) {
+                    this.uploading = true;
+                    this.message = '';
+                    var config = {
+
+                        file: this.$.fileInput.files[0],
+                        name: this.fileName,
+                        parentId: this.selectedFolder._id,
+                        userId: Cookies("bioinfo_user"),
+                        sid: Cookies("bioinfo_sid"),
+                        format: 'PLAIN',
+                        bioFormat: selBioformat.value,
+                        callbackProgress: function(chunk, total, response) {
+                            me.percentProgress = Math.round((chunk.id / total) * 100);
+                            if (chunk.last) {
+                                me.percentProgress = 100;
+                                me.uploading = false;
+                                me.message = 'Done';
+                                me.$.fileInput.value = null;
+                                me.fileName = '';
+                                me.fire('need-refresh');
+                                
+                                var uploadedFile = response.response[0].results[0];
+                                me.fire('file-uploaded', uploadedFile);
+                            }
+                        },
+                        error: function(msg) {
+                            me.$.fileInput.value = null;
+                            me.fileName = '';
+                            me.uploading = false;
+                            me.message = msg;
+                        }
+                    };
+                    SteviaManager.files.upload(config);
+                } else {
+                    alert("Please select a file");
+                    return;
+                }
+            }
+        },
+        percentProgressChanged: function(neo, old) {
+            this.$.progressBar.style.width = neo + '%';
+        },
+        selectedFolderChanged: function(neo, old) {
+            this.fileName = "None";
+        },
+
+        handleValidate: function(e) {
+            /* Check bioformat */
+            var selBioformat;
+            if (this.$.bioformatSelect.selectedBioformat != null) {
+                selBioformat = this.$.bioformatSelect.selectedBioformat;
+            }
+            if (this.selectedBioformat != null) {
+                selBioformat = this.selectedBioformat;
+            }
+            if (selBioformat == null) {
+                alert("Please select a bioformat");
+                return;
+            }
+
+            /* Validate bioformat */
+            var file = this.$.fileInput.files[0];
+            if (selBioformat != null && file != null) {
+                this.$.validator.reset();
+                var validator;
+
+                if (selBioformat.validator) {
+                    if (typeof selBioformat.validator !== "function") {
+                        alert("Validator '" + selBioformat.validator + "' not recognized.");
+                        return;
+                    }
+                    validator = new selBioformat.validator({});
+                } else {
+                    validator = new Validator({});
+                }
+
+                this.$.validator.validator = validator;
+                this.$.validator.setFile(file);
+                this.$.validator.validate();
+            }
+
+        },
+
+        handleValidatorEnd: function(e) {
+            if (!this.$.validator.errorCount > 0) {
+                // this.status = "update";
+                this.handleForm();
+            }
+        }
+
+    });
+</script>

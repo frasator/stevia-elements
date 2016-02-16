@@ -294,9 +294,6 @@
             jobItem: {
                 type: Object
             },
-            selectedStudy: {
-                type: Object
-            },
             allowedTools: {
                 type: Array
             },
@@ -368,7 +365,7 @@
                 if (Cookies("bioinfo_sid") && Cookies("bioinfo_user")) {
                     this.sessionInitiated();
                 } else {
-                    this.logout();
+                    this.sessionFinished();
                 }
             }
         },
@@ -423,11 +420,10 @@
         },
         sessionInitiated: function(e) {
             var me = this;
-
             this.isLogged = true;
             this.selectedOption = 'home';
 
-            /**START OPENCGA CHECK**/
+            /**START CHECK**/
             if (!this.userInfoInterval) {
                 this.getUserInfo(); //first call
                 this.userInfoInterval = setInterval(function() {
@@ -437,6 +433,7 @@
             this.fire("login");
         },
         sessionFinished: function(e) {
+            this.logout();
             this.userData = null;
             this.showJobs = false;
             this.selectedOption = 'home';
@@ -444,17 +441,17 @@
             Cookies.expire('bioinfo_sid');
             Cookies.expire('bioinfo_user');
 
-            /**END OPENCGA CHECK**/
+            /**END CHECK**/
             clearInterval(this.userInfoInterval);
             this.userInfoInterval = null;
             this.fire("logout");
         },
         getUserInfo: function(force) {
             var me = this;
-            var lastActivity = null;
+            var updated_at = null;
             if (force != true) {
                 if (this.userData != null) {
-                    lastActivity = this.userData.lastActivity;
+                    updated_at = this.userData.updated_at;
                 }
             }
             var user = Cookies('bioinfo_user');
@@ -462,16 +459,16 @@
                 console.log('cookie: bioinfo_user, is not set, session will be finished...');
                 this.sessionFinished();
             } else {
-                OpencgaManager.users.read({
+                SteviaManager.users.read({
                     id: user,
                     query: {
                         sid: Cookies('bioinfo_sid'),
-                        lastActivity: lastActivity
+                        updated_at: updated_at
                     },
                     request: {
                         success: function(response) {
-                            if ((response.response[0].errorMsg === '' || response.response[0].errorMsg == null) && response.response[0].result.length > 0) {
-                                me.userData = response.response[0].result[0];
+                            if ((response.response[0].errorMsg === '' || response.response[0].errorMsg == null) && response.response[0].results.length > 0) {
+                                me.userData = response.response[0].results[0];
                                 me.userText = me._checkUserName(me.userData);
                                 console.log("userData has been modified since last call");
                             }
@@ -491,9 +488,8 @@
             var user = Cookies('bioinfo_user');
             if (!user) {
                 console.log('cookie: bioinfo_user, is not set, session will be finished...');
-                this.sessionFinished();
             } else {
-                OpencgaManager.users.logout({
+                SteviaManager.users.logout({
                     id: user,
                     query: {
                         sid: Cookies('bioinfo_sid')
@@ -513,7 +509,7 @@
             if (userData.email === 'anonymous@anonymous.anonymous') {
                 return 'anonymous';
             } else {
-                return userData.name;
+                return userData.email;
             }
         }
     });
