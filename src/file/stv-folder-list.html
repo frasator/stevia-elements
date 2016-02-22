@@ -228,6 +228,10 @@
             }
         },
         handleUploadFile: function(e) {
+            this.set('selected', null);
+            this.fire('fileselect', {
+                file: null
+            });
             this.fire('upload-file');
         },
         handleCreateFolder: function(e) {
@@ -254,7 +258,9 @@
                 sel.removeAttribute('selected');
             }
             e.currentTarget.setAttribute('selected', '');
-            this.fire('fileselect', this.selected);
+            this.fire('fileselect', {
+                file: this.selected
+            });
 
             this.fileName = this.selected.name;
             this.fileType = this.selected.type;
@@ -274,6 +280,10 @@
         handleFileDblClick: function(e) {
             var file = e.currentTarget.file;
             if (file.type == 'FOLDER') {
+                this.set('selected', null);
+                this.fire('fileselect', {
+                    file: null
+                });
                 this.fire('openfolder', file);
             } else if (file.type == "FILE") {
                 this.fire('previewfile', file);
@@ -286,6 +296,10 @@
             }
         },
         handleBack: function() {
+            this.set('selected', null);
+            this.fire('fileselect', {
+                file: null
+            });
             this.fire('back');
         },
         checkFolder: function(folder) {
@@ -329,6 +343,10 @@
                             if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
                                 console.log("delete");
                                 console.log(response);
+                                me.set('selected', null);
+                                me.fire('fileselect', {
+                                    file: null
+                                });
 
                                 me.fire('need-refresh');
                             } else {

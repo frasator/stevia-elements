@@ -60,20 +60,16 @@
     </style>
     <template>
         <div class="horizontal layout">
-            <div class="vertical layout left">
+            <div class="vertical layout center-justified">
+                <label class="stv">File path:</label>
                 <div>
-                    <div>
-                        <label class="stv">File path:</label>
-                        <div>
-                            /
-                            <span>{{selectedFolder.name}}</span>
-                        </div>
-                        <br>
-                    </div>
-                    <div hidden$="{{hideBioformats}}">
-                        <label class="stv">Bioformat:</label>
-                        <stv-file-bioformat id="bioformatSelect" bioformats="{{bioformats}}" on-selected-bioformat-change="handleSelectedBioformatChange"></stv-file-bioformat>
-                    </div>
+                    /
+                    <span>{{selectedFolder.name}}</span>
+                </div>
+                <br>
+                <div hidden$="{{hideBioformats}}">
+                    <label class="stv">Bioformat:</label>
+                    <stv-file-bioformat id="bioformatSelect" bioformats="{{bioformats}}" on-selected-bioformat-change="handleSelectedBioformatChange"></stv-file-bioformat>
                 </div>
                 <br>
 
@@ -90,7 +86,8 @@
 
                     <br>
 
-                    <div class="stv-btn stv-btn-shdw" on-click="handleValidate">Upload</div>
+                    <!-- <div class="stv-btn stv-btn-shdw" on-click="handleValidate">Upload</div> -->
+                    <div class="stv-btn stv-btn-shdw" on-click="handleForm">Upload</div>
                 </form>
                 <br>
 
@@ -253,7 +250,6 @@
                     this.uploading = true;
                     this.message = '';
                     var config = {
-
                         file: this.$.fileInput.files[0],
                         name: this.fileName,
                         parentId: this.selectedFolder._id,
@@ -270,10 +266,18 @@
                                 me.$.fileInput.value = null;
                                 me.fileName = '';
                                 me.fire('need-refresh');
-                                
-                                var uploadedFile = response.response[0].results[0];
+
+                                var uploadedFile = response.file;
+                                console.log(uploadedFile);
                                 me.fire('file-uploaded', uploadedFile);
                             }
+                        },
+                        callbackExists: function(file) {
+                            console.log('File already exists');
+                            console.log(file);
+                            me.message = 'File already exists with that name.';
+                            me.percentProgress = 0;
+                            me.uploading = false;
                         },
                         error: function(msg) {
                             me.$.fileInput.value = null;

@@ -124,7 +124,9 @@ var SteviaManager = {
         upload: function(args) {
             var url = SteviaManager._url({
                 query: {
-                    sid: args.sid
+                    sid: args.sid,
+                    name: args.name,
+                    parentId: args.parentId
                 },
                 request: {}
             }, 'files', 'upload');
@@ -196,7 +198,16 @@ var SteviaManager = {
                 }, this);
             };
             request.open(method, url, async);
-            request.send();
+            if (args.request.headers != null) {
+                for (var header in args.request.headers) {
+                    request.setRequestHeader(header, args.request.headers[header]);
+                }
+            }
+            var body = null;
+            if (args.request.body != null) {
+                body = args.request.body;
+            }
+            request.send(body);
             return url;
         }
     },
@@ -209,6 +220,7 @@ var SteviaManager = {
         var format = args.format;
         var bioFormat = args.bioFormat;
         var callbackProgress = args.callbackProgress;
+        var callbackExists = args.callbackExists;
 
         /**/
         var resume = true;
@@ -222,16 +234,30 @@ var SteviaManager = {
         var start;
         var end;
 
-        var getResumeInfo = function(formData) {
+        /**/
+        var resumeResponse;
+        /**/
+
+        var getResumeInfo = function(formData, callback) {
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', url, false); //false = sync call
+            xhr.open('POST', url, true); //false = sync call
+            xhr.onload = function(e) {
+                console.log(xhr.responseText);
+                callback(JSON.parse(xhr.responseText));
+            };
             xhr.send(formData);
-            console.log(xhr.responseText);
-            // var response = JSON.parse(xhr.responseText);
-            // return response.response[0];
-            return xhr.responseText;
         };
-        var checkChunk = function(id, size, resumeInfo) {
+        var uploadChunk = function(formData, chunk, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.onload = function(e) {
+                chunk.done = true;
+                console.log('chunk ' + chunk.id + ' done');
+                callback(JSON.parse(xhr.responseText));
+            };
+            xhr.send(formData);
+        };
+        var checkChunk = function(id, size) {
             if (typeof resumeInfo[id] === 'undefined') {
                 return false;
             } else if (resumeInfo[id].size != size /*|| resumeInfo[id].hash != hash*/ ) {
@@ -240,10 +266,11 @@ var SteviaManager = {
             return true;
         };
         var processChunk = function(c) {
-            console.log(blob);
             var chunkBlob = blob.slice(c.start, c.end);
 
-            if (checkChunk(c.id, chunkBlob.size, resumeInfo) == false) {
+            console.log(c);
+            if (checkChunk(c.id, chunkBlob.size) == false) {
+                console.log('chunk ' + c.id + ' not uploaded');
                 var formData = new FormData();
                 formData.append('chunk_id', c.id);
                 formData.append('chunk_size', chunkBlob.size);
@@ -269,7 +296,8 @@ var SteviaManager = {
                     }
                 });
             } else {
-                callbackProgress(c, NUM_CHUNKS);
+                console.log('chunk ' + c.id + ' already uploaded');
+                callbackProgress(c, NUM_CHUNKS, resumeResponse);
                 if (!c.last) {
                     processChunk(chunkMap[(c.id + 1)]);
                 } else {
@@ -278,28 +306,9 @@ var SteviaManager = {
             }
 
         };
-        var uploadChunk = function(formData, chunk, callback) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', url, true);
-            xhr.onload = function(e) {
-                chunk.done = true;
-                console.log('chunk ' + chunk.id + ' done');
-                callback(JSON.parse(xhr.responseText));
-            };
-            xhr.send(formData);
-        };
 
         /**/
         /**/
-
-        if (resume) {
-            var resumeFormData = new FormData();
-            resumeFormData.append('resume_upload', resume);
-            resumeFormData.append('name', name);
-            resumeFormData.append('userId', userId);
-            resumeFormData.append('parentId', parentId);
-            resumeInfo = getResumeInfo(resumeFormData);
-        }
 
         start = 0;
         end = BYTES_PER_CHUNK;
@@ -312,16 +321,36 @@ var SteviaManager = {
                 id: chunkId,
                 start: start,
                 end: end,
+                size: end - start,
                 done: false,
                 last: last
             };
             start = end;
             end = start + BYTES_PER_CHUNK;
+            if (end > SIZE) {
+                end = SIZE;
+            }
             chunkId++;
         }
-        setTimeout(function() {
-            processChunk(chunkMap[0]);
-        }, 50);
+        if (resume) {
+            var resumeFormData = new FormData();
+            resumeFormData.append('resume_upload', resume);
+            resumeFormData.append('chunk_map', JSON.stringify(chunkMap));
+            resumeFormData.append('name', name);
+            resumeFormData.append('userId', userId);
+            resumeFormData.append('parentId', parentId);
+            getResumeInfo(resumeFormData, function(response) {
+                resumeInfo = response.resumeInfo;
+                resumeResponse = response;
+                if (response.exists) {
+                    callbackExists(response.file);
+                } else {
+                    setTimeout(function() {
+                        processChunk(chunkMap[0]);
+                    }, 50);
+                }
+            });
+        }
     },
     _addQueryParamtersToUrl: function(paramsWS, url) {
         var chr = "?";

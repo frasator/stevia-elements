@@ -59,6 +59,9 @@
         <div class="horizontal layout">
             <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
                 <div class="horizontal layout flex">
+                    <template is="dom-if" if="{{hasJob(file)}}">
+                        <div class="icon"><i class$="{{computeJobIcon(file.job)}}"></i></div>
+                    </template>
                     <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
                     <div class="name flex" title$="{{file.name}}">{{file.name}}</div>
                 </div>
@@ -94,15 +97,34 @@
             }) + " " + date.getDate() + ", " + date.getFullYear();
         },
         computeIcon: function(file) {
+            if (file.job != null) {
+                return 'fa fa-folder-o';
+            }
             var iconMap = {
                 "FOLDER": 'fa fa-folder',
                 "FILE": 'fa fa-file-o'
             };
-
             return iconMap[file.type];
+        },
+        computeJobIcon: function(job) {
+            if(job){
+                if(job.status.indexOf('ERROR') != -1){
+                    return 'fa fa-times';
+                }
+                var iconMap = {
+                    "QUEUED": 'fa fa-clock-o',
+                    "RUNNING": 'fa fa-circle-o-notch fa-spin',
+                    "DONE": 'fa fa-check',
+                };
+                return iconMap[job.status];
+            }
         },
         computeViewMode: function(viewMode, value) {
             return viewMode == value;
+        },
+        hasJob: function(file) {
+            console.log(file.job);
+            return file.job != null;
         }
     });
 </script>

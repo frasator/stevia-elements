@@ -250,7 +250,16 @@
             console.log(neo);
             if (neo) {
                 this._setInitialSelection();
+            } else {
+                this.clean();
             }
+        },
+        clean: function() {
+            this.set('folder', null);
+            this.set('selectedFile', null);
+            this.set('folders', []);
+            this.set('files', []);
+            this.set('loading', false);
         },
         ready: function() {
             var me = this;
@@ -289,11 +298,7 @@
             }
         },
         handleFileSelect: function(e) {
-            this.selectedFile = e.detail;
-            this._checkCustomButtons();
-        },
-        handleFileSelect: function(e) {
-            this.selectedFile = e.detail;
+            this.selectedFile = e.detail.file;
             this._checkCustomButtons();
         },
         handleOpenFolder: function(e) {
@@ -328,7 +333,7 @@
             this.files = [];
             if (this.folders.length > 0) {
                 this.set('folder', this.folders[this.folders.length - 1]);
-            }else{
+            } else {
                 this.set('folder', this.userData.home);
             }
             this.refreshFolderFiles();
