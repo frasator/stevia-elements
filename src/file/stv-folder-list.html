@@ -204,7 +204,8 @@
                 notify: true,
                 value: function() {
                     return null;
-                }
+                },
+                observer: 'selectedChanged'
             },
             mode: {
                 type: String,
@@ -229,9 +230,6 @@
         },
         handleUploadFile: function(e) {
             this.set('selected', null);
-            this.fire('fileselect', {
-                file: null
-            });
             this.fire('upload-file');
         },
         handleCreateFolder: function(e) {
@@ -247,20 +245,20 @@
         handleDeleteFile: function(e) {
             if (confirm("Are you sure?")) {
                 this._deleteFile();
-
             }
         },
-        handleFileClick: function(e) {
-
-            this.selected = e.currentTarget.file;
+        selectedChanged: function(neo, old) {
             var sel = this.querySelector("stv-folder-list-item[selected]");
             if (sel) {
                 sel.removeAttribute('selected');
             }
-            e.currentTarget.setAttribute('selected', '');
             this.fire('fileselect', {
                 file: this.selected
             });
+        },
+        handleFileClick: function(e) {
+            this.selected = e.currentTarget.file;
+            e.currentTarget.setAttribute('selected', '');
 
             this.fileName = this.selected.name;
             this.fileType = this.selected.type;
@@ -281,9 +279,6 @@
             var file = e.currentTarget.file;
             if (file.type == 'FOLDER') {
                 this.set('selected', null);
-                this.fire('fileselect', {
-                    file: null
-                });
                 this.fire('openfolder', file);
             } else if (file.type == "FILE") {
                 this.fire('previewfile', file);
@@ -297,9 +292,6 @@
         },
         handleBack: function() {
             this.set('selected', null);
-            this.fire('fileselect', {
-                file: null
-            });
             this.fire('back');
         },
         checkFolder: function(folder) {
@@ -344,10 +336,6 @@
                                 console.log("delete");
                                 console.log(response);
                                 me.set('selected', null);
-                                me.fire('fileselect', {
-                                    file: null
-                                });
-
                                 me.fire('need-refresh');
                             } else {
                                 console.log(response.response[0].errorMsg);
