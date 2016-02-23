@@ -45,12 +45,12 @@
             </div>
         </div>
         <form id="formPassword">
-            <label class="stv">Old password</label>
+            <label class="stv">Old password:</label>
             <input class="stv" type="password" value="{{oldpassword::input}}" required pattern="[a-zA-Z0-9]+">
             <br>
-            <label class="stv">New password</label>
+            <label class="stv">New password:</label>
             <input class="stv" type="password" value="{{password::input}}" required pattern="[a-zA-Z0-9]+">
-            <label class="stv">Check password</label>
+            <label class="stv">Check password:</label>
             <input class="stv" type="password" value="{{passwordCheck::input}}" required pattern="[a-zA-Z0-9]+">
             <br>
 
@@ -107,10 +107,10 @@
                     },
                     request: {
                         success: function (response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
+                            if (response.response[0].error == null) {
                                 me.message = 'Password updated';
                             } else {
-                                me.message = response.response[0].errorMsg;
+                                me.message = response.response[0].error;
                             }
                         },
                         error: function () {
@@ -133,10 +133,10 @@
                     },
                     request: {
                         success: function (response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
+                            if (response.response[0].error == null) {
                                 me.message = 'E-mail updated';
                             } else {
-                                me.message = response.response[0].errorMsg;
+                                me.message = response.response[0].error;
                             }
                         },
                         error: function () {

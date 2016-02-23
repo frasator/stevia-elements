@@ -53,12 +53,12 @@
             </div>
         </div>
         <form id="form" vertical layout on-keypress="handleFormKey">
-            <label class="stv">E-mail</label>
+            <label class="stv">E-mail:</label>
             <input class="stv" type="email" value="{{email::input}}" required>
 
             <span hidden$={{hideSignup}} class="shortcut" on-click="handleSignup">Create new user...</span>
             <br>
-            <label class="stv">Password</label>
+            <label class="stv">Password:</label>
             <input class="stv" type="password" value="{{password::input}}" required pattern="[a-zA-Z0-9]+">
 
             <span hidden$={{hideSignup}} class="shortcut" on-click="handleRemember">Remember password...</span>
@@ -137,11 +137,16 @@
                 },
                 request: {
                     success: function(response) {
-                        Cookies.set('bioinfo_sid', response.response[0].results[0].id);
-                        Cookies.set('bioinfo_user', me.email);
-                        me.fire('login', {
-                            status: true
-                        });
+                        if(response.response[0].error == null){
+                            Cookies.set('bioinfo_sid', response.response[0].results[0].id);
+                            Cookies.set('bioinfo_user', me.email);
+                            me.fire('login', {
+                                status: true
+                            });
+                        }else{
+                            console.log(response.response[0].error);
+                            me.message = response.response[0].error;
+                        }
                         me.email = null;
                         me.password = null;
                     },

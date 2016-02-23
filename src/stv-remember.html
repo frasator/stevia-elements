@@ -39,10 +39,10 @@
             </div>
         </div>
         <form id="form" vertical layout on-keypress="handleFormKey">
-            <label class="stv">User ID</label>
+            <!-- <label class="stv">User ID</label>
             <input class="stv" type="text" value="{{user::input}}" required pattern="[a-zA-Z0-9]+">
-            <br>
-            <label class="stv">e-mail</label>
+            <br> -->
+            <label class="stv">E-mail:</label>
             <input class="stv" type="email" value="{{email::input}}" required>
             <br>
             <br>
@@ -103,11 +103,11 @@
                     },
                     request: {
                         success: function(response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
-                                var userId = response.response[0].result[0].id;
+                            if (response.response[0].error == null) {
+                                var userId = response.response[0].results[0].id;
                                 me.message = 'An email was sent with a new password';
                             } else {
-                                me.message = response.response[0].errorMsg;
+                                me.message = response.response[0].error;
                             }
                             me.loading = false;
                         },

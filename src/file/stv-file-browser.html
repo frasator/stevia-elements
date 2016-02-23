@@ -367,7 +367,6 @@
         },
         _getFilesInFolder: function(folderId, callback) {
             var me = this;
-            var files;
 
             var bfList = [];
             if (this.bioformats > 0) {
@@ -395,13 +394,11 @@
                 request: {
                     async: true,
                     success: function(response) {
-                        // console.log(response);
-                        if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
-                            files = me._filterFiles(response.response[0].results);
-                            //                            files = response.response[0].result;
+                        if (response.response[0].error == null) {
+                            var files = me._filterFiles(response.response[0].results);
                             callback(files);
                         } else {
-                            console.log(response.response[0].errorMsg);
+                            console.log(response.response[0].error);
                         }
                     },
                     error: function() {

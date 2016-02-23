@@ -176,7 +176,7 @@ var SteviaManager = {
                 var contentType = this.getResponseHeader('Content-Type');
                 if (contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
-                    if (json.error === '' || json.error == null) {
+                    if (json.error == null) {
                         args.request.success(json, this);
                     } else {
                         if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
@@ -340,14 +340,18 @@ var SteviaManager = {
             resumeFormData.append('userId', userId);
             resumeFormData.append('parentId', parentId);
             getResumeInfo(resumeFormData, function(response) {
-                resumeInfo = response.resumeInfo;
-                resumeResponse = response;
-                if (response.exists) {
-                    callbackExists(response.file);
+                if (response.error == null) {
+                    resumeInfo = response.resumeInfo;
+                    resumeResponse = response;
+                    if (response.exists) {
+                        callbackExists(response.file);
+                    } else {
+                        setTimeout(function() {
+                            processChunk(chunkMap[0]);
+                        }, 50);
+                    }
                 } else {
-                    setTimeout(function() {
-                        processChunk(chunkMap[0]);
-                    }, 50);
+                    console.log('Upload error: ' + response.response[0].error);
                 }
             });
         }

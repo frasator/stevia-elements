@@ -58,13 +58,13 @@
                     },
                     request: {
                         success: function(response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
+                            if (response.response[0].error == null) {
                                 me.message = '';
                                 me.name = '';
                                 me.fire('need-refresh');
                                 me.fire('folder-created');
                             } else {
-                                me.message = response.response[0].errorMsg;
+                                me.message = response.response[0].error;
                             }
                         },
                         error: function() {

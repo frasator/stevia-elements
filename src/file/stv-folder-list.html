@@ -332,13 +332,13 @@
                     },
                     request: {
                         success: function(response) {
-                            if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
-                                console.log("delete");
+                            if (response.response[0].error == null) {
+                                console.log("delete:");
                                 console.log(response);
                                 me.set('selected', null);
                                 me.fire('need-refresh');
                             } else {
-                                console.log(response.response[0].errorMsg);
+                                console.log(response.response[0].error);
                             }
                         },
                         error: function() {

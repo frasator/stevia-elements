@@ -38,12 +38,12 @@
             </div>
         </div>
         <form id="form" on-keypress="handleFormKey">
-            <label class="stv">E-mail</label>
+            <label class="stv">E-mail:</label>
             <input class="stv" type="email" value="{{email::input}}" required>
             <br>
-            <label class="stv">Create a password</label>
+            <label class="stv">Create a password:</label>
             <input class="stv" type="password" value="{{password::input}}" required>
-            <label class="stv">Confirm your password</label>
+            <label class="stv">Confirm your password:</label>
             <input class="stv" type="password" value="{{passwordCheck::input}}" required>
 
             <br>
@@ -111,7 +111,7 @@
                 request: {
                     async: false,
                     success: function(response) {
-                        if (response.response[0].errorMsg === '' || response.response[0].errorMsg == null) {
+                        if (response.response[0].error == null) {
                             var email = response.response[0].results[0].email;
                             me.message = email + ' created';
                             Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id);
@@ -123,7 +123,8 @@
                                 status: true
                             });
                         } else {
-                            me.message = response.response[0].errorMsg;
+                            console.log(response.response[0].error);
+                            me.message = response.response[0].error;
                             //Delete cookies
                             Cookies.expire('bioinfo_sid');
                             Cookies.expire('bioinfo_user');
