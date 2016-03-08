@@ -141,7 +141,7 @@
                 </div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="refreshFolderFiles" on-previewfile="handlePreviewFile" folder="{{folder}}"
+                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" on-previewfile="handlePreviewFile" folder="{{folder}}"
                 files="{{files}}" mode="{{mode}}" disable-icon-view="{{disableIconView}}">
                 </stv-folder-list>
             </div>
@@ -255,13 +255,13 @@
             }
         },
         userDataChanged: function(neo, old) {
-            console.log(neo);
+            // console.log(neo);
             if (neo) {
                 this._setInitialSelection();
 
                 this.treeIndex = {};
                 this._createTreeIndex(this.treeIndex, this.userData.tree);
-                console.log(this.treeIndex);
+                // console.log(this.treeIndex);
             } else {
                 this.clean();
             }
@@ -382,11 +382,14 @@
             this.refreshFolderFiles(folderId);
         },
 
+        handleNeedRefresh: function(e) {
+            this.refreshFolderFiles(this.folder._id);
+        },
         handleUploadFile: function(e) {
             this.$.uploadFilePanel.hidden = !this.$.uploadFilePanel.hidden;
         },
         handleFileUploaded: function(e) {
-            this.refreshFolderFiles();
+            this.refreshFolderFiles(this.folder._id);
             this.$.uploadFilePanel.hidden = true;
         },
         handleLoading: function(e) {
@@ -401,6 +404,7 @@
             return true;
         },
         _getFilesInFolder: function(folderId, callback) {
+            // console.log(folderId);
             var me = this;
 
             var bfList = [];
