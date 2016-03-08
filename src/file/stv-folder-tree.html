@@ -1,0 +1,156 @@
+<!-- <link rel="import" href="stv-folder-tree.html"> -->
+
+<dom-module id="stv-folder-tree">
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            height: 100%;
+            width: 100%;
+            background-color: inherit;
+        }
+    </style>
+    <template>
+        <template is="dom-repeat" items="{{tree}}" as="file">
+            <stv-folder-tree-item file="{{file}}">
+            </stv-folder-tree-item>
+        </template>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-folder-tree",
+        properties: {
+            tree: {
+                type: Array,
+                observer: 'treeChanged'
+            }
+        },
+        treeChanged: function(neo, old) {
+            var openIndex = {};
+            if (old) {
+                for (var i = 0; i < old.length; i++) {
+                    this._createOpenIndex(openIndex, old[i]);
+                }
+            }
+            if (neo) {
+                for (var i = 0; i < neo.length; i++) {
+                    this._initFile(neo[i], null, openIndex);
+                }
+            }
+        },
+        _initFile: function(file, parent, openIndex) {
+            if (parent == null) {
+                file.path = file.n;
+            } else {
+                file.path = parent.path + '/' + file.n;
+                file.parent = parent;
+            }
+            file.open = openIndex[file.path] || false;
+            for (var i = 0; i < file.f.length; i++) {
+                this._initFile(file.f[i], file, openIndex);
+            }
+        },
+        _createOpenIndex: function(openIndex, file) {
+            if (openIndex[file.path] == null) {
+                openIndex[file.path] = file.open;
+                for (var i = 0; i < file.f.length; i++) {
+                    this._createOpenIndex(openIndex, file.f[i]);
+                }
+            }
+        }
+    });
+</script>
+
+<dom-module id="stv-folder-tree-item">
+    <style>
+        :host {
+            position: relative;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        .main {
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .main:hover {
+            background-color: var(--hover-color)
+        }
+
+        .name:before {
+            font-family: "FontAwesome";
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            content: '\f07b';
+        }
+
+        .arrow:before {
+            font-family: "FontAwesome";
+            display: inline-block;
+            width: 12px;
+            text-align: center;
+            content: '\f0da';
+        }
+
+        .arrow[open]:before {
+            content: '\f0d7';
+        }
+
+        .arrow[empty]:before {
+            content: '\00a0';
+        }
+
+        .arrow {
+            padding: 2px 0 2px 2px;
+        }
+
+        .name {
+            padding: 2px 2px 2px 0;
+        }
+    </style>
+    <template>
+        <div class="main horizontal layout stv-nosel">
+            <div class="arrow" empty$="{{isEmpty(file.f)}}" open$="{{file.open}}" on-click="handleArrowClick"></div>
+            <div class="name flex" on-click="handleClick" on-dblclick="handleDblclick">{{file.n}}</div>
+        </div>
+        <div style="margin-left:7px;" hidden$="{{!file.open}}">
+            <template is="dom-repeat" items="{{file.f}}" as="f">
+                <stv-folder-tree-item file="{{f}}">
+                </stv-folder-tree-item>
+            </template>
+        </div>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-folder-tree-item",
+        properties: {
+            file: {
+                type: Object
+            }
+        },
+        isEmpty: function(f) {
+            return f.length == 0;
+        },
+        handleArrowClick: function(e) {
+            this.toggleOpen();
+        },
+        handleDblclick: function(e) {
+            this.toggleOpen();
+        },
+        handleClick: function(e) {
+            this.fire('treeitemclick', {
+                _id: this.file._id
+            });
+        },
+        toggleOpen: function() {
+            if (this.file.f.length > 0) {
+                this.set('file.open', !this.file.open);
+            }
+        }
+    });
+</script>

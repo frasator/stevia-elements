@@ -1,6 +1,7 @@
 <link rel="import" href="stv-file-upload.html">
 <link rel="import" href="stv-folder-list.html">
 <link rel="import" href="stv-file-preview.html">
+<link rel="import" href="stv-folder-tree.html">
 
 
 <dom-module id="stv-file-browser">
@@ -58,6 +59,7 @@
         }
 
         #mainmenucontent {
+            position: relative;
             height: calc(100% - 30px);
             overflow-y: auto;
         }
@@ -116,7 +118,7 @@
             <div id="breadcrums" class="flex">
                 <b>/</b>
                 <template is="dom-repeat" items="{{folders}}">
-                    <span class="clickable" on-click="handleBreadcrumClick" folder="{{item}}">{{item.name}}</span>
+                    <span class="clickable" on-click="handleBreadcrumClick" folder="{{item}}">{{item.n}}</span>
                     <b>/</b>
                 </template>
 
@@ -135,7 +137,7 @@
                     </div>
                 </div>
                 <div id="mainmenucontent">
-                    <!-- TREE -->
+                    <stv-folder-tree tree="{{userData.tree}}" on-treeitemclick="handleTreeItemClick"></stv-folder-tree>
                 </div>
             </div>
             <div id="maincontent">
@@ -201,6 +203,12 @@
                     return []
                 }
             },
+            treeIndex: {
+                type: Object,
+                value: function() {
+                    return {}
+                }
+            },
             files: {
                 type: Array,
                 notify: true
@@ -250,8 +258,25 @@
             console.log(neo);
             if (neo) {
                 this._setInitialSelection();
+
+                this.treeIndex = {};
+                this._createTreeIndex(this.treeIndex, this.userData.tree);
+                console.log(this.treeIndex);
             } else {
                 this.clean();
+            }
+        },
+        _createTreeIndex: function(index, tree) {
+            var process = function(index, file) {
+                if (index[file.path] == null) {
+                    index[file.path] = file;
+                    for (var i = 0; i < file.f.length; i++) {
+                        process(index, file.f[i]);
+                    }
+                }
+            }
+            for (var i = 0; i < tree.length; i++) {
+                process(index, tree[i]);
             }
         },
         clean: function() {
@@ -260,6 +285,10 @@
             this.set('folders', []);
             this.set('files', []);
             this.set('loading', false);
+            // this.set('contentData', '');
+        },
+        reset: function() {
+            this.clean();
         },
         ready: function() {
             var me = this;
@@ -293,8 +322,8 @@
         },
         _setInitialSelection: function() {
             if (this._parentPanel != null && this._parentPanel.hidden === false) {
-                this.folder = (this.folder) ? this.folder : this.userData.home;
-                this.refreshFolderFiles();
+                var folderId = (this.folder) ? this.folder._id : this.userData.home._id
+                this.refreshFolderFiles(folderId);
             }
         },
         handleFileSelect: function(e) {
@@ -303,40 +332,54 @@
         },
         handleOpenFolder: function(e) {
             var me = this;
-            this.folder = e.detail;
-            this.push('folders', this.folder);
+            var folderId = e.detail._id;
             this.files = [];
-            this.refreshFolderFiles();
+            this.refreshFolderFiles(folderId);
         },
-        refreshFolderFiles: function() {
+        refreshFolderFiles: function(folderId) {
             var me = this;
-            this.loading = true;
-            this._getFilesInFolder(this.folder._id, function(files) {
-                me.files = files;
-                me.loading = false;
-                //                console.log(files);
+            this.set('loading', true);
+            this._getFilesInFolder(folderId, function(file) {
+                me.set('folder', file);
+                me.set('files', file.files);
+                me.set('loading', false);
+                me.refresFoldersPath();
             });
+        },
+        refresFoldersPath: function() {
+            var index = this.treeIndex;
+            var f = index[this.folder.path];
+            var folders = [];
+            while (f.parent != null) {
+                folders.push(f);
+                f = f.parent;
+            }
+            this.set('folders', folders.reverse());
         },
         handleBreadcrumClick: function(e) {
             var me = this;
-            this.folder = e.currentTarget.folder;
-
-            while (this.folder !== this.folders[this.folders.length - 1]) {
-                this.pop('folders');
-            }
+            var folderId = e.currentTarget.folder._id;
             this.files = [];
-            this.refreshFolderFiles();
+            this.refreshFolderFiles(folderId);
+        },
+        handleTreeItemClick: function(e) {
+            var me = this;
+            if (this.folder._id !== e.detail._id) {
+                this.loading = true;
+                this.refreshFolderFiles(e.detail._id);
+            }
         },
         handleBackFolder: function(e) {
             var me = this;
-            this.pop('folders');
-            this.files = [];
-            if (this.folders.length > 0) {
-                this.set('folder', this.folders[this.folders.length - 1]);
+            var folderId;
+            var idx = this.folders.length - 2;
+            if (this.folders.length > 0 && idx >= 0) {
+                folderId = this.folders[idx]._id;
             } else {
-                this.set('folder', this.userData.home);
+                folderId = this.userData.home._id;
             }
-            this.refreshFolderFiles();
+            this.files = [];
+            this.refreshFolderFiles(folderId);
         },
 
         handleUploadFile: function(e) {
@@ -348,14 +391,6 @@
         },
         handleLoading: function(e) {
             this.fire("loading")
-        },
-        reset: function() {
-            this.set('selectedFile', undefined);
-            this.set('folder', undefined);
-            this.set('folders', []);
-            this.set('files', []);
-            this.set('contentData', '');
-            this.set('loading', false);
         },
 
         /* Private methods */
@@ -395,8 +430,10 @@
                     async: true,
                     success: function(response) {
                         if (response.response[0].error == null) {
-                            var files = me._filterFiles(response.response[0].results);
-                            callback(files);
+                            var file = response.response[0].results[0];
+                            var files = me._filterFiles(file.files);
+                            file.files = files;
+                            callback(file);
                         } else {
                             console.log(response.response[0].error);
                         }

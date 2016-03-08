@@ -66,7 +66,7 @@
         loadPage: function() {
             var data;
             SteviaManager.files.content({
-                id: this.file.id,
+                id: this.file._id,
                 query: {
                     sid: Cookies('bioinfo_sid'),
                     limit: this._limit,
@@ -75,7 +75,8 @@
                 request: {
                     async: false,
                     success: function(response) {
-                        data = response;
+                        console.log(response.response[0].results[0]);
+                        data = response.response[0].results[0];
                     },
                     error: function() {
 
@@ -84,8 +85,7 @@
             });
 
             if (data) {
-                this.contentData =
-                    this.contentData = this.contentData + data;
+                this.contentData =this.contentData = this.contentData + data;
             } else {
                 this._end = true;
             }
