@@ -327,6 +327,7 @@
             }
         },
         handleFileSelect: function(e) {
+            console.log(e.detail.file);
             this.selectedFile = e.detail.file;
             this._checkCustomButtons();
         },
@@ -456,7 +457,7 @@
             }
 
             files.sort(function(a, b) {
-                return b.created_at.localeCompare(a.created_at);
+                return b.createdAt.localeCompare(a.createdAt);
             });
             var filesFiltered = [];
             for (var i = 0; i < files.length; i++) {

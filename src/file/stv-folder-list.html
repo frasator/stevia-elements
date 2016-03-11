@@ -269,7 +269,7 @@
             }
             this.fileBioformat = this.selected.bioformat;
 
-            var date = new Date(Date.parse(this.selected.created_at));
+            var date = new Date(Date.parse(this.selected.createdAt));
             this.fileDate = date.toLocaleString("en-us", {
                 month: "short"
             }) + " " + date.getDate() + ", " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();

@@ -59,10 +59,10 @@
         <div class="horizontal layout">
             <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
                 <div class="horizontal layout flex">
+                    <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
                     <template is="dom-if" if="{{hasJob(file)}}">
                         <div class="icon"><i class$="{{computeJobIcon(file.job)}}"></i></div>
                     </template>
-                    <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
                     <div class="name flex" title$="{{file.name}}">{{file.name}}</div>
                 </div>
                 <div class="creationDate">{{computeDate(file)}}</div>
@@ -91,14 +91,14 @@
             }
         },
         computeDate: function(file) {
-            var date = new Date(Date.parse(file.created_at));
+            var date = new Date(Date.parse(file.createdAt));
             return date.toLocaleString("en-us", {
                 month: "short"
             }) + " " + date.getDate() + ", " + date.getFullYear();
         },
         computeIcon: function(file) {
             if (file.job != null) {
-                return 'fa fa-folder-o';
+                return 'fa fa-flask';
             }
             var iconMap = {
                 "FOLDER": 'fa fa-folder',

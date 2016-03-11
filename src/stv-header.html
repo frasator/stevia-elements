@@ -448,10 +448,10 @@
         },
         getUserInfo: function(force) {
             var me = this;
-            var updated_at = null;
+            var updatedAt = null;
             if (force != true) {
                 if (this.userData != null) {
-                    updated_at = this.userData.updated_at;
+                    updatedAt = this.userData.updatedAt;
                 }
             }
             var user = Cookies('bioinfo_user');
@@ -463,7 +463,7 @@
                     id: user,
                     query: {
                         sid: Cookies('bioinfo_sid'),
-                        updated_at: updated_at
+                        updatedAt: updatedAt
                     },
                     request: {
                         success: function(response) {

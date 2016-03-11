@@ -157,7 +157,7 @@ var Utils = {
         return validated;
     },
     getUrl: function (fileId) {
-        return OpencgaManager.files.download({
+        return SteviaManager.files.download({
             id: fileId,
             query: {
                 sid: Cookies("bioinfo_sid")
@@ -168,7 +168,7 @@ var Utils = {
         });
     },
     getFileContent: function (callback, fileId) {
-        OpencgaManager.files.content({
+        SteviaManager.files.content({
             id: fileId,
             query: {
                 sid: Cookies("bioinfo_sid")
@@ -186,7 +186,7 @@ var Utils = {
     loadExampleFile: function (callback, toolName, exampleFileName) {
 
         var me = this;
-        OpencgaManager.files.contentExample({
+        SteviaManager.files.contentExample({
             query: {
                 toolName: toolName,
                 fileName: exampleFileName
@@ -205,7 +205,7 @@ var Utils = {
         })
     },
     downloadExampleFile: function (toolName, fileName) {
-        var url = OpencgaManager.files.downloadExample({
+        var url = SteviaManager.files.downloadExample({
             query: {
                 toolName: toolName,
                 fileName: fileName
@@ -344,8 +344,8 @@ var Utils = {
             }
             commandObject[name] = value;
             /* clean values for viz*/
-            value = value.replace(/\/httpd\/bioinfo\/opencga\/analysis\/.+\/examples\//, '');
-            value = value.replace('/httpd/bioinfo/opencga/accounts/', '');
+            value = value.replace(/\/httpd\/bioinfo\/stevia\/analysis\/.+\/examples\//, '');
+            value = value.replace('/httpd/bioinfo/stevia/accounts/', '');
             value = value.replace(/,/g, ", ");
 
             tableHtml += '<tr style="border-collapse: collapse;border:1px solid #ccc;">';
