@@ -5,7 +5,6 @@
             position: relative;
             display: block;
             box-sizing: border-box;
-
             transition: all 0.2s;
             background-color: inherit;
             width: 600px;
@@ -65,7 +64,7 @@
                 <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="running" data-checked$="{{computeView(view, 'running')}}" title="Running">
                     <i class="fa fa-circle-o-notch" style="color: #298c63;"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="ready" data-checked$="{{computeView(view, 'ready')}}" title="Ready">
+                <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="done" data-checked$="{{computeView(view, 'done')}}" title="Ready">
                     <i class="fa fa-check" style="color:#0068cc;"></i>
                 </div>
                 <div id="errorBtn" class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="error" data-checked$="{{computeView(view, 'error')}}" title="Error">
@@ -152,19 +151,17 @@
         },
         handleSelect: function(e) {
             e.stopPropagation();
-            this.selected = e.currentTarget.job;
-
-            if (this.selected.status === "ERROR") {
-                e.currentTarget._checkShowError();
+            var job = e.currentTarget.job;
+            if (job.status === 'DONE') {
+                this.selected = job;
+                var sel = this.querySelector("stv-job-item[selected]");
+                if (sel) {
+                    sel.removeAttribute('selected');
+                }
+                e.currentTarget.setAttribute('selected', '');
+                console.log(this.selected);
+                this.fire('jobselect', this.selected);
             }
-
-            var sel = this.querySelector("stv-job-item[selected]");
-            if (sel) {
-                sel.removeAttribute('selected');
-            }
-            e.currentTarget.setAttribute('selected', '');
-            console.log(this.selected);
-            this.fire('jobselect', this.selected);
         },
         checkFolder: function(folder) {
             return folder == null;
@@ -175,10 +172,16 @@
         userDataChanged: function(neo, old) {
             if (neo) {
                 this.set('jobs', neo.jobs);
+            } else {
+                this.clean();
             }
         },
+        clean: function() {
+            this.set('jobs', []);
+            this.set('filteredJobs', []);
+            this.set('selected', null);
+        },
         jobsChanged: function(neo, old) {
-
             var me = this;
 
             //Para que desaparezca el filtro de error cuando no hay errores
@@ -211,7 +214,7 @@
                     if (item.tool === me.toolFilterValue) {
                         return true;
                     }
-                    if(item.execution === me.toolFilterValue){
+                    if (item.execution === me.toolFilterValue) {
                         return true;
                     }
                     if (item.tool + '.' + item.execution === me.toolFilterValue) {
@@ -219,7 +222,6 @@
                     }
                 });
             }
-
             var statusFilterJobs = this._filterByStatus(jobs);
             this.set('filteredJobs', statusFilterJobs);
 
@@ -247,8 +249,8 @@
             this.view = e.currentTarget.dataset.value;
             var jobItems = document.getElementsByClassName('jobItem');
             for (var i = 0; i < jobItems.length; i++) {
-                if (jobItems[i].$.fileInfo.hidden == false) {
-                    jobItems[i].handleViewChange();
+                if (jobItems[i].showInfo == true) {
+                    jobItems[i].showInfo = false;
                 }
             }
         },
@@ -266,8 +268,12 @@
 
             for (var i = 0; i < filteredJobs.length; i++) {
                 var job = filteredJobs[i];
+                var status = job.status.toLowerCase();
+                if (status.indexOf('error') != -1) {
+                    status = 'error';
+                }
 
-                if (job.status.toLowerCase() === this.view) {
+                if (status === this.view) {
                     jobs.push(job);
                 }
             }

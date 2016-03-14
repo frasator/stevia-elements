@@ -104,7 +104,6 @@
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {
-                                var userId = response.response[0].results[0].id;
                                 me.message = 'An email was sent with reset password instructions';
                             } else {
                                 me.message = response.response[0].error;

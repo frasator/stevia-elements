@@ -411,10 +411,7 @@
             this.$.stvLogin._login();
         },
         anonymousSign: function() {
-            this.$.stvSignup.user = "anonymous" + Utils.randomString(40);
-            this.$.stvSignup.name = "anonymous";
             this.$.stvSignup.email = "anonymous@anonymous.anonymous";
-            this.$.stvSignup.organization = "none";
             this.$.stvSignup.password = "anonymous";
             this.$.stvSignup._signup();
         },
@@ -506,7 +503,7 @@
             }
         },
         _checkUserName: function(userData) {
-            if (userData.email === 'anonymous@anonymous.anonymous') {
+            if (userData.email.indexOf('anonymous___') != -1) {
                 return 'anonymous';
             } else {
                 return userData.email;

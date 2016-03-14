@@ -24,12 +24,9 @@
     Polymer({
         is: "stv-file-preview",
         properties: {
-            file: {
-                type: Object,
-                value: function() {
-                    return null;
-                },
-                observer: 'fileChanged'
+            fileId: {
+                type: String,
+                observer: 'fileIdChanged'
             },
             contentData: {
                 type: String,
@@ -66,7 +63,7 @@
         loadPage: function() {
             var data;
             SteviaManager.files.content({
-                id: this.file._id,
+                id: this.fileId,
                 query: {
                     sid: Cookies('bioinfo_sid'),
                     limit: this._limit,
@@ -75,7 +72,7 @@
                 request: {
                     async: false,
                     success: function(response) {
-                        console.log(response.response[0].results[0]);
+                        // console.log(response.response[0].results[0]);
                         data = response.response[0].results[0];
                     },
                     error: function() {
@@ -100,9 +97,9 @@
                 }
             }
         },
-        fileChanged: function(neo, old) {
+        fileIdChanged: function(neo, old) {
+            this._clear();
             if (neo != null) {
-                this._clear();
                 this.loadPage();
             }
         },
