@@ -5,7 +5,6 @@
             position: relative;
             display: block;
             box-sizing: border-box;
-
             transition: all 0.2s;
             background-color: inherit;
             width: 600px;
@@ -153,7 +152,7 @@
         handleSelect: function(e) {
             e.stopPropagation();
             var job = e.currentTarget.job;
-            if(job.status === 'DONE'){
+            if (job.status === 'DONE') {
                 this.selected = job;
                 var sel = this.querySelector("stv-job-item[selected]");
                 if (sel) {
@@ -173,10 +172,16 @@
         userDataChanged: function(neo, old) {
             if (neo) {
                 this.set('jobs', neo.jobs);
+            } else {
+                this.clean();
             }
         },
+        clean: function() {
+            this.set('jobs', []);
+            this.set('filteredJobs', []);
+            this.set('selected', null);
+        },
         jobsChanged: function(neo, old) {
-
             var me = this;
 
             //Para que desaparezca el filtro de error cuando no hay errores
@@ -209,7 +214,7 @@
                     if (item.tool === me.toolFilterValue) {
                         return true;
                     }
-                    if(item.execution === me.toolFilterValue){
+                    if (item.execution === me.toolFilterValue) {
                         return true;
                     }
                     if (item.tool + '.' + item.execution === me.toolFilterValue) {
