@@ -113,7 +113,7 @@
                     success: function(response) {
                         if (response.response[0].error == null) {
                             var email = response.response[0].results[0].email;
-                            me.message = email + ' created';
+                            // me.message = email + ' created';
                             Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id);
                             Cookies.set('bioinfo_user', email);
 

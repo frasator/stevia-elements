@@ -14,7 +14,18 @@
             background-color: #ccc;
         }
 
-        .name {
+        #name {
+            width: calc(100% - 80px);
+        }
+
+        #creationDate {
+            color: #444;
+            width: 80px;
+            text-align: center;
+        }
+
+        .filename {
+            width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -22,12 +33,6 @@
 
         .icon {
             padding: 0 5px 0 2px;
-        }
-
-        .creationDate {
-            color: #444;
-            width: 80px;
-            text-align: center;
         }
 
         #status {
@@ -56,24 +61,24 @@
         }
     </style>
     <template>
-        <div class="horizontal layout">
-            <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
-                <div class="horizontal layout flex">
+        <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
+            <div id="list" class="horizontal layout">
+                <div id="name" class="horizontal layout">
                     <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
                     <template is="dom-if" if="{{hasJob(file)}}">
                         <div class="icon"><i class$="{{computeJobIcon(file.job)}}"></i></div>
                     </template>
-                    <div class="name flex" title$="{{file.name}}">{{file.name}}</div>
+                    <div class="filename" title$="{{file.name}}">{{file.name}}</div>
                 </div>
-                <div class="creationDate">{{computeDate(file)}}</div>
-            </template>
-            <template is="dom-if" if="{{computeViewMode(viewMode, 'icon')}}">
-                <div class="vertical layout flex icon-mode-elem" title$="{{file.name}}">
-                    <div class="icon huge-icon"><i class$="{{computeIcon(file)}}"></i></div>
-                    <div class="name flex">{{file.name}}</div>
-                </div>
-            </template>
-        </div>
+                <div id="creationDate">{{computeDate(file)}}</div>
+            </div>
+        </template>
+        <template is="dom-if" if="{{computeViewMode(viewMode, 'icon')}}">
+            <div class="vertical layout flex icon-mode-elem" title$="{{file.name}}">
+                <div class="icon huge-icon"><i class$="{{computeIcon(file)}}"></i></div>
+                <div class="name flex">{{file.name}}</div>
+            </div>
+        </template>
     </template>
 </dom-module>
 <script>
@@ -107,8 +112,8 @@
             return iconMap[file.type];
         },
         computeJobIcon: function(job) {
-            if(job){
-                if(job.status.indexOf('ERROR') != -1){
+            if (job) {
+                if (job.status.indexOf('ERROR') != -1) {
                     return 'fa fa-times';
                 }
                 var iconMap = {
