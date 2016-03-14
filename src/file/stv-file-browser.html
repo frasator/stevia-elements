@@ -501,7 +501,7 @@
         },
         handlePreviewFile: function(e) {
             this.$.filePreviewPanel.show();
-            this.$.filePreview.file = this.selectedFile;
+            this.$.filePreview.fileId = this.selectedFile._id;
         },
         _checkCustomButtons: function() {
             var els = this.$.botbar.querySelectorAll('.custom-button');

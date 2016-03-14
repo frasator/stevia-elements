@@ -65,7 +65,7 @@
                 <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="running" data-checked$="{{computeView(view, 'running')}}" title="Running">
                     <i class="fa fa-circle-o-notch" style="color: #298c63;"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="ready" data-checked$="{{computeView(view, 'ready')}}" title="Ready">
+                <div class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="done" data-checked$="{{computeView(view, 'done')}}" title="Ready">
                     <i class="fa fa-check" style="color:#0068cc;"></i>
                 </div>
                 <div id="errorBtn" class="stv-btn stv-btn-shdw file" on-click="handleView" data-value="error" data-checked$="{{computeView(view, 'error')}}" title="Error">
@@ -152,19 +152,17 @@
         },
         handleSelect: function(e) {
             e.stopPropagation();
-            this.selected = e.currentTarget.job;
-
-            if (this.selected.status === "ERROR") {
-                e.currentTarget._checkShowError();
+            var job = e.currentTarget.job;
+            if(job.status === 'DONE'){
+                this.selected = job;
+                var sel = this.querySelector("stv-job-item[selected]");
+                if (sel) {
+                    sel.removeAttribute('selected');
+                }
+                e.currentTarget.setAttribute('selected', '');
+                console.log(this.selected);
+                this.fire('jobselect', this.selected);
             }
-
-            var sel = this.querySelector("stv-job-item[selected]");
-            if (sel) {
-                sel.removeAttribute('selected');
-            }
-            e.currentTarget.setAttribute('selected', '');
-            console.log(this.selected);
-            this.fire('jobselect', this.selected);
         },
         checkFolder: function(folder) {
             return folder == null;
@@ -219,7 +217,6 @@
                     }
                 });
             }
-
             var statusFilterJobs = this._filterByStatus(jobs);
             this.set('filteredJobs', statusFilterJobs);
 
