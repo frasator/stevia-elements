@@ -117,8 +117,8 @@
                             <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{disableRelaunch}}"></i>
                             <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i>
-                            <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i>
-                            <i class="fa fa-envelope-o" title="Report Error" hidden$="{{showError}}"></i> -->
+                            <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
+                            <i class="fa fa-bug" title="Report Error" hidden$="{{showError}}" on-click="handleReportError"></i>
                         </template>
                     </div>
                 </div>
@@ -281,6 +281,28 @@
             e.stopPropagation();
             this.$.filePreview.fileId = this.job.elog;
             this.$.filePreviewPanel.show();
+        },
+        handleReportError: function(e) {
+            e.stopPropagation();
+            var jobId = this.job._id;
+            SteviaManager.jobs.reportError({
+                id: jobId,
+                query: {
+                    sid: Cookies('bioinfo_sid')
+                },
+                request: {
+                    success: function(response) {
+                        if (response.response[0].error == null) {
+                            alert(response.response[0].results[0]);
+                        } else {
+                            alert('Sorry! There was a problem, try again later');
+                        }
+                    },
+                    error: function() {
+                        console.log('Server error, try again later');
+                    }
+                }
+            });
         }
     });
 </script>
