@@ -344,6 +344,7 @@
                 me.set('folder', file);
                 me.set('files', file.files);
                 me.set('loading', false);
+                me.$.folderList.set('selected', null);
                 me.refresFoldersPath();
             });
         },

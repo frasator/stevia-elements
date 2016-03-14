@@ -248,6 +248,11 @@
             }
         },
         selectedChanged: function(neo, old) {
+            this.fileName = "";
+            this.fileType = "";
+            this.fileBioformat = "";
+            this.fileDate = "";
+
             var sel = this.querySelector("stv-folder-list-item[selected]");
             if (sel) {
                 sel.removeAttribute('selected');
