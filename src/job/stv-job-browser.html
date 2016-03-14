@@ -5,7 +5,6 @@
             position: relative;
             display: block;
             box-sizing: border-box;
-
             transition: all 0.2s;
             background-color: inherit;
             width: 600px;
@@ -153,7 +152,7 @@
         handleSelect: function(e) {
             e.stopPropagation();
             var job = e.currentTarget.job;
-            if(job.status === 'DONE'){
+            if (job.status === 'DONE') {
                 this.selected = job;
                 var sel = this.querySelector("stv-job-item[selected]");
                 if (sel) {
@@ -209,7 +208,7 @@
                     if (item.tool === me.toolFilterValue) {
                         return true;
                     }
-                    if(item.execution === me.toolFilterValue){
+                    if (item.execution === me.toolFilterValue) {
                         return true;
                     }
                     if (item.tool + '.' + item.execution === me.toolFilterValue) {
@@ -244,8 +243,8 @@
             this.view = e.currentTarget.dataset.value;
             var jobItems = document.getElementsByClassName('jobItem');
             for (var i = 0; i < jobItems.length; i++) {
-                if (jobItems[i].$.fileInfo.hidden == false) {
-                    jobItems[i].handleViewChange();
+                if (jobItems[i].showInfo == true) {
+                    jobItems[i].showInfo = false;
                 }
             }
         },
@@ -263,8 +262,12 @@
 
             for (var i = 0; i < filteredJobs.length; i++) {
                 var job = filteredJobs[i];
+                var status = job.status.toLowerCase();
+                if (status.indexOf('error') != -1) {
+                    status = 'error';
+                }
 
-                if (job.status.toLowerCase() === this.view) {
+                if (status === this.view) {
                     jobs.push(job);
                 }
             }
