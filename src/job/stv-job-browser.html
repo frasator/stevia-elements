@@ -172,10 +172,16 @@
         userDataChanged: function(neo, old) {
             if (neo) {
                 this.set('jobs', neo.jobs);
+            } else {
+                this.clean();
             }
         },
+        clean: function() {
+            this.set('jobs', []);
+            this.set('filteredJobs', []);
+            this.set('selected', null);
+        },
         jobsChanged: function(neo, old) {
-
             var me = this;
 
             //Para que desaparezca el filtro de error cuando no hay errores
