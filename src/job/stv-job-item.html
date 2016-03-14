@@ -118,19 +118,17 @@
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{disableRelaunch}}"></i>
                             <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i>
                             <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
-                            <i class="fa fa-bug" title="Report Error" hidden$="{{showError}}" on-click="handleReportError"></i>
+                            <i class="fa fa-bug" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
                         </template>
                     </div>
                 </div>
             </div>
-            <template is="dom-if" if="{{showInfo}}">
-                <div id="fileInfo" class="vertical layout flex">
-                    <div class="horizontal layout">
-                        <span class="data">Description:&nbsp;</span>
-                        <span class="value">{{job.description}}</span>
-                    </div>
+            <div id="fileInfo" class="vertical layout flex" hidden="{{!showInfo}}">
+                <div class="horizontal layout">
+                    <span class="data">Description:&nbsp;</span>
+                    <span class="value">{{job.description}}</span>
                 </div>
-            </template>
+            </div>
             <stv-panel modal fixed closable hidden id="filePreviewPanel">
                 <div class="header">
                     <i class="fa fa-eye"></i> File Preview
@@ -151,12 +149,6 @@
             showInfo: {
                 type: Boolean,
                 value: false
-            },
-            errorFiles: {
-                type: Object,
-                value: function() {
-                    return {};
-                }
             },
             contentData: {
                 type: String,

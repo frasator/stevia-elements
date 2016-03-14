@@ -249,8 +249,8 @@
             this.view = e.currentTarget.dataset.value;
             var jobItems = document.getElementsByClassName('jobItem');
             for (var i = 0; i < jobItems.length; i++) {
-                if (jobItems[i].$.fileInfo.hidden == false) {
-                    jobItems[i].handleViewChange();
+                if (jobItems[i].showInfo == true) {
+                    jobItems[i].showInfo = false;
                 }
             }
         },
@@ -268,8 +268,12 @@
 
             for (var i = 0; i < filteredJobs.length; i++) {
                 var job = filteredJobs[i];
+                var status = job.status.toLowerCase();
+                if (status.indexOf('error') != -1) {
+                    status = 'error';
+                }
 
-                if (job.status.toLowerCase() === this.view) {
+                if (status === this.view) {
                     jobs.push(job);
                 }
             }
