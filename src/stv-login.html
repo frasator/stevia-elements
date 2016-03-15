@@ -138,8 +138,8 @@
                 request: {
                     success: function(response) {
                         if(response.response[0].error == null){
-                            Cookies.set('bioinfo_sid', response.response[0].results[0].id);
-                            Cookies.set('bioinfo_user', me.email);
+                            Cookies.set('bioinfo_sid', response.response[0].results[0].id,{path:window.location.pathname});
+                            Cookies.set('bioinfo_user', me.email,{path:window.location.pathname});
                             me.fire('login', {
                                 status: true
                             });
@@ -152,8 +152,8 @@
                     },
                     error: function(response) {
                         //Delete all cookies
-                        Cookies.expire('bioinfo_sid');
-                        Cookies.expire('bioinfo_user');
+                        Cookies.expire('bioinfo_sid',{path:window.location.pathname});
+                        Cookies.expire('bioinfo_user',{path:window.location.pathname});
                         me.message = response.error.split(":")[1];
                         if (response.errorEvent) {
                             me.message = 'Server error, try again later.';

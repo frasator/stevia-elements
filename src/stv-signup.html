@@ -114,8 +114,8 @@
                         if (response.response[0].error == null) {
                             var email = response.response[0].results[0].email;
                             // me.message = email + ' created';
-                            Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id);
-                            Cookies.set('bioinfo_user', email);
+                            Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id,{path:window.location.pathname});
+                            Cookies.set('bioinfo_user', email,{path:window.location.pathname});
 
                             me.clean();
 
@@ -126,8 +126,8 @@
                             console.log(response.response[0].error);
                             me.message = response.response[0].error;
                             //Delete cookies
-                            Cookies.expire('bioinfo_sid');
-                            Cookies.expire('bioinfo_user');
+                            Cookies.expire('bioinfo_sid',{path:window.location.pathname});
+                            Cookies.expire('bioinfo_user',{path:window.location.pathname});
                         }
                     },
                     error: function() {

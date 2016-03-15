@@ -14,10 +14,11 @@
             /*right: 0;*/
             /*margin: 0px auto 0px auto;*/
             height: 100%;
+          width:  100%;
             transition: all 0.2s;
             background-color: inherit;
-            width: 650px;
-            height: 400px;
+            /*width: 650px;*/
+            /*height: 400px;*/
         }
 
         #topbar,
@@ -50,22 +51,21 @@
             border-right: 1px solid rgba(130, 130, 130, 0.4);
         }
 
-    #mainmenu > .resizer {
-      width: 2px;
-      height: 100%;
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      cursor: col-resize;
-      display: none;
-    }
+        #mainmenu > .resizer {
+            width: 2px;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            cursor: col-resize;
+            display: none;
+        }
 
-    #mainmenu:hover > .resizer {
-      display: inherit;
-      background-color: #E1E3E5;
-      border-left: 1px solid #DDD;
-    }
-
+        #mainmenu:hover > .resizer {
+            display: inherit;
+            background-color: #E1E3E5;
+            border-left: 1px solid #DDD;
+        }
 
         #mainmenubar {
             box-sizing: border-box;
@@ -75,13 +75,11 @@
             border-bottom: 1px solid rgba(125, 125, 125, 0.5);
         }
 
-
-
         #mainmenucontent {
             position: relative;
             height: calc(100% - 30px);
             overflow-y: auto;
-            width:100%;
+            width: 100%;
         }
 
         #maincontent {
@@ -158,7 +156,7 @@
                 <div id="mainmenucontent">
                     <stv-folder-tree tree="{{userData.tree}}" on-treeitemclick="handleTreeItemClick"></stv-folder-tree>
                 </div>
-            <div class="resizer" id="mainmenuresizer"></div>
+                <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
                 <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" on-previewfile="handlePreviewFile" folder="{{folder}}"
@@ -325,41 +323,32 @@
                 el.setAttribute('hidden', '');
             }
 
+            var resizer = this.$.mainmenuresizer;
+            var mainmenu = this.$.mainmenu;
 
-                  var resizer = this.$.mainmenuresizer;
-                  var mainmenu = this.$.mainmenu;
+            var startX, startWidth;
 
-                  var startX, startWidth;
+            function initDrag(e) {
+                startX = e.clientX;
+                startWidth = parseInt(document.defaultView.getComputedStyle(mainmenu).width, 10);
+                document.documentElement.addEventListener('mousemove', doDrag, false);
+                document.documentElement.addEventListener('mouseup', stopDrag, false);
+            }
 
-                  function initDrag(e) {
-                    startX = e.clientX;
-                    startWidth = parseInt(document.defaultView.getComputedStyle(mainmenu).width, 10);
-                    document.documentElement.addEventListener('mousemove', doDrag, false);
-                    document.documentElement.addEventListener('mouseup', stopDrag, false);
-                  }
+            function doDrag(e) {
+                var dif = e.clientX - startX;
 
-                  function doDrag(e) {
-                    mainmenu.style.width = (startWidth + e.clientX - startX) + 'px';
-                  }
+                mainmenu.style.width = (startWidth + dif) + 'px';
+                me.$.maincontent.style.width = "calc(100% - " + mainmenu.style.width + ")";
+                me.$.maincontent.style.left = mainmenu.style.width;
+            }
 
-                  function stopDrag(e) {
+            function stopDrag(e) {
+                document.documentElement.removeEventListener('mousemove', doDrag, false);
+                document.documentElement.removeEventListener('mouseup', stopDrag, false);
+            }
 
-
-                    document.documentElement.removeEventListener('mousemove', doDrag, false);
-                    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-
-                    var dif = e.clientX - startX;
-
-                    mainmenu.style.width = (startWidth + dif) + 'px';
-                    me.$.maincontent.style.width = "calc(100% - " + mainmenu.style.width + ")";
-                    me.$.maincontent.style.left = mainmenu.style.width;
-                    // me.$.maincontent.style.left = "1px";
-                    // elem._column.width = (startWidth + dif);
-                  }
-
-                  resizer.addEventListener('mousedown', initDrag, false);
-
-
+            resizer.addEventListener('mousedown', initDrag, false);
         },
         checkFileModeOk: function(mode, selectedFile) {
             if (this.enableSelectOk == true) {

@@ -435,8 +435,8 @@
             this.showJobs = false;
             this.selectedOption = 'home';
             this.isLogged = false;
-            Cookies.expire('bioinfo_sid');
-            Cookies.expire('bioinfo_user');
+            Cookies.expire('bioinfo_sid',{path:window.location.pathname});
+            Cookies.expire('bioinfo_user',{path:window.location.pathname});
 
             /**END CHECK**/
             clearInterval(this.userInfoInterval);
