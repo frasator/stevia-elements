@@ -227,7 +227,8 @@
                 var query = {
                     sid: Cookies("bioinfo_sid"),
                     name: this.job.name,
-                    description: this.job.description
+                    description: this.job.description,
+                    outdirId:this.job.folder.parent
                 };
                 var jobConfig = {};
                 jobConfig.options = this.job.options;
