@@ -261,6 +261,11 @@
                     reflectToAttribute: true,
                     value: false
                 },
+                resizable: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
                 modal: {
                     type: Boolean,
                     reflectToAttribute: true,
@@ -320,8 +325,8 @@
                     child._parentPanel = this;
                 }
 
-
                 //resizer
+                if (this.resizable!=null && this.resizable==true) {
                 var resizerNW = this.$.resizerNW;
                 var resizerNE = this.$.resizerNE;
                 var resizerSW = this.$.resizerSW;
@@ -370,7 +375,7 @@
                             me.style.left = (leftStart + (e.clientX - startX)) + 'px';
                         }
                     } else if (mode == "sw") {
-                      var currentWidth = (startWidth - (e.clientX - startX));
+                        var currentWidth = (startWidth - (e.clientX - startX));
                         if (currentWidth > startMinWidth) {
                             me.style.height = (startHeight + e.clientY - startY) + 'px';
                             me.style.width = currentWidth + 'px';
@@ -388,7 +393,7 @@
                 resizerNE.addEventListener('mousedown', initDrag, false);
                 resizerSW.addEventListener('mousedown', initDrag, false);
                 resizerSE.addEventListener('mousedown', initDrag, false);
-
+                }
             },
             hiddenChanged: function(neo, old) {
                 // check if is not hidden
