@@ -11,7 +11,8 @@
         }
 
         stv-file-bioformat {
-            height: 150px;
+            /*height: 150px;*/
+            margin-bottom:15px;
         }
 
         .uploadbar {
@@ -64,7 +65,7 @@
                 <label class="stv">File path:</label>
                 <div>
                     /
-                    <span>{{selectedFolder.name}}</span>
+                    <span>{{selectedFolder.path}}</span>
                 </div>
                 <br>
                 <div hidden$="{{hideBioformats}}">

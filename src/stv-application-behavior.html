@@ -176,11 +176,17 @@
             if (this.$.stvHeader != null) {
                 for (var i = 0; i < menuButtons.length; i++) {
                     var elem = menuButtons[i];
+                    var panel = this.$[elem.dataset.panel];
                     if (!this.$.stvHeader.isLogged) {
                         elem.hidden = true;
+                        if(panel != null){
+                            panel.hide();
+                        }
                     } else {
                         elem.hidden = false;
                     }
+                    /*panels*/
+                    console.log(panel);
                 }
             }
 

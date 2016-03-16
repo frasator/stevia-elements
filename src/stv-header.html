@@ -198,10 +198,6 @@
                     <span class="option-text">{{userText}}</span>
                 </div>
 
-                <div title="Upload" id="projects" data-option="projects" on-click="handleMenu" hidden$="{{computeBrowse(hideBrowse, hideLogin, isLogged)}}">
-                    <span class="option-text"> upload </span>
-                </div>
-
                 <div title="Profile" id="profile" data-option="profile" on-click="handleMenu" hidden$="{{computeProfile(userText, hideSignup, hideLogin, isLogged)}}">
                     <i class="fa fa-user"></i>
                     <span class="option-text"> profile </span>
@@ -274,15 +270,6 @@
                 value: false,
                 reflectToAttribute: true
             },
-            hideBrowse: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-            showJobs: {
-                type: Boolean,
-                value: true
-            },
             userData: {
                 type: Object,
                 notify: true
@@ -313,12 +300,6 @@
 
         computeUser: function(hideLogin, isLogged) {
             if (hideLogin) {
-                return true;
-            }
-            return !isLogged
-        },
-        computeBrowse: function(hideBrowse, hideLogin, isLogged) {
-            if (hideLogin || hideBrowse) {
                 return true;
             }
             return !isLogged
@@ -385,9 +366,6 @@
                 this.selectedOption = option;
             }
         },
-        handleJobClick: function(e) {
-            this.showJobs = !this.showJobs;
-        },
         handleLogoutClick: function(e) {
             this.sessionFinished();
         },
@@ -432,7 +410,6 @@
         sessionFinished: function(e) {
             this.logout();
             this.userData = null;
-            this.showJobs = false;
             this.selectedOption = 'home';
             this.isLogged = false;
             Cookies.expire('bioinfo_sid',{path:window.location.pathname});

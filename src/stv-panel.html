@@ -21,6 +21,11 @@
             position: fixed;
         }
 
+        :host[collapsed] {
+            height: 32px !important;
+            min-height: 32px !important;
+        }
+
         #loading {
             width: 100%;
             height: 100%;
@@ -320,7 +325,6 @@
                     child._parentPanel = this;
                 }
 
-
                 //resizer
                 var resizerNW = this.$.resizerNW;
                 var resizerNE = this.$.resizerNE;
@@ -370,7 +374,7 @@
                             me.style.left = (leftStart + (e.clientX - startX)) + 'px';
                         }
                     } else if (mode == "sw") {
-                      var currentWidth = (startWidth - (e.clientX - startX));
+                        var currentWidth = (startWidth - (e.clientX - startX));
                         if (currentWidth > startMinWidth) {
                             me.style.height = (startHeight + e.clientY - startY) + 'px';
                             me.style.width = currentWidth + 'px';

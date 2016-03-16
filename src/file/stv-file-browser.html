@@ -14,7 +14,7 @@
             /*right: 0;*/
             /*margin: 0px auto 0px auto;*/
             height: 100%;
-          width:  100%;
+            width: 100%;
             transition: all 0.2s;
             background-color: inherit;
             /*width: 650px;*/
@@ -159,8 +159,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" on-previewfile="handlePreviewFile" folder="{{folder}}"
-                files="{{files}}" mode="{{mode}}" disable-icon-view="{{disableIconView}}">
+                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" on-previewfile="handlePreviewFile" folder="{{folder}}" files="{{files}}" mode="{{mode}}" disable-icon-view="{{disableIconView}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -180,7 +179,6 @@
             </div>
             <stv-file-upload class="container" id="uploadFile" on-file-uploaded="handleFileUploaded" selected-folder="{{folder}}" bioformats="{{bioformats}}"></stv-file-upload>
         </stv-panel>
-
 
         <stv-panel modal closable hidden id="filePreviewPanel">
             <div class="header">
@@ -352,10 +350,10 @@
         },
         checkFileModeOk: function(mode, selectedFile) {
             if (this.enableSelectOk == true) {
-                if (mode === 'file' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FILE') {
+                if (mode === 'file' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FILE') {
                     return true;
                 }
-                if (mode === 'folder' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FOLDER') {
+                if (mode === 'folder' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FOLDER') {
                     return true;
                 }
             }
