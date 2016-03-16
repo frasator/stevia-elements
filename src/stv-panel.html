@@ -266,6 +266,11 @@
                     reflectToAttribute: true,
                     value: false
                 },
+                resizable: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
                 modal: {
                     type: Boolean,
                     reflectToAttribute: true,
@@ -326,6 +331,7 @@
                 }
 
                 //resizer
+                if (this.resizable!=null && this.resizable==true) {
                 var resizerNW = this.$.resizerNW;
                 var resizerNE = this.$.resizerNE;
                 var resizerSW = this.$.resizerSW;
@@ -392,7 +398,7 @@
                 resizerNE.addEventListener('mousedown', initDrag, false);
                 resizerSW.addEventListener('mousedown', initDrag, false);
                 resizerSE.addEventListener('mousedown', initDrag, false);
-
+                }
             },
             hiddenChanged: function(neo, old) {
                 // check if is not hidden
