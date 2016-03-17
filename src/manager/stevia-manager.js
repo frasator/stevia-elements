@@ -3,74 +3,74 @@ var SteviaManager = {
     version: (typeof window.STEVIA_SERVER_VERSION === 'undefined') ? 'v1' : window.STEVIA_SERVER_VERSION,
 
     users: {
-        login: function(args) {
+        login: function (args) {
             return SteviaManager._doRequest(args, 'users', 'login');
         },
-        logout: function(args) {
+        logout: function (args) {
             return SteviaManager._doRequest(args, 'users', 'logout');
         },
-        read: function(args) {
+        read: function (args) {
             return SteviaManager._doRequest(args, 'users', 'info');
         },
-        update: function(args) {
+        update: function (args) {
             return SteviaManager._doRequest(args, 'users', 'update');
         },
-        updateEmail: function(args) {
+        updateEmail: function (args) {
             return SteviaManager._doRequest(args, 'users', 'change-email');
         },
-        updatePassword: function(args) {
+        updatePassword: function (args) {
             return SteviaManager._doRequest(args, 'users', 'change-password');
         },
-        resetPassword: function(args) {
+        resetPassword: function (args) {
             return SteviaManager._doRequest(args, 'users', 'reset-password');
         },
-        create: function(args) {
+        create: function (args) {
             return SteviaManager._doRequest(args, 'users', 'create');
         },
-        delete: function(args) {
+        delete: function (args) {
             return SteviaManager._doRequest(args, 'users', 'delete');
         }
     },
 
     jobs: {
-        create: function(args) {
+        create: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'create');
         },
-        delete: function(args) {
+        delete: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'delete');
         },
-        info: function(args) {
+        info: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'info');
         },
-        reportError(args){
-          return SteviaManager._doRequest(args, 'jobs', 'report-error');
+        reportError(args) {
+            return SteviaManager._doRequest(args, 'jobs', 'report-error');
         }
     },
     util: {
-        proxy: function(args) {
+        proxy: function (args) {
             return SteviaManager._doRequest(args, 'util', 'proxy');
         }
     },
     tools: {
-        search: function(args) {
+        search: function (args) {
             return SteviaManager._doRequest(args, 'tools', 'search');
         },
-        info: function(args) {
+        info: function (args) {
             return SteviaManager._doRequest(args, 'tools', 'info');
         },
-        help: function(args) {
+        help: function (args) {
             return SteviaManager._doRequest(args, 'tools', 'help');
         },
-        update: function(args) {
+        update: function (args) {
             return SteviaManager._doRequest(args, 'tools', 'update');
         },
-        delete: function(args) {
+        delete: function (args) {
             return SteviaManager._doRequest(args, 'tools', 'delete');
         }
     },
 
     files: {
-        list: function(args) {
+        list: function (args) {
             return SteviaManager._doRequest(args, 'files', 'list');
         },
         // fetch: function (args) {
@@ -82,49 +82,49 @@ var SteviaManager = {
         // variants: function (args) {
         //     return SteviaManager._doRequest(args, 'files', 'variants');
         // },
-        read: function(args) {
+        read: function (args) {
             return SteviaManager._doRequest(args, 'files', 'info');
         },
-        info: function(args) {
+        info: function (args) {
             return SteviaManager._doRequest(args, 'files', 'info');
         },
-        delete: function(args) {
+        delete: function (args) {
             return SteviaManager._doRequest(args, 'files', 'delete');
         },
         // index: function (args) {
         //     return SteviaManager._doRequest(args, 'files', 'index');
         // },
-        search: function(args) {
+        search: function (args) {
             return SteviaManager._doRequest(args, 'files', 'search');
         },
-        filesByFolder: function(args) {
+        filesByFolder: function (args) {
             return SteviaManager._doRequest(args, 'files', 'files');
         },
-        content: function(args) {
+        content: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content');
         },
-        contentGrep: function(args) {
+        contentGrep: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content-grep');
         },
-        createFolder: function(args) {
+        createFolder: function (args) {
             return SteviaManager._doRequest(args, 'files', 'create-folder');
         },
         // setHeader: function (args) {
         //     return SteviaManager._doRequest(args, 'files', 'set-header');
         // },
-        contentExample: function(args) {
+        contentExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content-example');
         },
-        downloadExample: function(args) {
+        downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
-        update: function(args) {
+        update: function (args) {
             return SteviaManager._doRequest(args, 'files', 'update');
         },
-        download: function(args) {
+        download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
         },
-        upload: function(args) {
+        upload: function (args) {
             var url = SteviaManager._url({
                 query: {
                     sid: args.sid,
@@ -137,7 +137,7 @@ var SteviaManager = {
             SteviaManager._uploadFile(args);
         }
     },
-    _url: function(args, api, action) {
+    _url: function (args, api, action) {
         var host = SteviaManager.host;
         if (typeof args.request.host !== 'undefined' && args.request.host != null) {
             host = args.request.host;
@@ -157,7 +157,7 @@ var SteviaManager = {
         return url;
     },
 
-    _doRequest: function(args, api, action) {
+    _doRequest: function (args, api, action) {
         var url = SteviaManager._url(args, api, action);
         if (args.request.url === true) {
             return url;
@@ -175,7 +175,7 @@ var SteviaManager = {
                 console.log(url);
             }
             var request = new XMLHttpRequest();
-            request.onload = function() {
+            request.onload = function () {
                 var contentType = this.getResponseHeader('Content-Type');
                 if (contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
@@ -194,7 +194,7 @@ var SteviaManager = {
                     args.request.success(this.response, this);
                 }
             };
-            request.onerror = function(e) {
+            request.onerror = function (e) {
                 args.request.error({
                     error: 'Request error.',
                     errorEvent: e
@@ -214,7 +214,7 @@ var SteviaManager = {
             return url;
         }
     },
-    _uploadFile: function(args) {
+    _uploadFile: function (args) {
         var url = args.url;
         var blob = args.file;
         var name = args.name;
@@ -241,26 +241,26 @@ var SteviaManager = {
         var resumeResponse;
         /**/
 
-        var getResumeInfo = function(formData, callback) {
+        var getResumeInfo = function (formData, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true); //false = sync call
-            xhr.onload = function(e) {
+            xhr.onload = function (e) {
                 console.log(xhr.responseText);
                 callback(JSON.parse(xhr.responseText));
             };
             xhr.send(formData);
         };
-        var uploadChunk = function(formData, chunk, callback) {
+        var uploadChunk = function (formData, chunk, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
-            xhr.onload = function(e) {
+            xhr.onload = function (e) {
                 chunk.done = true;
                 console.log('chunk ' + chunk.id + ' done');
                 callback(JSON.parse(xhr.responseText));
             };
             xhr.send(formData);
         };
-        var checkChunk = function(id, size) {
+        var checkChunk = function (id, size) {
             if (typeof resumeInfo[id] === 'undefined') {
                 return false;
             } else if (resumeInfo[id].size != size /*|| resumeInfo[id].hash != hash*/ ) {
@@ -268,7 +268,7 @@ var SteviaManager = {
             }
             return true;
         };
-        var processChunk = function(c) {
+        var processChunk = function (c) {
             var chunkBlob = blob.slice(c.start, c.end);
 
             console.log(c);
@@ -290,7 +290,7 @@ var SteviaManager = {
                 }
                 formData.append('chunk_content', chunkBlob);
 
-                uploadChunk(formData, c, function(chunkResponse) {
+                uploadChunk(formData, c, function (chunkResponse) {
                     callbackProgress(c, NUM_CHUNKS, chunkResponse);
                     if (!c.last) {
                         processChunk(chunkMap[(c.id + 1)]);
@@ -342,14 +342,14 @@ var SteviaManager = {
             resumeFormData.append('name', name);
             resumeFormData.append('userId', userId);
             resumeFormData.append('parentId', parentId);
-            getResumeInfo(resumeFormData, function(response) {
+            getResumeInfo(resumeFormData, function (response) {
                 if (response.error == null) {
                     resumeInfo = response.resumeInfo;
                     resumeResponse = response;
                     if (response.exists) {
                         callbackExists(response.file);
                     } else {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             processChunk(chunkMap[0]);
                         }, 50);
                     }
@@ -359,7 +359,7 @@ var SteviaManager = {
             });
         }
     },
-    _addQueryParamtersToUrl: function(paramsWS, url) {
+    _addQueryParamtersToUrl: function (paramsWS, url) {
         var chr = "?";
         if (url.indexOf("?") != -1) {
             chr = "&";
@@ -369,7 +369,7 @@ var SteviaManager = {
             query = chr + query;
         return url + query;
     },
-    _queryString: function(obj) {
+    _queryString: function (obj) {
         var items = [];
         for (var key in obj) {
             if (obj[key] != null && obj[key] != undefined) {
@@ -377,5 +377,52 @@ var SteviaManager = {
             }
         }
         return items.join('&');
-    }
+    },
+
+    /*HELP METHODS*/
+    getFileContent: function (fileId, cb) {
+        SteviaManager.files.content({
+            id: fileId,
+            query: {
+                sid: Cookies('bioinfo_sid')
+            },
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    getPlainFolderFiles: function (fileId, cb) {
+        SteviaManager.files.filesByFolder({
+            id: fileId,
+            query: {
+                sid: Cookies('bioinfo_sid')
+            },
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response.response[0].results);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    getFileURL: function (fileId) {
+        return SteviaManager.files.download({
+            id: fileId,
+            query: {
+                sid: Cookies("bioinfo_sid")
+            },
+            request: {
+                url: true
+            }
+        });
+    },
 };

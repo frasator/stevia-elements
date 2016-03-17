@@ -186,7 +186,6 @@
             <stv-file-upload class="container" id="uploadFile" on-file-uploaded="handleFileUploaded" selected-folder="{{folder}}" bioformats="{{bioformats}}"></stv-file-upload>
         </stv-panel>
 
-
         <stv-panel modal closable hidden id="filePreviewPanel">
             <div class="header">
                 <i class="fa fa-eye"></i> File Preview
@@ -374,10 +373,10 @@
         },
         checkFileModeOk: function(mode, selectedFile) {
             if (this.enableSelectOk == true) {
-                if (mode === 'file' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FILE') {
+                if (mode === 'file' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FILE') {
                     return true;
                 }
-                if (mode === 'folder' && selectedFile != null && selectedFile.id != null && selectedFile.type == 'FOLDER') {
+                if (mode === 'folder' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FOLDER') {
                     return true;
                 }
             }
