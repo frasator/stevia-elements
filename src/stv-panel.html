@@ -214,13 +214,14 @@
         <div id="loading" hidden$="{{!loading}}">
             <i id="loading-icon" class="fa fa-circle-o-notch fa-spin"></i>
         </div>
-        <div id="resizerNW" data-value="nw">
+
+        <div hidden$="{{!resizable}}" id="resizerNW" data-value="nw">
         </div>
-        <div id="resizerNE" data-value="ne">
+        <div hidden$="{{!resizable}}" id="resizerNE" data-value="ne">
         </div>
-        <div id="resizerSW" data-value="sw">
+        <div hidden$="{{!resizable}}" id="resizerSW" data-value="sw">
         </div>
-        <div id="resizerSE" data-value="se">
+        <div hidden$="{{!resizable}}" id="resizerSE" data-value="se">
         </div>
     </template>
 </dom-module>
@@ -340,6 +341,7 @@
 
                     function initDrag(e) {
                         e.stopPropagation();
+                        document.body.classList.add('stv-nosel');
                         mode = e.currentTarget.dataset.value;
                         startX = e.clientX;
                         startY = e.clientY;
@@ -391,6 +393,7 @@
                     function stopDrag(e) {
                         document.documentElement.removeEventListener('mousemove', doDrag, false);
                         document.documentElement.removeEventListener('mouseup', stopDrag, false);
+                        document.body.classList.remove('stv-nosel');
                     }
 
                     resizerNW.addEventListener('mousedown', initDrag, false);

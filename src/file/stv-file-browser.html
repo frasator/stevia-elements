@@ -334,6 +334,7 @@
             var startX, startWidth, startMinContent, startContent, startMinMenu;
 
             function initDrag(e) {
+                document.body.classList.add('stv-nosel');
                 startX = e.clientX;
                 startWidth = parseInt(document.defaultView.getComputedStyle(mainmenu).width, 10);
                 startMinContent = parseInt(document.defaultView.getComputedStyle(maincontent).minWidth, 10);
@@ -365,6 +366,7 @@
             function stopDrag(e) {
                 document.documentElement.removeEventListener('mousemove', doDrag, false);
                 document.documentElement.removeEventListener('mouseup', stopDrag, false);
+                document.body.classList.remove('stv-nosel');
             }
 
             resizer.addEventListener('mousedown', initDrag, false);
