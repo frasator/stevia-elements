@@ -44,9 +44,12 @@
         }
 
         #mainmenu {
-            position: absolute;
+            position: relative;
+            /*position: absolute;*/
             box-sizing: border-box;
-            width: 200px;
+            width: 30%;
+            /*width: 200px;*/
+            min-width: 10px;
             height: 100%;
             border-right: 1px solid rgba(130, 130, 130, 0.4);
         }
@@ -83,10 +86,13 @@
         }
 
         #maincontent {
-            position: absolute;
-            left: 200px;
-            top: 0;
-            width: calc(100% - 200px);
+            position: relative;
+            /*position: absolute;*/
+            /*left: 180px;
+            top: 0;*/
+            width: 70%;
+            /*width: calc(100% - 200px);*/
+            min-width: 180px;
             height: 100%;
             white-space: nowrap;
         }
@@ -145,7 +151,7 @@
             </div>
         </div>
 
-        <div id="main" class="flex">
+        <div id="main" class="horizontal layout flex">
             <div id="mainmenu">
                 <div id="mainmenubar" class="horizontal layout">
                     <div class="bar horizontal layout flex">
@@ -323,22 +329,39 @@
 
             var resizer = this.$.mainmenuresizer;
             var mainmenu = this.$.mainmenu;
+            var maincontent = this.$.maincontent;
 
-            var startX, startWidth;
+            var startX, startWidth, startMinContent, startContent, startMinMenu;
 
             function initDrag(e) {
                 startX = e.clientX;
                 startWidth = parseInt(document.defaultView.getComputedStyle(mainmenu).width, 10);
+                startMinContent = parseInt(document.defaultView.getComputedStyle(maincontent).minWidth, 10);
+                startContent = parseInt(document.defaultView.getComputedStyle(maincontent).width, 10);
+                startMinMenu = parseInt(document.defaultView.getComputedStyle(mainmenu).minWidth, 10);
+                mainWidth = parseInt(document.defaultView.getComputedStyle(me.$.main).width, 10);
                 document.documentElement.addEventListener('mousemove', doDrag, false);
                 document.documentElement.addEventListener('mouseup', stopDrag, false);
             }
 
             function doDrag(e) {
                 var dif = e.clientX - startX;
+                var menuWidth = startWidth + dif;
+                var contentWidth = startContent - dif;
+                var main = menuWidth + contentWidth;
+                var maindif = mainWidth - main;
 
-                mainmenu.style.width = (startWidth + dif) + 'px';
-                me.$.maincontent.style.width = "calc(100% - " + mainmenu.style.width + ")";
-                me.$.maincontent.style.left = mainmenu.style.width;
+                if (contentWidth > startMinContent && menuWidth > startMinMenu) {
+                    if (maindif != 0) {
+                        startWidth = startWidth + Math.ceil(maindif / 2);
+                        contentWidth = contentWidth + Math.floor(maindif / 2);
+                    }
+                    mainmenu.style.width = menuWidth + 'px';
+                    // me.$.maincontent.style.width = "Calc(100%-" + menuWidth + ")";
+                    me.$.maincontent.style.width = contentWidth + 'px';
+                    // me.$.maincontent.style.left = mainmenu.style.width;
+                }
+
             }
 
             function stopDrag(e) {

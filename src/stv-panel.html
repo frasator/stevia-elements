@@ -331,73 +331,72 @@
                 }
 
                 //resizer
-                if (this.resizable!=null && this.resizable==true) {
-                var resizerNW = this.$.resizerNW;
-                var resizerNE = this.$.resizerNE;
-                var resizerSW = this.$.resizerSW;
-                var resizerSE = this.$.resizerSE;
+                if (this.resizable != null && this.resizable == true) {
+                    var resizerNW = this.$.resizerNW;
+                    var resizerNE = this.$.resizerNE;
+                    var resizerSW = this.$.resizerSW;
+                    var resizerSE = this.$.resizerSE;
+                    var startX, startWidth, startY, startHeight, mode, topStart, leftStart, startMinWidth, startMinHeight;
 
-                var startX, startWidth, startY, startHeight, mode, topStart, leftStart, startMinWidth, startMinHeight;
+                    function initDrag(e) {
+                        e.stopPropagation();
+                        mode = e.currentTarget.dataset.value;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        topStart = parseInt(document.defaultView.getComputedStyle(me).top, 10);
+                        leftStart = parseInt(document.defaultView.getComputedStyle(me).left, 10);
+                        startWidth = parseInt(document.defaultView.getComputedStyle(me).width, 10);
+                        startHeight = parseInt(document.defaultView.getComputedStyle(me).height, 10);
+                        startMinWidth = parseInt(document.defaultView.getComputedStyle(me).minWidth, 10);
+                        startMinHeight = parseInt(document.defaultView.getComputedStyle(me).minHeight, 10);
 
-                function initDrag(e) {
-                    e.stopPropagation();
-                    mode = e.currentTarget.dataset.value;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    topStart = parseInt(document.defaultView.getComputedStyle(me).top, 10);
-                    leftStart = parseInt(document.defaultView.getComputedStyle(me).left, 10);
-                    startWidth = parseInt(document.defaultView.getComputedStyle(me).width, 10);
-                    startHeight = parseInt(document.defaultView.getComputedStyle(me).height, 10);
-                    startMinWidth = parseInt(document.defaultView.getComputedStyle(me).minWidth, 10);
-                    startMinHeight = parseInt(document.defaultView.getComputedStyle(me).minHeight, 10);
+                        document.documentElement.addEventListener('mousemove', doDrag, false);
+                        document.documentElement.addEventListener('mouseup', stopDrag, false);
+                    }
 
-                    document.documentElement.addEventListener('mousemove', doDrag, false);
-                    document.documentElement.addEventListener('mouseup', stopDrag, false);
-                }
-
-                function doDrag(e) {
-                    if (mode == "se") {
-                        me.style.width = (startWidth + e.clientX - startX) + 'px';
-                        me.style.height = (startHeight + e.clientY - startY) + 'px';
-                    } else if (mode == "ne") {
-                        var currentHeight = (startHeight - (e.clientY - startY));
-                        if (currentHeight > startMinHeight) {
-                            me.style.height = currentHeight + 'px';
+                    function doDrag(e) {
+                        if (mode == "se") {
                             me.style.width = (startWidth + e.clientX - startX) + 'px';
-                            me.style.top = (topStart + e.clientY - startY) + 'px';
-                        }
-                    } else if (mode == "nw") {
-                        var currentHeight = (startHeight - (e.clientY - startY));
-                        var currentWidth = (startWidth - (e.clientX - startX));
-                        if (currentHeight > startMinHeight) {
-                            me.style.width = currentWidth + 'px';
-                            me.style.height = currentHeight + 'px';
-                            me.style.top = (topStart + (e.clientY - startY)) + 'px';
-                        }
-                        if (currentWidth > startMinWidth) {
-                            me.style.width = currentWidth + 'px';
-                            me.style.height = currentHeight + 'px';
-                            me.style.left = (leftStart + (e.clientX - startX)) + 'px';
-                        }
-                    } else if (mode == "sw") {
-                        var currentWidth = (startWidth - (e.clientX - startX));
-                        if (currentWidth > startMinWidth) {
                             me.style.height = (startHeight + e.clientY - startY) + 'px';
-                            me.style.width = currentWidth + 'px';
-                            me.style.left = (leftStart + e.clientX - startX) + 'px';
+                        } else if (mode == "ne") {
+                            var currentHeight = (startHeight - (e.clientY - startY));
+                            if (currentHeight > startMinHeight) {
+                                me.style.height = currentHeight + 'px';
+                                me.style.width = (startWidth + e.clientX - startX) + 'px';
+                                me.style.top = (topStart + e.clientY - startY) + 'px';
+                            }
+                        } else if (mode == "nw") {
+                            var currentHeight = (startHeight - (e.clientY - startY));
+                            var currentWidth = (startWidth - (e.clientX - startX));
+                            if (currentHeight > startMinHeight) {
+                                me.style.width = currentWidth + 'px';
+                                me.style.height = currentHeight + 'px';
+                                me.style.top = (topStart + (e.clientY - startY)) + 'px';
+                            }
+                            if (currentWidth > startMinWidth) {
+                                me.style.width = currentWidth + 'px';
+                                me.style.height = currentHeight + 'px';
+                                me.style.left = (leftStart + (e.clientX - startX)) + 'px';
+                            }
+                        } else if (mode == "sw") {
+                            var currentWidth = (startWidth - (e.clientX - startX));
+                            if (currentWidth > startMinWidth) {
+                                me.style.height = (startHeight + e.clientY - startY) + 'px';
+                                me.style.width = currentWidth + 'px';
+                                me.style.left = (leftStart + e.clientX - startX) + 'px';
+                            }
                         }
                     }
-                }
 
-                function stopDrag(e) {
-                    document.documentElement.removeEventListener('mousemove', doDrag, false);
-                    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-                }
+                    function stopDrag(e) {
+                        document.documentElement.removeEventListener('mousemove', doDrag, false);
+                        document.documentElement.removeEventListener('mouseup', stopDrag, false);
+                    }
 
-                resizerNW.addEventListener('mousedown', initDrag, false);
-                resizerNE.addEventListener('mousedown', initDrag, false);
-                resizerSW.addEventListener('mousedown', initDrag, false);
-                resizerSE.addEventListener('mousedown', initDrag, false);
+                    resizerNW.addEventListener('mousedown', initDrag, false);
+                    resizerNE.addEventListener('mousedown', initDrag, false);
+                    resizerSW.addEventListener('mousedown', initDrag, false);
+                    resizerSE.addEventListener('mousedown', initDrag, false);
                 }
             },
             hiddenChanged: function(neo, old) {
