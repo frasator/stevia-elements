@@ -123,7 +123,7 @@
         </div>
         <div style="margin-left:7px;" hidden$="{{!file.open}}">
             <template is="dom-repeat" items="{{file.f}}" as="f">
-                <stv-folder-tree-item file="{{f}}">
+                <stv-folder-tree-item file="{{f}}" on-drop="handleDrop" on-dragover="allowDrop">
                 </stv-folder-tree-item>
             </template>
         </div>
@@ -161,6 +161,36 @@
             if (this.file.f.length > 0) {
                 this.set('file.open', !this.file.open);
             }
-        }
+        },
+        allowDrop: function(e) {
+            e.preventDefault();
+            console.log("allow drop 2");
+        },
+        handleDrop: function(e){
+          e.preventDefault();
+          console.log("DROP");
+          var newParentId = e.currentTarget.file._id;
+          console.log(newParentId);
+          SteviaManager.files.move({
+              query: {
+                  sid: Cookies("bioinfo_sid"),
+                  fileId: e.dataTransfer.getData("text"),
+                  newId: newParentId
+              },
+              request: {
+                  success: function(response) {
+                      if (response.response[0].error == null) {
+                          console.log(response.response[0].results[0])
+                      } else {
+                        console.log(response.response[0].error)
+                      }
+                  },
+                  error: function() {
+                    console.log('Server error, try again later')
+                  }
+              }
+          });
+          this.fire('need-refresh');
+      }
     });
 </script>

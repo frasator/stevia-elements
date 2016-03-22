@@ -124,6 +124,9 @@ var SteviaManager = {
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
         },
+        move: function (args){
+          return SteviaManager._doRequest(args, 'files', 'move');
+        },
         upload: function (args) {
             var url = SteviaManager._url({
                 query: {

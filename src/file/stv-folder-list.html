@@ -150,7 +150,7 @@
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
                 <template is="dom-repeat" items="{{files}}" filter="checkFilters" observe="type">
-                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}">
+                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDrag" draggable="true" on-drop="handleDrop" on-dragover="allowDrop">
                     </stv-folder-list-item>
                 </template>
             </div>
@@ -381,6 +381,41 @@
             if (this.selected != null) {
                 this.showInfo = !this.showInfo;
             }
-        }
+        },
+        allowDrop: function(e) {
+            e.preventDefault();
+            console.log("allow drop 1");
+        },
+        handleDrag: function(e) {
+            console.log('DRAG');
+                e.dataTransfer.setData("text/plain",e.currentTarget.file._id);
+        },
+        handleDrop: function(e) {
+            e.preventDefault();
+            console.log("DROP");
+            var newParentId = e.currentTarget.file._id;
+            console.log(newParentId);
+            var fileId = e.dataTransfer.getData("text");
+            SteviaManager.files.move({
+                query: {
+                    sid: Cookies("bioinfo_sid"),
+                    fileId: fileId,
+                    newId: newParentId
+                },
+                request: {
+                    success: function(response) {
+                        if (response.response[0].error == null) {
+                            console.log(response.response[0].results[0])
+                        } else {
+                            console.log(response.response[0].error)
+                        }
+                    },
+                    error: function() {
+                        console.log('Server error, try again later')
+                    }
+                }
+            });
+            this.fire('need-refresh');
+        },
     });
 </script>
