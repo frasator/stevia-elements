@@ -1,0 +1,67 @@
+<dom-module id="stv-input-text">
+    <style>
+
+    </style>
+    <template>
+
+
+        <div class="horizontal layout">
+            <div class="flex">
+                <label id="label" class="stv">{{label}}</label>
+            </div>
+            <div>
+                <stv-button-tooltip hidden$="{{_hideTooltip}}" message="{{tooltip}}"></stv-button-tooltip>
+            </div>
+
+        </div>
+
+        <input class="stv" id="input" type="text" value={{value::input}} placeholder="{{placeholder}}" required$="{{required}}"
+               pattern="{{pattern}}">
+        <!--<label id="message" class="stv">{{message}}</label>-->
+
+        <!--pattern="^[\w ]+$">-->
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: "stv-input-text",
+        properties: {
+            label: {
+                type: String
+            },
+            value: {
+                type: String
+            },
+            placeholder: {
+                type: String
+            },
+            required: {
+                type: Boolean,
+                reflectToAttribute: true,
+                value: false
+            },
+            pattern: {
+                type: String
+            },
+            message: {
+                type: String
+            },
+            tooltip: {
+                type: String,
+                value: ""
+            },
+            _hideTooltip: {
+                type: Boolean
+            }
+        },
+        ready: function () {
+            this._hideTooltip = (this.tooltip == "")
+        },
+        getValue: function () {
+            return this.value;
+        }
+//        isTooltipHidden: function(){
+//            return this.tooltip != "";
+//        }
+    });
+</script>
