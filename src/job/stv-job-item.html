@@ -222,7 +222,7 @@
         },
         handleRelaunchJob: function(e) {
             e.stopPropagation();
-
+            var me=this;
             if (confirm("You are going to relaunch this Job. Are you sure?")) {
                 var query = {
                     sid: Cookies("bioinfo_sid"),
@@ -250,7 +250,7 @@
                             } else {
                                 console.log(response.response[0].error);
                             }
-                            this.fire('need-refresh');
+                            me.fire('job-launched');
                         },
                         error: function() {
                             console.log('Server error, try again later.');
