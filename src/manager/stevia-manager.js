@@ -124,8 +124,8 @@ var SteviaManager = {
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
         },
-        move: function (args){
-          return SteviaManager._doRequest(args, 'files', 'move');
+        move: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'move');
         },
         upload: function (args) {
             var url = SteviaManager._url({
@@ -427,5 +427,18 @@ var SteviaManager = {
                 url: true
             }
         });
+    },
+        
+    //Download the file given a file Id.
+    downloadFile: function (fileId) {
+        var url = this.getFileURL(fileId);
+        var link = document.createElement('a');
+        link.href = url;
+        var event = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        });
+        link.dispatchEvent(event);
     },
 };
