@@ -8,9 +8,7 @@
     "license": "GPLv2",
     "private": true,
     "ignore": [
-        ".git",
-        ".gitignore",
-        ".jsbeautifyrc",
+        "**/.*",
         "node_modules",
         "bower_components",
         "test",
