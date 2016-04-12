@@ -8,15 +8,17 @@
     "license": "GPLv2",
     "private": true,
     "ignore": [
-        "**/.*",
+        ".git",
+        ".gitignore",
+        ".jsbeautifyrc",
         "node_modules",
         "bower_components",
         "test",
         "tests"
     ],
     "dependencies": {
-        "polymer": "Polymer/polymer#1.2.3",
-        "iron-flex-layout": "PolymerElements/iron-flex-layout#1.2.2",
+        "polymer": "Polymer/polymer#1.4.0",
+        "iron-flex-layout": "PolymerElements/iron-flex-layout#1.3.1",
         "fontawesome": "*",
         "cookies-js": "~1.1.0",
         "crypto-js": "3.1.6",
