@@ -29,7 +29,10 @@ var SteviaManager = {
         },
         delete: function (args) {
             return SteviaManager._doRequest(args, 'users', 'delete');
-        }
+        },
+        feedback: function (args) {
+            return SteviaManager._doRequest(args, 'users', 'feedback');
+        },
     },
 
     jobs: {
@@ -428,7 +431,7 @@ var SteviaManager = {
             }
         });
     },
-        
+
     //Download the file given a file Id.
     downloadFile: function (fileId) {
         var url = this.getFileURL(fileId);
