@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
-    <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../bower_components/web-component-tester/browser.js"></script>
+    <script src="../../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../../web-component-tester/browser.js"></script>
 
     <link rel="import" href="../stv-dialog.html">
 </head>
 <body>
 
-<test-fixture id="element-confirm-fixture">
+<test-fixture id="stv-dialog-fixture">
     <template>
-        <element-confirm></element-confirm>
+        <stv-dialog></stv-dialog>
     </template>
 </test-fixture>
 
 <script>
-    suite('<element-confirm>', function() {
+    suite('<stv-dialog>', function() {
         var myEl;
         var myElRoot;
 
@@ -32,7 +32,7 @@
         }
 
         setup(function(){
-            myEl = fixture("element-confirm-fixture");
+            myEl = fixture("stv-dialog-fixture");
             myElRoot = Polymer.dom(myEl.root);
         });
 
