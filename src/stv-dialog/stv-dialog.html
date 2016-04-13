@@ -47,8 +47,10 @@ with a z-index above this value will not be blocked.
     <template>
         <style>
 
-            h2 {
-                font-size: 1em;
+            #message {
+                font-size: 1.2em;
+                font-weight: bold;
+                text-align: center;
             }
 
             .blocking-div {
@@ -70,13 +72,16 @@ with a z-index above this value will not be blocked.
                 left: 50%;
                 transform: translate(-50%, -50%);
                 z-index: 1002;
-                @apply(--modal-window-style)
+                @apply(--modal-window-style);
+
+                @apply(--layout-vertical);
             }
 
             .buttons{
                 margin-top: 5%;
                 @apply(--layout-horizontal);
                 @apply(--layout-around-justified);
+                align-items: flex-end;
             }
 
             .buttons > button {
@@ -92,7 +97,9 @@ with a z-index above this value will not be blocked.
         </style>
         <div class="blocking-div">
             <div class="modal-window">
-                <h2>{{message}}</h2>
+                <div id="message">
+                    {{message}}
+                </div>
                 <input type="text" id="text" hidden value$="{{inputValue}}">
                 <div id="buttonsHolder" class="buttons">
                     <button id="ok" on-click="_handleOk"></button>
