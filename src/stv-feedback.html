@@ -7,31 +7,111 @@
             position: relative;
             box-sizing: border-box;
             box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
+            padding: 5px;
+        }
+
+        #emailPanel {
+            width: 500px;
+            height: 500px;
+            min-width: 500px;
+            min-height: 500px;
+            padding: 5px;
+        }
+
+        .send {
+            margin: 0 auto;
+            width: 100px;
+            margin-top: 5px;
+        }
+
+        #emailContent {
+            padding: 20px;
+        }
+
+        .data {
+            color: #666;
+            margin: 10px 5px 5px 5px;
         }
     </style>
     <template>
-        <div id="">
-            <i class="fa fa-bolt"></i> &nbsp; Feedback
-        </div>
-        <div id="">
-          <div on-mousedown="handleExample">
-              <i class="fa fa-envelope-o" aria-hidden="true"></i> &nbsp; Send an email
-          </div>
-          <a href="{{url}}" target="_blank">
-              <i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp; Go to git issue
-          </a>
-        </div>
+        <stv-panel id="emailPanel" modal closable>
+            <div class="header">
+                <i class="fa fa-envelope-o"></i> Send an email
+            </div>
+            <div id="emailContent" class="container">
+                <div class="horizontal layout flex">
+                    <div class="data" for="">Subject &nbsp;</div>
+                    <input style="margin-top: 5px;" type="text" value="{{subject::input}}" />
+
+                    <label class="data" for="">Type &nbsp;</label>
+                    <stv-select id="emailType" style="width:150px; margin-top:5px">
+                        <stv-option value="suggest">Suggest</stv-option>
+                        <stv-option value="question">Question</stv-option>
+                        <stv-option value="error">Error</stv-option>
+                    </stv-select>
+                </div>
+
+                <div class="data" for="">Text &nbsp; </div>
+                <textarea class="stv" style="height: 300px; width:400px" name="" id="" cols="30" rows="10" value="{{text::input}}"></textarea>
+
+                <div class="stv-btn stv-btn-shdw send" on-click="handleSendEmail">&nbsp; SEND</div>
+                <div id="Sending" hidden$="{{!sending}}">
+                    <i class="fa fa-circle-o-notch fa-spin"></i> Sending...
+                </div>
+            </div>
+        </stv-panel>
     </template>
 
     <script>
         Polymer({
             is: "stv-feedback",
             properties: {
-
+                subject: {
+                    type: String,
+                    value: ""
+                },
+                text: {
+                    type: String,
+                    value: ""
+                },
+                sending: {
+                    type: Boolean,
+                    value: false
+                }
             },
             ready: function() {},
-            handleShowMenu: function(e) {
-                debugger
+            handleSendEmail: function(e) {
+                e.stopPropagation();
+                this.sending = true;
+                var me = this;
+                var subject = this.subject;
+                var text = this.text;
+                var type = this.$.emailType.selectedOption.value;
+
+                setTimeout(function() {
+                    SteviaManager.users.feedback({
+                        query: {
+                            sid: Cookies('bioinfo_sid'),
+                            subject: subject,
+                            type: type,
+                            text: text
+                        },
+                        request: {
+                            success: function(response) {
+                                if (response.response[0].error == null) {
+                                    me.sending = false;
+                                    me.fire('feedbackend');
+                                    alert(response.response[0].results[0]);
+                                } else {
+                                    alert('Sorry! There was a problem, try again later');
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later');
+                            }
+                        }
+                    });
+                }, 5000)
             }
         })
     </script>
