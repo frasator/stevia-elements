@@ -1,5 +1,5 @@
 <link rel="import" href="../../../polymer/polymer.html">
-<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
 <!--
 `<stv-dialog>` allows the user to emulate the behavior of window.confirm(), window.alert() and window.prompt().
 
@@ -44,7 +44,6 @@ with a z-index above this value will not be blocked.
  @demo demo/index.html
  -->
 <dom-module id="stv-dialog">
-    <style include="iron-flex"></style>
     <template>
         <style>
 
@@ -76,11 +75,13 @@ with a z-index above this value will not be blocked.
 
             .buttons{
                 margin-top: 5%;
+                @apply(--layout-horizontal);
+                @apply(--layout-around-justified);
             }
 
             .buttons > button {
                 padding: 5px 5px 5px 5px;
-                @apply(--buttons-style)
+                @apply(--buttons-style);
             }
 
             input {
@@ -93,7 +94,7 @@ with a z-index above this value will not be blocked.
             <div class="modal-window">
                 <h2>{{message}}</h2>
                 <input type="text" id="text" hidden value$="{{inputValue}}">
-                <div id="buttonsHolder" class="buttons layout horizontal around-justified">
+                <div id="buttonsHolder" class="buttons">
                     <button id="ok" on-click="_handleOk"></button>
                     <button id="cancel" on-click="_handleCancel" hidden>Cancel</button>
                 </div>
