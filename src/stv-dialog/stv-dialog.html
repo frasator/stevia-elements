@@ -1,0 +1,246 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<!--
+`<stv-dialog>` allows the user to emulate the behavior of window.confirm(), window.alert() and window.prompt().
+
+When the dialog box pops up, it blocks the rest of the page content until the user clicks the ok or
+cancel button. When the user does, the callback provided is executed passing to it a boolean value representing the
+user's response (**true** if the user clicked the ok button and **false** otherwise)
+
+### Use example
+```
+...
+<body>
+    <stv-dialog id="example"></stv-dialog>
+</body>
+<script>
+var element = document.querySelector("#example");
+element.confirm("This is an example", function(response){
+    if(response){
+        console.log("The user confirmed");
+    } else {
+        console.log("The user rejected");
+    }
+});
+</script>
+...
+```
+> **Important**: `<stv-dialog>` needs to be loaded in the DOM in order to work. Otherwise the dialog box will not
+ be displayed.
+
+### Styling
+
+`<stv-dialog>` provides the following custom properties and mixins for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--modal-window-background` | Sets the background-color for the dialog box | `rgb(230,230,230)`
+`--modal-window-style` | Mixin that will be applied to the dialog box| `{}`
+`--buttons-style` | Mixin that will be applied to the `<button>` elements | `{}`
+
+> **Note**: In order to block the page content, `<stv-dialog>` uses the z-index 1001 . Every dom element
+with a z-index above this value will not be blocked.
+
+ @demo demo/index.html
+ -->
+<dom-module id="stv-dialog">
+    <style include="iron-flex"></style>
+    <template>
+        <style>
+
+            h2 {
+                font-size: 1em;
+            }
+
+            .blocking-div {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left:0;
+                right: 0;
+                z-index: 1001;
+
+            }
+
+            .modal-window{
+                background-color: var(--modal-window-background, rgb(230,230,230));
+                padding: 10px 100px 15px 100px;
+                box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
+                position: absolute;
+                top:30%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 1002;
+                @apply(--modal-window-style)
+            }
+
+            .buttons{
+                margin-top: 5%;
+            }
+
+            .buttons > button {
+                padding: 5px 5px 5px 5px;
+                @apply(--buttons-style)
+            }
+
+            input {
+                position: relative;
+                left: 50%;
+                transform: translate(-50%, 0);
+            }
+        </style>
+        <div class="blocking-div">
+            <div class="modal-window">
+                <h2>{{message}}</h2>
+                <input type="text" id="text" hidden value$="{{inputValue}}">
+                <div id="buttonsHolder" class="buttons layout horizontal around-justified">
+                    <button id="ok" on-click="_handleOk"></button>
+                    <button id="cancel" on-click="_handleCancel" hidden>Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </template>
+    <script>
+        var stvDialog = Polymer({
+            is: "stv-dialog",
+
+            properties: {
+
+                hidden: {
+                    type: Boolean,
+                    reflectOnAttribute: true
+                },
+
+                /**
+                 * The type of dialog box to be displayed: "confirm", "alert" or "prompt"
+                 */
+                _mode:{
+                    type:String
+                }
+            },
+
+            ready : function(){
+                this.hidden = true;
+            },
+
+
+            /**
+             * Holder for the passed **callback** when calling confirm, alert or prompt functions
+             */
+            _callback: undefined,
+
+
+            /**
+             * Calls to _executeCb passing true
+             */
+            _handleOk:function(){
+                this._executeCb(true);
+            },
+
+
+            /**
+             * Calls to _executeCb passing false
+             */
+            _handleCancel:function(){
+                this._executeCb(false);
+            },
+
+
+            /** Executes _callback passing to it the user response as a boolean.  If _mode === "prompt" it
+             * passes the input text as well to _callback. Then it sets _callback to undefined and hides the dialog box.
+             *
+             * @param userResponse {boolean}
+             */
+            _executeCb: function(userResponse) {
+                if(this._callback !== undefined){
+                    if(this._mode === "prompt"){
+                        this._callback(userResponse, this.$.text.value);
+                    } else {
+                        this._callback(userResponse);
+                    }
+                }
+
+                this._callback = undefined;
+                this._closeDialog();
+            },
+
+
+            /**
+             * Sets the message inside the confirm button and the elements needed according to **_mode**.
+             *
+             * @param {string} confirmBtnMessage The message that will be displayed inside the ok button
+             */
+            _setElement: function(confirmBtnMessage) {
+                this.$.ok.textContent = confirmBtnMessage;
+                if(this._mode === "prompt") {
+                   this.$.text.removeAttribute("hidden");
+                    //TODO: Fix -> The user needs to press enter for the focus to work.
+                   this.$.text.focus();
+                   this.$.cancel.removeAttribute("hidden");
+                }else {
+                    this.$.ok.focus();
+                    if(this._mode === "confirm"){
+                        this.$.cancel.removeAttribute("hidden");
+                    }
+                }
+
+            },
+
+
+            /**
+             * Resets all the element light DOM to default values
+             */
+            _closeDialog: function(){
+                this.$.text.setAttribute("hidden", true);
+                this.$.cancel.setAttribute("hidden", true);
+                this.$.text.value = "";
+                this.hidden = true;
+            },
+
+
+            /**
+             * Shows an confirm-like dialog to the user.
+             *
+             * @param {string} msg Message to be displayed in the dialog box
+             * @param {function} cb
+            */
+            confirm: function(msg, cb) {
+                this._mode = "confirm";
+                this._setElement("Confirm");
+                this.message = msg;
+                this.hidden = false;
+                this._callback = cb;
+            },
+
+            /**
+             * Shows an alert-like dialog to the user.
+             *
+             * @param {string} msg Message to be displayed in the dialog box
+             * @param {function} cb
+             */
+            alert: function(msg, cb) {
+                this._mode = "alert";
+                this._setElement("Accept");
+                this.message = msg;
+                this.hidden = false;
+                this._callback = cb;
+            },
+
+            /**
+             * Shows an prompt-like dialog. Additionally to the user's response, the user's input will be passed as
+             * second parameter to the cb.
+             *
+             * @param {string} msg Message to be displayed in the dialog box
+             * @param {function} cb
+             */
+            prompt: function(msg, cb){
+                this._mode = "prompt";
+                this._setElement("Accept");
+                this.message = msg;
+                this.hidden = false;
+                this._callback = cb;
+            }
+        })
+    </script>
+</dom-module>
