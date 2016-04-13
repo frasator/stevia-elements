@@ -1,0 +1,31 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
+<dom-module id="stv-feedback">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+    :host {
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
+    }
+    </style>
+    <template>
+      <div on-mousedown="handleShowMenu">
+          <i class="fa fa-lightbulb-o"></i> &nbsp; Feedback
+      </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "stv-feedback",
+            properties: {
+
+            },
+            ready: function() {},
+            handleShowMenu: function(e){
+              debugger
+            }
+        })
+    </script>
+</dom-module>
