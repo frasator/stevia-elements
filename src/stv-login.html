@@ -1,4 +1,7 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-login">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
         :host {
             display: block;
@@ -52,7 +55,7 @@
                 <i class="fa fa-sign-in"></i>
             </div>
         </div>
-        <form id="form" vertical layout on-keypress="handleFormKey">
+        <form id="form" on-keypress="handleFormKey">
             <label class="stv">E-mail:</label>
             <input class="stv" type="email" value="{{email::input}}" required>
 
@@ -75,92 +78,100 @@
         </form>
         <div class="message">{{message}}</div>
     </template>
-</dom-module>
 
-<script>
-    Polymer({
-        is: "stv-login",
-        properties: {
-            email: {
-                type: String,
-                value: ''
-            },
-            password: {
-                type: String,
-                value: ''
-            },
-            message: {
-                type: String,
-                value: ''
-            },
-            hideSignup: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-            hideAnonymous: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
-            },
-        },
-        handleFormKey: function(e) {
-            if (e.which == 13) {
-                this.handleForm();
-            }
-        },
-        handleRemember: function(e) {
-            this.fire("remember", {});
-        },
-        handleSignup: function(e) {
-            this.fire("signup", {});
-        },
-        handleForm: function(e) {
-            this.message = '';
-            this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
-            if (this.$.form.checkValidity()) {
-                this._login();
-            }
-        },
-        handleAnonymous: function() {
-            this.fire('anonymous');
-        },
-        _login: function() {
-            var me = this;
-            // console.log(this.email)
-            // console.log(this.password)
-            SteviaManager.users.login({
-                id: this.email,
-                query: {
-                    // password: this.password
-                    password: CryptoJS.SHA1(this.password).toString()
+    <script>
+        Polymer({
+            is: "stv-login",
+            properties: {
+                email: {
+                    type: String,
+                    value: ''
                 },
-                request: {
-                    success: function(response) {
-                        if(response.response[0].error == null){
-                            Cookies.set('bioinfo_sid', response.response[0].results[0].id,{path:window.location.pathname});
-                            Cookies.set('bioinfo_user', me.email,{path:window.location.pathname});
-                            me.fire('login', {
-                                status: true
-                            });
-                        }else{
-                            console.log(response.response[0].error);
-                            me.message = response.response[0].error;
-                        }
-                        me.email = null;
-                        me.password = null;
+                password: {
+                    type: String,
+                    value: ''
+                },
+                message: {
+                    type: String,
+                    value: ''
+                },
+                hideSignup: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                hideAnonymous: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+            },
+            handleFormKey: function(e) {
+                if (e.which == 13) {
+                    this.handleForm();
+                }
+            },
+            handleRemember: function(e) {
+                this.fire("remember", {});
+            },
+            handleSignup: function(e) {
+                this.fire("signup", {});
+            },
+            handleForm: function(e) {
+                this.message = '';
+                this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
+                if (this.$.form.checkValidity()) {
+                    this._login();
+                }
+            },
+            handleAnonymous: function() {
+                this.fire('anonymous');
+            },
+            _login: function() {
+                var me = this;
+                // console.log(this.email)
+                // console.log(this.password)
+                SteviaManager.users.login({
+                    id: this.email,
+                    query: {
+                        // password: this.password
+                        password: CryptoJS.SHA1(this.password).toString()
                     },
-                    error: function(response) {
-                        //Delete all cookies
-                        Cookies.expire('bioinfo_sid',{path:window.location.pathname});
-                        Cookies.expire('bioinfo_user',{path:window.location.pathname});
-                        me.message = response.error.split(":")[1];
-                        if (response.errorEvent) {
-                            me.message = 'Server error, try again later.';
+                    request: {
+                        success: function(response) {
+                            if (response.response[0].error == null) {
+                                Cookies.set('bioinfo_sid', response.response[0].results[0].id, {
+                                    path: window.location.pathname
+                                });
+                                Cookies.set('bioinfo_user', me.email, {
+                                    path: window.location.pathname
+                                });
+                                me.fire('login', {
+                                    status: true
+                                });
+                            } else {
+                                console.log(response.response[0].error);
+                                me.message = response.response[0].error;
+                            }
+                            me.email = null;
+                            me.password = null;
+                        },
+                        error: function(response) {
+                            //Delete all cookies
+                            Cookies.expire('bioinfo_sid', {
+                                path: window.location.pathname
+                            });
+                            Cookies.expire('bioinfo_user', {
+                                path: window.location.pathname
+                            });
+                            me.message = response.error.split(":")[1];
+                            if (response.errorEvent) {
+                                me.message = 'Server error, try again later.';
+                            }
                         }
                     }
-                }
-            });
-        }
-    });
-</script>
+                });
+            }
+        });
+    </script>
+</dom-module>

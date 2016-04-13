@@ -1,9 +1,13 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+
 <script src="../../../client-line-navigator/line-navigator.js"></script>
 <script src="../../../client-line-navigator/file-navigator.js"></script>
 <script src="validator.js"></script>
 <script src="vcf-validator.js"></script>
 
 <dom-module name="stv-validator" noscript>
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
         :host {
             display: block;
@@ -171,151 +175,151 @@
         </div>
 
     </template>
-</dom-module>
-<script>
-    Polymer({
-        is: "stv-validator",
-        properties: {
-            file: {
-                type: Object,
-                value: function() {
-                    return {};
+    <script>
+        Polymer({
+            is: "stv-validator",
+            properties: {
+                file: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    },
+                    observer: 'fileChanged'
                 },
-                observer: 'fileChanged'
-            },
-            validator: {
-                type: Object,
-                value: function() {
-                    return new Validator({});
+                validator: {
+                    type: Object,
+                    value: function() {
+                        return new Validator({});
+                    },
+                    observer: 'validatorChanged'
                 },
-                observer: 'validatorChanged'
+                log: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                errorCount: {
+                    type: Number,
+                    value: 0
+                },
+                warningCount: {
+                    type: Number,
+                    value: 0
+                },
+                infoCount: {
+                    type: Number,
+                    value: 0
+                },
+                progress: {
+                    type: Number,
+                    value: 0,
+                    observer: 'progressChanged'
+                }
             },
-            log: {
-                type: Array,
-                value: function() {
+            ready: function() {
+
+            },
+            reset: function() {
+                this.progress = 0;
+            },
+            validate: function() {
+                this.set("log", []);
+                this.errorCount = 0;
+                this.warningCount = 0;
+                this.infoCount = 0;
+                this.validator.validate();
+            },
+            setFile: function(file) {
+                this.fileChanged(file);
+            },
+            validatorChanged: function(neo, old) {
+                var me = this;
+                neo.on("end", function(e) {
+                    me.fire("end");
+                });
+
+                neo.on("err", function(e) {
+                    me.fire("err");
+                });
+
+                neo.on("log", function(e) {
+                    switch (e.type) {
+                        case "error":
+                            me.errorCount++;
+                            break;
+                        case "warning":
+                            me.warningCount++;
+                            break;
+                    }
+                    me.push("log", e);
+                });
+
+                neo.on("progress", function(e) {
+                    me.progress = Math.ceil(e);
+                })
+
+                neo.init();
+
+            },
+            fileChanged: function(neo, old) {
+                if (neo && this.validator) {
+                    this.validator.init();
+                    this.validator.file = neo;
+                }
+            },
+            computeLog: function(validator) {
+                if (validator) {
+                    return validator.log;
+                } else {
                     return [];
                 }
             },
-            errorCount: {
-                type: Number,
-                value: 0
+            progressChanged: function(neo, old) {
+                console.log("progress : " + neo);
+                this.$.progressBar.style.width = neo + '%';
             },
-            warningCount: {
-                type: Number,
-                value: 0
+            computeSpin: function(progress) {
+                return progress >= 100 || progress <= 0;
             },
-            infoCount: {
-                type: Number,
-                value: 0
+            handleLogViewClick: function(e) {
+                var me = this;
+                var elem = e.currentTarget;
+                var line = elem.line - 1;
+                this.validator._navigator.readLines(line, 1, function linesReadHandler(err, index, lines, eof, progress) {
+                    if (err) {
+                        return;
+                    }
+
+                    if (lines.length > 0) {
+                        me.linePreview = lines[0];
+                        me.$.linePreview.show();
+                    }
+
+                    if (eof) {
+                        return;
+                    }
+
+                });
             },
-            progress: {
-                type: Number,
-                value: 0,
-                observer: 'progressChanged'
+            handleLogHover: function(e) {
+
+                var elem = e.currentTarget;
+
+                var view = elem.getElementsByClassName("view")[0];
+                view.hidden = false;
+            },
+            handleLogHoverOut: function(e) {
+
+                var elem = e.currentTarget;
+
+                var view = elem.getElementsByClassName("view")[0];
+                view.hidden = true;
+            },
+            handleCloseLinePreview: function(e) {
+                this.linePreview = "";
             }
-        },
-        ready: function() {
 
-        },
-        reset: function() {
-            this.progress = 0;
-        },
-        validate: function() {
-            this.set("log", []);
-            this.errorCount = 0;
-            this.warningCount = 0;
-            this.infoCount = 0;
-            this.validator.validate();
-        },
-        setFile: function(file) {
-            this.fileChanged(file);
-        },
-        validatorChanged: function(neo, old) {
-            var me = this;
-            neo.on("end", function(e) {
-                me.fire("end");
-            });
-
-            neo.on("err", function(e) {
-                me.fire("err");
-            });
-
-            neo.on("log", function(e) {
-                switch (e.type) {
-                    case "error":
-                        me.errorCount++;
-                        break;
-                    case "warning":
-                        me.warningCount++;
-                        break;
-                }
-                me.push("log", e);
-            });
-
-            neo.on("progress", function(e) {
-                me.progress = Math.ceil(e);
-            })
-
-            neo.init();
-
-        },
-        fileChanged: function(neo, old) {
-            if (neo && this.validator) {
-                this.validator.init();
-                this.validator.file = neo;
-            }
-        },
-        computeLog: function(validator) {
-            if (validator) {
-                return validator.log;
-            } else {
-                return [];
-            }
-        },
-        progressChanged: function(neo, old) {
-            console.log("progress : " + neo);
-            this.$.progressBar.style.width = neo + '%';
-        },
-        computeSpin: function(progress) {
-            return progress >= 100 || progress <= 0;
-        },
-        handleLogViewClick: function(e) {
-            var me = this;
-            var elem = e.currentTarget;
-            var line = elem.line - 1;
-            this.validator._navigator.readLines(line, 1, function linesReadHandler(err, index, lines, eof, progress) {
-                if (err) {
-                    return;
-                }
-
-                if (lines.length > 0) {
-                    me.linePreview = lines[0];
-                    me.$.linePreview.show();
-                }
-
-                if (eof) {
-                    return;
-                }
-
-            });
-        },
-        handleLogHover: function(e) {
-
-            var elem = e.currentTarget;
-
-            var view = elem.getElementsByClassName("view")[0];
-            view.hidden = false;
-        },
-        handleLogHoverOut: function(e) {
-
-            var elem = e.currentTarget;
-
-            var view = elem.getElementsByClassName("view")[0];
-            view.hidden = true;
-        },
-        handleCloseLinePreview: function(e) {
-            this.linePreview = "";
-        }
-
-    })
-</script>
+        })
+    </script>
+</dom-module>

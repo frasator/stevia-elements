@@ -1,3 +1,4 @@
+<link rel="import" href="../../polymer/polymer.html">
 <dom-module id="stv-signup">
     <style>
         :host {
@@ -53,88 +54,95 @@
         </form>
         <div class="message">{{message}}</div>
     </template>
-</dom-module>
 
-
-<script>
-    Polymer({
-        is: "stv-signup",
-        properties: {
-            email: {
-                type: String,
-                value: ''
-            },
-            password: {
-                type: String,
-                value: ''
-            },
-            passwordCheck: {
-                type: String,
-                value: ''
-            },
-            message: {
-                type: String,
-                value: ''
-            }
-        },
-        handleFormKey: function(e) {
-            if (e.which == 13) {
-                this.handleForm();
-            }
-        },
-        handleForm: function(e) {
-            this.message = '';
-            this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
-            if (this.$.form.checkValidity()) {
-                if (this.password === this.passwordCheck) {
-                    this._signup();
-                } else {
-                    alert("Sorry, your password does not match");
-                }
-            } else {
-                // alert("Please, you should fill all the fields. If error persist, contact crew at " + CONTACT_MAIL + ".");
-                alert("Please, you should fill all the fields.");
-            }
-        },
-        clean:function(){
-            this.email = "";
-            this.password = "";
-            this.passwordCheck = "";
-        },
-        _signup: function() {
-            var me = this;
-            SteviaManager.users.create({
-                query: {
-                    email: this.email,
-                    password: CryptoJS.SHA1(this.password).toString()
+    <script>
+        Polymer({
+            is: "stv-signup",
+            properties: {
+                email: {
+                    type: String,
+                    value: ''
                 },
-                request: {
-                    async: false,
-                    success: function(response) {
-                        if (response.response[0].error == null) {
-                            var email = response.response[0].results[0].email;
-                            // me.message = email + ' created';
-                            Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id,{path:window.location.pathname});
-                            Cookies.set('bioinfo_user', email,{path:window.location.pathname});
-
-                            me.clean();
-
-                            me.fire('login', {
-                                status: true
-                            });
-                        } else {
-                            console.log(response.response[0].error);
-                            me.message = response.response[0].error;
-                            //Delete cookies
-                            Cookies.expire('bioinfo_sid',{path:window.location.pathname});
-                            Cookies.expire('bioinfo_user',{path:window.location.pathname});
-                        }
-                    },
-                    error: function() {
-                        me.message = 'Server error, try again later.';
-                    }
+                password: {
+                    type: String,
+                    value: ''
+                },
+                passwordCheck: {
+                    type: String,
+                    value: ''
+                },
+                message: {
+                    type: String,
+                    value: ''
                 }
-            });
-        }
-    });
-</script>
+            },
+            handleFormKey: function(e) {
+                if (e.which == 13) {
+                    this.handleForm();
+                }
+            },
+            handleForm: function(e) {
+                this.message = '';
+                this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
+                if (this.$.form.checkValidity()) {
+                    if (this.password === this.passwordCheck) {
+                        this._signup();
+                    } else {
+                        alert("Sorry, your password does not match");
+                    }
+                } else {
+                    // alert("Please, you should fill all the fields. If error persist, contact crew at " + CONTACT_MAIL + ".");
+                    alert("Please, you should fill all the fields.");
+                }
+            },
+            clean: function() {
+                this.email = "";
+                this.password = "";
+                this.passwordCheck = "";
+            },
+            _signup: function() {
+                var me = this;
+                SteviaManager.users.create({
+                    query: {
+                        email: this.email,
+                        password: CryptoJS.SHA1(this.password).toString()
+                    },
+                    request: {
+                        async: false,
+                        success: function(response) {
+                            if (response.response[0].error == null) {
+                                var email = response.response[0].results[0].email;
+                                // me.message = email + ' created';
+                                Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id, {
+                                    path: window.location.pathname
+                                });
+                                Cookies.set('bioinfo_user', email, {
+                                    path: window.location.pathname
+                                });
+
+                                me.clean();
+
+                                me.fire('login', {
+                                    status: true
+                                });
+                            } else {
+                                console.log(response.response[0].error);
+                                me.message = response.response[0].error;
+                                //Delete cookies
+                                Cookies.expire('bioinfo_sid', {
+                                    path: window.location.pathname
+                                });
+                                Cookies.expire('bioinfo_user', {
+                                    path: window.location.pathname
+                                });
+                            }
+                        },
+                        error: function() {
+                            me.message = 'Server error, try again later.';
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</dom-module>

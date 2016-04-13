@@ -1,3 +1,4 @@
+<link rel="import" href="../../polymer/polymer.html">
 <dom-module id="stv-button-tooltip">
     <style>
         :host {
@@ -32,7 +33,6 @@
             /*position: absolute;*/
             /*z-index: 99;*/
         }
-
     </style>
     <template>
 
@@ -40,14 +40,14 @@
 
         <!--pattern="^[\w ]+$">-->
     </template>
-</dom-module>
-<script>
-    Polymer({
-        is: "stv-button-tooltip",
-        properties: {
-            message: {
-                type: String
+    <script>
+        Polymer({
+            is: "stv-button-tooltip",
+            properties: {
+                message: {
+                    type: String
+                }
             }
-        }
-    });
-</script>
+        });
+    </script>
+</dom-module>

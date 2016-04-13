@@ -1,4 +1,7 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-search">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
         :host {
             display: block;
@@ -64,119 +67,119 @@
             </template>
         </div>
     </template>
-</dom-module>
-<script>
-    Polymer({
-        is: 'stv-search',
-        properties: {
-            placeholder: {
-                type: String,
-                reflectToAttribute: true,
-                value: 'Search...'
+    <script>
+        Polymer({
+            is: 'stv-search',
+            properties: {
+                placeholder: {
+                    type: String,
+                    reflectToAttribute: true,
+                    value: 'Search...'
+                },
+                url: {
+                    type: String
+                },
+                results: {
+                    type: Array
+                },
+                lastQuery: {
+                    type: String,
+                    value: ''
+                }
             },
-            url: {
-                type: String
+            clean: function() {
+                this.$.input.value = "";
+                this.set('results', []);
+                this.set('lastQuery', '');
             },
-            results: {
-                type: Array
-            },
-            lastQuery: {
-                type: String,
-                value: ''
-            }
-        },
-        clean: function() {
-            this.$.input.value = "";
-            this.set('results', []);
-            this.set('lastQuery', '');
-        },
 
-        toggleList: function(e) {
-            if (this.$.list.style.display === '') {
-                this.showList(e);
-            } else {
-                this.hideList();
-            }
-        },
-        showList: function(e) {
-            this.$.list.style.display = 'block';
-
-        },
-        hideList: function() {
-            this.$.list.style.display = '';
-        },
-        handleKeyUp: function(e) {
-            // 40 - down arrow;
-            // 38 - up arrow;
-            if (e.keyCode == 38 || e.keyCode == 40) {
-                var result = this.$.list.querySelector('.result-item[hover]');
-                if (result == null) {
-                    this.$.list.querySelector('.result-item').setAttribute('hover', '');
+            toggleList: function(e) {
+                if (this.$.list.style.display === '') {
+                    this.showList(e);
                 } else {
-                    result.removeAttribute('hover');
-                    if (e.keyCode == 40 && result.nextElementSibling != null) {
-                        if (result.nextElementSibling.classList.contains('result-item')) {
-                            result.nextElementSibling.setAttribute('hover', '');
-                        }
-                    } else if (e.keyCode == 38 && result.previousElementSibling != null) {
-                        if (result.previousElementSibling.classList.contains('result-item')) {
-                            result.previousElementSibling.setAttribute('hover', '');
-                        }
-                    }
+                    this.hideList();
                 }
-            } else if (e.keyCode === 27) {
-                this.$.input.blur();
-            } else if (e.keyCode !== 13) {
-                var query = e.currentTarget.value;
-                this._getResults(query);
-            } else if (e.keyCode === 13) {
-                var result = this.$.list.querySelector('.result-item[hover]');
-                if (result != null) {
-                    this.fire('item-select', result.innerHTML);
-                }
-            }
-        },
-        _getResults: function(query) {
-            var me = this;
-            if (query.length > 1) {
-                this.lastQuery = query;
-                this.searchFunction(query, function(result) {
-                    var results = me.parseFunction(result);
-                    if (results.length > 0) {
-                        me.showList();
-                    }
-                    me.set('results', results);
-                });
-            }
-            if (query.length <= 1) {
-                this.hideList();
-            }
-        },
-        handleFocus: function() {
-            console.log(this.lastQuery);
-            this._getResults(this.lastQuery);
-        },
-        handleResultKeySelect: function(e) {
-            if (e.which === 13) {
-                this.fire('item-select', e.currentTarget.innerHTML);
-            }
-        },
-        handleResultClickSelect: function(e) {
-            this.fire('item-select', e.currentTarget.innerHTML);
-        },
+            },
+            showList: function(e) {
+                this.$.list.style.display = 'block';
 
-        /*custom functions*/
-        setSearchFunction: function(fn) {
-            this.searchFunction = fn;
-        },
-        setParseFunction: function(fn) {
-            this.parseFunction = fn;
-        },
-        searchFunction: function(query, cb) {
-            cb(['Please', 'implement', ' a search function']);
-        },
-        parseFunction: function(result) {
-            return result;
-        }
-    });
-</script>
+            },
+            hideList: function() {
+                this.$.list.style.display = '';
+            },
+            handleKeyUp: function(e) {
+                // 40 - down arrow;
+                // 38 - up arrow;
+                if (e.keyCode == 38 || e.keyCode == 40) {
+                    var result = this.$.list.querySelector('.result-item[hover]');
+                    if (result == null) {
+                        this.$.list.querySelector('.result-item').setAttribute('hover', '');
+                    } else {
+                        result.removeAttribute('hover');
+                        if (e.keyCode == 40 && result.nextElementSibling != null) {
+                            if (result.nextElementSibling.classList.contains('result-item')) {
+                                result.nextElementSibling.setAttribute('hover', '');
+                            }
+                        } else if (e.keyCode == 38 && result.previousElementSibling != null) {
+                            if (result.previousElementSibling.classList.contains('result-item')) {
+                                result.previousElementSibling.setAttribute('hover', '');
+                            }
+                        }
+                    }
+                } else if (e.keyCode === 27) {
+                    this.$.input.blur();
+                } else if (e.keyCode !== 13) {
+                    var query = e.currentTarget.value;
+                    this._getResults(query);
+                } else if (e.keyCode === 13) {
+                    var result = this.$.list.querySelector('.result-item[hover]');
+                    if (result != null) {
+                        this.fire('item-select', result.innerHTML);
+                    }
+                }
+            },
+            _getResults: function(query) {
+                var me = this;
+                if (query.length > 1) {
+                    this.lastQuery = query;
+                    this.searchFunction(query, function(result) {
+                        var results = me.parseFunction(result);
+                        if (results.length > 0) {
+                            me.showList();
+                        }
+                        me.set('results', results);
+                    });
+                }
+                if (query.length <= 1) {
+                    this.hideList();
+                }
+            },
+            handleFocus: function() {
+                console.log(this.lastQuery);
+                this._getResults(this.lastQuery);
+            },
+            handleResultKeySelect: function(e) {
+                if (e.which === 13) {
+                    this.fire('item-select', e.currentTarget.innerHTML);
+                }
+            },
+            handleResultClickSelect: function(e) {
+                this.fire('item-select', e.currentTarget.innerHTML);
+            },
+
+            /*custom functions*/
+            setSearchFunction: function(fn) {
+                this.searchFunction = fn;
+            },
+            setParseFunction: function(fn) {
+                this.parseFunction = fn;
+            },
+            searchFunction: function(query, cb) {
+                cb(['Please', 'implement', ' a search function']);
+            },
+            parseFunction: function(result) {
+                return result;
+            }
+        });
+    </script>
+</dom-module>

@@ -1,6 +1,10 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+
 <link rel="import" href="stv-folder-create.html">
 <link rel="import" href="stv-folder-list-item.html">
 <dom-module id="stv-folder-list">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
         :host {
             position: relative;
@@ -182,240 +186,240 @@
 
 
     </template>
-</dom-module>
-<script>
-    Polymer({
-        is: "stv-folder-list",
-        properties: {
-            folder: {
-                type: Object,
-                notify: true,
-                value: null
-            },
-            files: {
-                type: Array,
-                notify: true,
-                value: function() {
-                    return [];
-                }
-            },
-            selected: {
-                type: Object,
-                notify: true,
-                value: function() {
-                    return null;
+    <script>
+        Polymer({
+            is: "stv-folder-list",
+            properties: {
+                folder: {
+                    type: Object,
+                    notify: true,
+                    value: null
                 },
-                observer: 'selectedChanged'
-            },
-            mode: {
-                type: String,
-                reflectToAttribute: true,
-            },
-            viewMode: {
-                type: String,
-                value: 'list'
-            },
-            showInfo: {
-                type: Boolean,
-                value: false
-            },
-            disableIconView: {
-                type: Boolean,
-                value: false
-            },
-            isFile: {
-                type: Boolean,
-                value: false
-            }
-        },
-        handleUploadFile: function(e) {
-            this.set('selected', null);
-            this.fire('upload-file');
-        },
-        handleCreateFolder: function(e) {
-            if (this.$.createFolderModal.hasAttribute('hidden')) {
-                this.$.createFolderModal.removeAttribute('hidden');
-            } else {
-                this.$.createFolderModal.setAttribute('hidden', '');
-            }
-        },
-        handleFolderCreated: function(e) {
-            this.$.createFolderModal.setAttribute('hidden', '');
-        },
-        handleDeleteFile: function(e) {
-            if (confirm("Are you sure?")) {
-                this._deleteFile();
-            }
-        },
-        selectedChanged: function(neo, old) {
-            this.fileName = "";
-            this.fileType = "";
-            this.fileBioformat = "";
-            this.fileDate = "";
-
-            var sel = this.querySelector("stv-folder-list-item[selected]");
-            if (sel) {
-                sel.removeAttribute('selected');
-            }
-            this.fire('fileselect', {
-                file: this.selected
-            });
-        },
-        handleFileClick: function(e) {
-            this.selected = e.currentTarget.file;
-            e.currentTarget.setAttribute('selected', '');
-
-            this.fileName = this.selected.name;
-            this.fileType = this.selected.type;
-            if (this.fileType == "FOLDER") {
-                this.isFile = true;
-            } else {
-                this.isFile = false;
-            }
-            this.fileBioformat = this.selected.bioformat;
-
-            var date = new Date(Date.parse(this.selected.createdAt));
-            this.fileDate = date.toLocaleString("en-us", {
-                month: "short"
-            }) + " " + date.getDate() + ", " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-
-        },
-        handleFileDblClick: function(e) {
-            var file = e.currentTarget.file;
-            if (file.type == 'FOLDER') {
-                this.set('selected', null);
-                this.fire('openfolder', file);
-            } else if (file.type == "FILE") {
-                this.fire('previewfile', file);
-            }
-
-        },
-        handlePreviewFile: function(e) {
-            if (this.selected) {
-                this.fire('previewfile', this.selected);
-            }
-        },
-        handleBack: function() {
-            this.set('selected', null);
-            this.fire('back');
-        },
-        checkFolder: function(folder) {
-            return folder == null;
-        },
-        checkBack: function(folder) {
-            if (folder == null) {
-                return true
-            } else {
-                if (folder.name == '.') {
-                    return true;
+                files: {
+                    type: Array,
+                    notify: true,
+                    value: function() {
+                        return [];
+                    }
+                },
+                selected: {
+                    type: Object,
+                    notify: true,
+                    value: function() {
+                        return null;
+                    },
+                    observer: 'selectedChanged'
+                },
+                mode: {
+                    type: String,
+                    reflectToAttribute: true,
+                },
+                viewMode: {
+                    type: String,
+                    value: 'list'
+                },
+                showInfo: {
+                    type: Boolean,
+                    value: false
+                },
+                disableIconView: {
+                    type: Boolean,
+                    value: false
+                },
+                isFile: {
+                    type: Boolean,
+                    value: false
                 }
-            }
-            return false;
-        },
-        checkSelected: function(selected) {
-            return selected == null;
-        },
-        checkSelectedFile: function(selected) {
-            return selected == null || selected.type != "FILE";
-        },
-        checkFilters: function(item) {
-            return true;
-            //            return item.bioformat == "VARIANT";
-        },
-        isFolderMode: function(mode) {
-            return mode === 'folder';
-        },
+            },
+            handleUploadFile: function(e) {
+                this.set('selected', null);
+                this.fire('upload-file');
+            },
+            handleCreateFolder: function(e) {
+                if (this.$.createFolderModal.hasAttribute('hidden')) {
+                    this.$.createFolderModal.removeAttribute('hidden');
+                } else {
+                    this.$.createFolderModal.setAttribute('hidden', '');
+                }
+            },
+            handleFolderCreated: function(e) {
+                this.$.createFolderModal.setAttribute('hidden', '');
+            },
+            handleDeleteFile: function(e) {
+                if (confirm("Are you sure?")) {
+                    this._deleteFile();
+                }
+            },
+            selectedChanged: function(neo, old) {
+                this.fileName = "";
+                this.fileType = "";
+                this.fileBioformat = "";
+                this.fileDate = "";
 
-        /**/
-        _deleteFile: function() {
-            var me = this;
-            if (this.selected) {
-                SteviaManager.files.delete({
-                    id: this.selected._id,
+                var sel = this.querySelector("stv-folder-list-item[selected]");
+                if (sel) {
+                    sel.removeAttribute('selected');
+                }
+                this.fire('fileselect', {
+                    file: this.selected
+                });
+            },
+            handleFileClick: function(e) {
+                this.selected = e.currentTarget.file;
+                e.currentTarget.setAttribute('selected', '');
+
+                this.fileName = this.selected.name;
+                this.fileType = this.selected.type;
+                if (this.fileType == "FOLDER") {
+                    this.isFile = true;
+                } else {
+                    this.isFile = false;
+                }
+                this.fileBioformat = this.selected.bioformat;
+
+                var date = new Date(Date.parse(this.selected.createdAt));
+                this.fileDate = date.toLocaleString("en-us", {
+                    month: "short"
+                }) + " " + date.getDate() + ", " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+
+            },
+            handleFileDblClick: function(e) {
+                var file = e.currentTarget.file;
+                if (file.type == 'FOLDER') {
+                    this.set('selected', null);
+                    this.fire('openfolder', file);
+                } else if (file.type == "FILE") {
+                    this.fire('previewfile', file);
+                }
+
+            },
+            handlePreviewFile: function(e) {
+                if (this.selected) {
+                    this.fire('previewfile', this.selected);
+                }
+            },
+            handleBack: function() {
+                this.set('selected', null);
+                this.fire('back');
+            },
+            checkFolder: function(folder) {
+                return folder == null;
+            },
+            checkBack: function(folder) {
+                if (folder == null) {
+                    return true
+                } else {
+                    if (folder.name == '.') {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            checkSelected: function(selected) {
+                return selected == null;
+            },
+            checkSelectedFile: function(selected) {
+                return selected == null || selected.type != "FILE";
+            },
+            checkFilters: function(item) {
+                return true;
+                //            return item.bioformat == "VARIANT";
+            },
+            isFolderMode: function(mode) {
+                return mode === 'folder';
+            },
+
+            /**/
+            _deleteFile: function() {
+                var me = this;
+                if (this.selected) {
+                    SteviaManager.files.delete({
+                        id: this.selected._id,
+                        query: {
+                            sid: Cookies('bioinfo_sid'),
+                        },
+                        request: {
+                            success: function(response) {
+                                if (response.response[0].error == null) {
+                                    console.log("delete:");
+                                    console.log(response);
+                                    me.set('selected', null);
+                                    me.fire('need-refresh');
+                                } else {
+                                    console.log(response.response[0].error);
+                                }
+                            },
+                            error: function() {
+                                alert('Server error, try again later.');
+                            }
+                        }
+                    });
+                }
+            },
+            computeHeader: function(viewMode) {
+                return viewMode == "list";
+            },
+            computeViewModeIconClass: function(viewMode) {
+                var iconClass = (this.viewMode == "list") ? "fa fa-th" : "fa fa-list";
+                return iconClass;
+            },
+            handleViewMode: function(e) {
+                this.viewMode = (this.viewMode == "list") ? "icon" : "list";
+            },
+            computeClassViewMode: function(viewMode) {
+                if (viewMode == "icon") {
+                    return "horizontal layout wrap";
+                } else {
+                    return "";
+                }
+            },
+            computeContentClass: function(viewMode, showInfo) {
+                if (showInfo) {
+                    return viewMode + " info";
+                } else {
+                    return viewMode;
+                }
+            },
+            handleViewInfo: function(e) {
+                if (this.selected != null) {
+                    this.showInfo = !this.showInfo;
+                }
+            },
+            allowDrop: function(e) {
+                e.preventDefault();
+                console.log("allow drop 1");
+            },
+            handleDrag: function(e) {
+                console.log('DRAG');
+                e.dataTransfer.setData("text/plain", e.currentTarget.file._id);
+            },
+            handleDrop: function(e) {
+                e.preventDefault();
+                console.log("DROP");
+                var newParentId = e.currentTarget.file._id;
+                console.log(newParentId);
+                var fileId = e.dataTransfer.getData("text");
+                SteviaManager.files.move({
                     query: {
-                        sid: Cookies('bioinfo_sid'),
+                        sid: Cookies("bioinfo_sid"),
+                        fileId: fileId,
+                        newId: newParentId
                     },
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {
-                                console.log("delete:");
-                                console.log(response);
-                                me.set('selected', null);
-                                me.fire('need-refresh');
+                                console.log(response.response[0].results[0])
                             } else {
-                                console.log(response.response[0].error);
+                                console.log(response.response[0].error)
                             }
                         },
                         error: function() {
-                            alert('Server error, try again later.');
+                            console.log('Server error, try again later')
                         }
                     }
                 });
-            }
-        },
-        computeHeader: function(viewMode) {
-            return viewMode == "list";
-        },
-        computeViewModeIconClass: function(viewMode) {
-            var iconClass = (this.viewMode == "list") ? "fa fa-th" : "fa fa-list";
-            return iconClass;
-        },
-        handleViewMode: function(e) {
-            this.viewMode = (this.viewMode == "list") ? "icon" : "list";
-        },
-        computeClassViewMode: function(viewMode) {
-            if (viewMode == "icon") {
-                return "horizontal layout wrap";
-            } else {
-                return "";
-            }
-        },
-        computeContentClass: function(viewMode, showInfo) {
-            if (showInfo) {
-                return viewMode + " info";
-            } else {
-                return viewMode;
-            }
-        },
-        handleViewInfo: function(e) {
-            if (this.selected != null) {
-                this.showInfo = !this.showInfo;
-            }
-        },
-        allowDrop: function(e) {
-            e.preventDefault();
-            console.log("allow drop 1");
-        },
-        handleDrag: function(e) {
-            console.log('DRAG');
-                e.dataTransfer.setData("text/plain",e.currentTarget.file._id);
-        },
-        handleDrop: function(e) {
-            e.preventDefault();
-            console.log("DROP");
-            var newParentId = e.currentTarget.file._id;
-            console.log(newParentId);
-            var fileId = e.dataTransfer.getData("text");
-            SteviaManager.files.move({
-                query: {
-                    sid: Cookies("bioinfo_sid"),
-                    fileId: fileId,
-                    newId: newParentId
-                },
-                request: {
-                    success: function(response) {
-                        if (response.response[0].error == null) {
-                            console.log(response.response[0].results[0])
-                        } else {
-                            console.log(response.response[0].error)
-                        }
-                    },
-                    error: function() {
-                        console.log('Server error, try again later')
-                    }
-                }
-            });
-            this.fire('need-refresh');
-        },
-    });
-</script>
+                this.fire('need-refresh');
+            },
+        });
+    </script>
+</dom-module>

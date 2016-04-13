@@ -1,10 +1,11 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-input-text">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
     <style>
 
     </style>
     <template>
-
-
         <div class="horizontal layout">
             <div class="flex">
                 <label id="label" class="stv">{{label}}</label>
@@ -15,53 +16,52 @@
 
         </div>
 
-        <input class="stv" id="input" type="text" value={{value::input}} placeholder="{{placeholder}}" required$="{{required}}"
-               pattern="{{pattern}}">
+        <input class="stv" id="input" type="text" value={{value::input}} placeholder="{{placeholder}}" required$="{{required}}" pattern="{{pattern}}">
         <!--<label id="message" class="stv">{{message}}</label>-->
 
         <!--pattern="^[\w ]+$">-->
     </template>
+    <script>
+        Polymer({
+            is: "stv-input-text",
+            properties: {
+                label: {
+                    type: String
+                },
+                value: {
+                    type: String
+                },
+                placeholder: {
+                    type: String
+                },
+                required: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
+                pattern: {
+                    type: String
+                },
+                message: {
+                    type: String
+                },
+                tooltip: {
+                    type: String,
+                    value: ""
+                },
+                _hideTooltip: {
+                    type: Boolean
+                }
+            },
+            ready: function() {
+                this._hideTooltip = (this.tooltip == "")
+            },
+            getValue: function() {
+                    return this.value;
+                }
+                //        isTooltipHidden: function(){
+                //            return this.tooltip != "";
+                //        }
+        });
+    </script>
 </dom-module>
-<script>
-    Polymer({
-        is: "stv-input-text",
-        properties: {
-            label: {
-                type: String
-            },
-            value: {
-                type: String
-            },
-            placeholder: {
-                type: String
-            },
-            required: {
-                type: Boolean,
-                reflectToAttribute: true,
-                value: false
-            },
-            pattern: {
-                type: String
-            },
-            message: {
-                type: String
-            },
-            tooltip: {
-                type: String,
-                value: ""
-            },
-            _hideTooltip: {
-                type: Boolean
-            }
-        },
-        ready: function () {
-            this._hideTooltip = (this.tooltip == "")
-        },
-        getValue: function () {
-            return this.value;
-        }
-//        isTooltipHidden: function(){
-//            return this.tooltip != "";
-//        }
-    });
-</script>
