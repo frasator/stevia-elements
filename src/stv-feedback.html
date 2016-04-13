@@ -10,25 +10,12 @@
             padding: 5px;
         }
 
-        #options> div:hover {
-            background-color: #8ba7a7;
-            border: 1px solid #8ba7a7;
-        }
-
-        #options> a:hover {
-            background-color: #8ba7a7;
-            border: 1px solid #8ba7a7;
-        }
-
         #emailPanel {
             width: 500px;
             height: 500px;
+            min-width: 500px;
+            min-height: 500px;
             padding: 5px;
-        }
-
-        stv-panel {
-            width: 500px;
-            height: 300px;
         }
 
         .send {
@@ -47,27 +34,14 @@
         }
     </style>
     <template>
-        <stv-panel id="" modal closable>
-            <div class="header">
-                <i class="fa fa-bolt"></i> &nbsp; Feedback
-            </div>
-            <div id="options" class="container">
-                <div on-mousedown="handleSend">
-                    <i class="fa fa-envelope-o" aria-hidden="true"></i> &nbsp; Send an email
-                </div>
-                <a href="https://github.com/babelomics/" target="_blank">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i> &nbsp; Go to git issue
-                </a>
-            </div>
-        </stv-panel>
-        <stv-panel id="emailPanel" modal closable resizable hidden>
+        <stv-panel id="emailPanel" modal closable>
             <div class="header">
                 <i class="fa fa-envelope-o"></i> Send an email
             </div>
             <div id="emailContent" class="container">
                 <div class="horizontal layout flex">
                     <div class="data" for="">Subject &nbsp;</div>
-                    <input style="margin-top: 5px;" type="text" value="{{subject}}" />
+                    <input style="margin-top: 5px;" type="text" value="{{subject::input}}" />
 
                     <label class="data" for="">Type &nbsp;</label>
                     <stv-select id="emailType" style="width:150px; margin-top:5px">
@@ -78,9 +52,12 @@
                 </div>
 
                 <div class="data" for="">Text &nbsp; </div>
-                <textarea class="stv" style="height: 300px; width:400px" name="" id="" cols="30" rows="10" value="{{text}}"></textarea>
+                <textarea class="stv" style="height: 300px; width:400px" name="" id="" cols="30" rows="10" value="{{text::input}}"></textarea>
 
                 <div class="stv-btn stv-btn-shdw send" on-click="handleSendEmail">&nbsp; SEND</div>
+                <div id="Sending" hidden$="{{!sending}}">
+                    <i class="fa fa-circle-o-notch fa-spin"></i> Sending...
+                </div>
             </div>
         </stv-panel>
     </template>
@@ -89,46 +66,52 @@
         Polymer({
             is: "stv-feedback",
             properties: {
-              subject:{
-                type:String,
-                value: ""
-              },
-              text:{
-                type:String,
-                value: ""
-              }
+                subject: {
+                    type: String,
+                    value: ""
+                },
+                text: {
+                    type: String,
+                    value: ""
+                },
+                sending: {
+                    type: Boolean,
+                    value: false
+                }
             },
             ready: function() {},
-            handleSend: function(e) {
-                this.$.emailPanel.hidden = !this.$.emailPanel.hidden;
-            },
             handleSendEmail: function(e) {
-              e.stopPropagation();
-              var subject=this.subject;
-              var text=this.text;
-              var type=this.$.emailType.querySelector("jso-option[selected]").value;
-debugger
-              SteviaManager.user.feedback({
-                  query: {
-                      sid: Cookies('bioinfo_sid'),
-                      subject:subject,
-                      type: type,
-                      text:text
-                  },
-                  request: {
-                      success: function(response) {
-                          if (response.response[0].error == null) {
-                            debugger
-                              alert(response.response[0].results[0]);
-                          } else {
-                              alert('Sorry! There was a problem, try again later');
-                          }
-                      },
-                      error: function() {
-                          console.log('Server error, try again later');
-                      }
-                  }
-              });
+                e.stopPropagation();
+                this.sending = true;
+                var me = this;
+                var subject = this.subject;
+                var text = this.text;
+                var type = this.$.emailType.selectedOption.value;
+
+                setTimeout(function() {
+                    SteviaManager.users.feedback({
+                        query: {
+                            sid: Cookies('bioinfo_sid'),
+                            subject: subject,
+                            type: type,
+                            text: text
+                        },
+                        request: {
+                            success: function(response) {
+                                if (response.response[0].error == null) {
+                                    me.sending = false;
+                                    me.fire('feedbackend');
+                                    alert(response.response[0].results[0]);
+                                } else {
+                                    alert('Sorry! There was a problem, try again later');
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later');
+                            }
+                        }
+                    });
+                }, 5000)
             }
         })
     </script>
