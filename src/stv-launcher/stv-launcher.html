@@ -17,14 +17,6 @@
                 opacity: 0;
             }
 
-            .centered {
-                transform: translate(-47%, 0);
-            }
-
-            .left {
-                transform: translate(-90%,0);
-            }
-
 
         </style>
         <content id="icon"></content>
@@ -54,7 +46,6 @@
             _toogle: function(){
 
                 var dropdown = this.$.dropdown;
-                console.log(dropdown.getBoundingClientRect());
                 if(dropdown.hidden){
                     dropdown.removeAttribute("hidden");
                     this._fadeIn(dropdown);
@@ -62,6 +53,8 @@
                     dropdown.setAttribute("hidden", true);
                     dropdown.style.opacity = 0;
                 }
+
+                this._setDropdownPosition();
             },
 
             _getAppInfo: function(){
@@ -104,8 +97,20 @@
                  tick();
              },
 
-            _getPosition: function(){
-                return this.getBoundingClientRect();
+            _setDropdownPosition: function(){
+                var dropdownBCR = this.$.dropdown.getBoundingClientRect();
+                var iconBCR = Polymer.dom(this).children[0].getBoundingClientRect();
+                var calcMargin = dropdownBCR.width/2 - iconBCR.width/2;
+
+                if(dropdownBCR.right + calcMargin  > window.innerWidth){
+                   this.$.dropdown.style.marginLeft = (- dropdownBCR.width + iconBCR.width) + "px";
+                }else if(dropdownBCR.left - calcMargin >= 0){
+                   this.$.dropdown.style.marginLeft = (- calcMargin) + "px";
+                }
+
+                //this.$.dropdown.style.marginLeft = calcMargin + "px";
+
+
             }
         })
     </script>
