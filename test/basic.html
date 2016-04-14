@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <!-- import element to test and its dependencies -->
+    <link rel="import" href="../src/stv-dialog/stv-dialog.html">
+</head>
+<body>
+
+<test-fixture id="stv-dialog-fixture">
+    <template>
+        <stv-dialog></stv-dialog>
+    </template>
+</test-fixture>
+
+<script>
+    suite('<stv-dialog>', function() {
+        var myEl;
+        var myElRoot;
+
+        function createSetUp(elementHidden, okButtonHidden, cancelButtonHidden, inputHidden){
+            return {
+                elIsHidden: elementHidden,
+                okButtonHidden: okButtonHidden,
+                cancelButtonHidden: cancelButtonHidden,
+                inputHidden: inputHidden
+            }
+        }
+
+        setup(function(){
+            myEl = fixture("stv-dialog-fixture");
+            myElRoot = Polymer.dom(myEl.root);
+        });
+
+        test("The element has to be hidden by default", function(){
+            assert.equal(myEl.hidden, true);
+        });
+
+        test("Confirm default set up", function(){
+           myEl.confirm();
+
+           var setUp = createSetUp(
+                   myEl.hidden,
+                   Polymer.dom(myEl.root).querySelector("#ok").hidden,
+                   Polymer.dom(myEl.root).querySelector("#cancel").hidden,
+                   Polymer.dom(myEl.root).querySelector("#text").hidden
+           );
+
+            var expectedSetUp = createSetUp(false, false, false, true);
+
+            assert.deepEqual(setUp, expectedSetUp);
+        });
+
+        test("Alert default set up", function(){
+            myEl.alert();
+
+            var setUp = createSetUp(
+                    myEl.hidden,
+                    Polymer.dom(myEl.root).querySelector("#ok").hidden,
+                    Polymer.dom(myEl.root).querySelector("#cancel").hidden,
+                    Polymer.dom(myEl.root).querySelector("#text").hidden
+            );
+            var expectedSetUp = createSetUp(false, false, true, true);
+            assert.deepEqual(setUp, expectedSetUp);
+        });
+
+        test("Prompt default set up", function(){
+            myEl.prompt();
+
+            var setUp = createSetUp(
+                    myEl.hidden,
+                    Polymer.dom(myEl.root).querySelector("#ok").hidden,
+                    Polymer.dom(myEl.root).querySelector("#cancel").hidden,
+                    Polymer.dom(myEl.root).querySelector("#text").hidden
+            );
+            var expectedSetUp = createSetUp(false, false, false, false);
+
+            assert.deepEqual(setUp, expectedSetUp);
+        });
+
+        // This test could have be done synchronously but I've done it asynchronously for fun
+        test("Alert clicked (async test)", function(done){
+            var foo = undefined;
+
+            myEl.alert("Alert Message", function(){
+                foo = "not undefined";
+                assert.equal(foo, "not undefined");
+                done();
+            })
+
+            var okBtn = myElRoot.querySelector("#ok");
+            okBtn.click();
+
+        });
+    });
+</script>
+
+</body>
+</html>
