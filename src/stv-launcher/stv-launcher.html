@@ -1,5 +1,6 @@
 <link rel="import" href="../../../polymer/polymer.html">
-<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../fontawesome/css/font-awesome.min.css">
 
 <!--
 `stv-launcher`
@@ -7,8 +8,9 @@
 
 <dom-module id="stv-launcher">
     <template>
-        <style>
-            div {
+        <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+
+            #dropdown {
                 width: 150px;
                 background-color: #2F2F2F;
                 border: white solid 1px;
@@ -16,15 +18,21 @@
                 margin-top: 20px;
                 box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
                 opacity: 0;
-                padding-right: 10px;
+                padding : 10px 10px 10px 10px;
             }
 
+            #dropdown div:hover {
+                border: white solid 1px;
+            }
+
+            .fa {
+                color: white;
+                font-size: 4em;
+            }
 
         </style>
         <content id="icon"></content>
-        <div id="dropdown" class$="{{dropdownPosition}}" hidden>
-            <ul id="appsList">
-            </ul>
+        <div id="dropdown" hidden class="layout horizontal wrap around-justified">
         </div>
     </template>
     <script>
@@ -32,8 +40,6 @@
             is: "stv-launcher",
 
             properties:{
-                dropdownPosition: String,
-
                 dataSrc: String,
 
                 _applicationsList: Object
@@ -75,11 +81,17 @@
 
             _writeApps: function(){
                 this._applicationsList.forEach(function(element){
-                    var newListItem = document.createElement("li");
+                   var newListItem = document.createElement("i");
+                    var container = document.createElement("div");
 
-                    newListItem.textContent = element.name;
 
-                    Polymer.dom(this.$.appsList).appendChild(newListItem);
+                   newListItem.className = "fa fa-empire";
+
+                    Polymer.dom(container).appendChild(newListItem);
+
+                    Polymer.dom(this.$.dropdown).appendChild(container);
+                    console.log(container);
+
                 }, this);
             },
 
@@ -109,10 +121,6 @@
                 }else if(dropdownBCR.left - calcMargin >= 0){
                    this.$.dropdown.style.marginLeft = (- calcMargin) + "px";
                 }
-
-                //this.$.dropdown.style.marginLeft = calcMargin + "px";
-
-
             }
         })
     </script>
