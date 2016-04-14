@@ -26,7 +26,7 @@
 
         </style>
         <content id="icon"></content>
-        <div id="dropdown" class$="{{dropdownPosition}}">
+        <div id="dropdown" class$="{{dropdownPosition}}" hidden>
         </div>
     </template>
     <script>
@@ -39,7 +39,13 @@
             },
 
             ready: function(){
+                var icon = Polymer.dom(this).children[0];
+                icon.addEventListener("click", this.test.bind(this));
             },
+
+            test: function(){
+                this.$.dropdown.removeAttribute("hidden");
+            }
         })
     </script>
 </dom-module>
