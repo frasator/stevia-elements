@@ -1,0 +1,21 @@
+[
+    {
+        "name": "VARIANT",
+        "shortDescription": "Fast and accurate functional characterization of variants in VCF files"
+    },
+
+    {
+        "name": "CellBase",
+        "shortDescription": "RESTful Web Services for retrieving releant biological information"
+    },
+
+    {
+        "name": "GenomeMaps",
+        "shortDescription": "Our highly efficient next generation genome viewer (used by the ICGC)"
+    },
+
+    {
+        "name": "BiERapp",
+        "shortDescription": "Variant/gene prioritzation tool (from VCF to candidates)"
+    }
+]

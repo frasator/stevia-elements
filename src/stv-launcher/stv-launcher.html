@@ -10,8 +10,7 @@
         <style>
             div {
                 width: 150px;
-                height: 150px;
-                background-color: grey;
+                background-color: lightgrey;
                 position: absolute;
                 margin-top: 20px;
                 box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
@@ -30,6 +29,8 @@
         </style>
         <content id="icon"></content>
         <div id="dropdown" class$="{{dropdownPosition}}" hidden>
+            <ul id="appsList">
+            </ul>
         </div>
     </template>
     <script>
@@ -37,17 +38,23 @@
             is: "stv-launcher",
 
             properties:{
-                dropdownPosition: String
+                dropdownPosition: String,
 
+                dataSrc: String,
+
+                _applicationsList: Object
             },
 
             ready: function(){
                 var icon = Polymer.dom(this).children[0];
+                this._getAppInfo();
                 icon.addEventListener("click", this._toogle.bind(this));
             },
 
             _toogle: function(){
+
                 var dropdown = this.$.dropdown;
+                console.log(dropdown.getBoundingClientRect());
                 if(dropdown.hidden){
                     dropdown.removeAttribute("hidden");
                     this._fadeIn(dropdown);
@@ -55,6 +62,30 @@
                     dropdown.setAttribute("hidden", true);
                     dropdown.style.opacity = 0;
                 }
+            },
+
+            _getAppInfo: function(){
+                var request = new XMLHttpRequest();
+
+                var that = this;
+
+                request.addEventListener("load", function(){
+                    that._applicationsList = JSON.parse(this.responseText);
+                    that._writeApps();
+                });
+
+                request.open("GET", this.dataSrc);
+                request.send();
+            },
+
+            _writeApps: function(){
+                this._applicationsList.forEach(function(element){
+                    var newListItem = document.createElement("li");
+
+                    newListItem.textContent = element.name;
+
+                    Polymer.dom(this.$.appsList).appendChild(newListItem);
+                }, this);
             },
 
              _fadeIn: function(el) {
@@ -71,7 +102,11 @@
                  };
 
                  tick();
-             }
+             },
+
+            _getPosition: function(){
+                return this.getBoundingClientRect();
+            }
         })
     </script>
 </dom-module>
