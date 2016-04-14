@@ -15,6 +15,7 @@
                 position: absolute;
                 margin-top: 20px;
                 box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
+                opacity: 0;
             }
 
             .centered {
@@ -42,12 +43,35 @@
 
             ready: function(){
                 var icon = Polymer.dom(this).children[0];
-                icon.addEventListener("click", this.test.bind(this));
+                icon.addEventListener("click", this._toogle.bind(this));
             },
 
-            test: function(){
-                this.$.dropdown.removeAttribute("hidden");
-            }
+            _toogle: function(){
+                var dropdown = this.$.dropdown;
+                if(dropdown.hidden){
+                    dropdown.removeAttribute("hidden");
+                    this._fadeIn(dropdown);
+                } else {
+                    dropdown.setAttribute("hidden", true);
+                    dropdown.style.opacity = 0;
+                }
+            },
+
+             _fadeIn: function(el) {
+                 el.style.opacity = 0;
+
+                 var last = +new Date();
+                 var tick = function() {
+                     el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
+                     last = +new Date();
+
+                     if (+el.style.opacity < 1) {
+                         (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+                     }
+                 };
+
+                 tick();
+             }
         })
     </script>
 </dom-module>
