@@ -23,6 +23,7 @@
     "pako": "~0.2.8",
     "client-line-navigator": "git://github.com/anpur/client-line-navigator",
     "file-saver.js": "~1.20150507.2",
-    "iron-component-page": "PolymerElements/iron-component-page#^1.1.5"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.1.5",
+    "web-component-tester": "Polymer/web-component-tester#^4.2.2"
   }
 }
