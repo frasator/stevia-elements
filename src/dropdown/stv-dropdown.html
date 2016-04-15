@@ -1,0 +1,173 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<dom-module id="stv-dropdown">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+        :host {
+            position: relative;
+            display: block;
+            box-sizing: border-box;
+            margin-right: 5px;
+            margin-left: 5px;
+            border: 1px solid #afafaf;
+            box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2);
+            background-color: var(--dark-primary-color);
+            color: var(--text-primary-color);
+            width: 150px;
+        }
+
+        :host::content > .button {
+            padding: 5px;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        :host::content ul {
+            box-sizing: border-box;
+            display: none;
+            position: absolute;
+            list-style: none;
+            text-decoration: none;
+            z-index: 100000;
+            border: 1px solid #afafaf;
+            background-color: var(--dark-primary-color);
+            color: var(--text-primary-color);
+            line-height: 22px;
+            width: 200px;
+            padding: 10px 10px;
+            box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            cursor: pointer;
+            text-transform: none;
+            margin: 1px 0 0 0;
+            /*transition: all 0.25s;*/
+        }
+
+        :host::content ul {
+            left: 0;
+            top: 100%;
+        }
+
+        :host::content ul[data-upward] {
+            top: inherit;
+            bottom: 100%;
+            margin-bottom: 2px;
+            left: 0;
+        }
+
+        :host::content ul ul {
+            top: 0px;
+            left: 100%;
+        }
+
+        :host::content ul li {
+            position: relative;
+            text-align: left;
+            padding: 2px 30px 2px 10px;
+            white-space: nowrap;
+        }
+
+        :host::content ul li[data-divider] {
+            height: 1px;
+            margin: 3px 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--light-secondary-color);
+        }
+
+        :host::content ul li[data-sub]:after {
+            font-family: 'FontAwesome';
+            content: '\f105';
+            /* > */
+            /*content:'\f0da';*/
+            position: absolute;
+            right: 10px;
+        }
+
+        :host::content ul li.active,
+        :host::content ul li:active {
+            background-color: #DEDEDE;
+        }
+
+        :host::content ul li:hover {
+            background-color: var(--dark-button-color);
+            color: var(--text-primary-color);
+        }
+
+        :host::content ul li[data-text]:hover {
+            background-color: inherit !important;
+            color: inherit !important;
+        }
+
+        :host::content ul li[data-divider]:hover {
+            background-color: var(--light-secondary-color) !important;
+        }
+
+        :host::content > .button:hover {
+            background-color: var(--dark-button-color);
+        }
+
+        :host::content > ul li:hover > ul {
+            display: block;
+        }
+    </style>
+    <template>
+        <!-- <div id="button" on-click="handleShowMenu"> -->
+        <content select=".button" on-click="handleShowMenu"></content>
+        <!-- </div> -->
+        <!-- <div id="menu" hidden> -->
+        <content select=".menu"></content>
+        <!-- </div> -->
+    </template>
+
+    <script>
+        Polymer({
+            is: "stv-dropdown",
+            properties: {
+                button: {
+                    type: Object
+                },
+                menu: {
+                    type: Object
+                }
+            },
+            listeners: {
+                click: 'clickHandler'
+            },
+            ready: function() {
+                this.button = this.children[0];
+                this.menu = this.children[1];
+            },
+            clickHandler: function(e) {
+                if (e.target.dataset.button != null) {
+                    this.handleShowMenu(e);
+                };
+            },
+            handleShowMenu: function(e) {
+                e.stopPropagation();
+                if (this.menu.style.display == "none" || this.menu.style.display == "") {
+                    this.menu.style.display = "block";
+                } else if (this.menu.style.display == "block") {
+                    this.menu.style.display = "none";
+                }
+                // this._getPosition();
+
+            },
+            _getPosition: function() {
+                var bcr = this.getBoundingClientRect();
+                var msg = this.$.menu.getBoundingClientRect();
+                var windowHeight = window.innerHeight;
+                var windowWidth = window.innerWidth;
+
+                this.$.menu.style.top = (bcr.bottom) + 'px';
+                this.$.menu.style.left = (bcr.left) + 'px';
+                if ((bcr.bottom + msg.height) > window.innerHeight) {
+                    this.$.menu.style.top = (bcr.top - msg.height) + 'px';
+                }
+                if ((bcr.right + msg.width) > window.innerWidth) {
+                    this.$.menu.style.left = (bcr.left - msg.width) + 'px';
+                }
+
+            }
+        })
+    </script>
+</dom-module>
