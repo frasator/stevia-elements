@@ -11,7 +11,7 @@
         <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
 
             #dropdown {
-                width: 150px;
+                width: 220px;
                 background-color: #2F2F2F;
                 border: white solid 1px;
                 position: absolute;
@@ -21,13 +21,23 @@
                 padding : 10px 10px 10px 10px;
             }
 
+            #dropdown > div {
+                margin: 4px 4px 4px 4px;
+                color: white;
+                text-align: center;
+                width: 100px;
+                border: transparent solid 1px;
+                padding: 10px 0 10px 0;
+            }
+
             #dropdown div:hover {
                 border: white solid 1px;
             }
 
             .fa {
-                color: white;
                 font-size: 4em;
+                display: block;
+                margin-bottom: 5px;
             }
 
         </style>
@@ -83,14 +93,20 @@
                 this._applicationsList.forEach(function(element){
                    var newListItem = document.createElement("i");
                     var container = document.createElement("div");
-
+                    var appName = document.createElement("span");
+                    Polymer.dom(appName).textContent = element.name
 
                    newListItem.className = "fa fa-empire";
 
                     Polymer.dom(container).appendChild(newListItem);
+                    Polymer.dom(container).appendChild(appName);
 
                     Polymer.dom(this.$.dropdown).appendChild(container);
-                    console.log(container);
+
+
+                    container.addEventListener("click", function(){
+                        console.log("redirecting to: " + element.link);
+                    })
 
                 }, this);
             },

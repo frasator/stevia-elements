@@ -1,21 +1,25 @@
 [
     {
         "name": "VARIANT",
-        "shortDescription": "Fast and accurate functional characterization of variants in VCF files"
+        "shortDescription": "Fast and accurate functional characterization of variants in VCF files",
+        "link": "http://variant.bioinfo.cipf.es/"
     },
 
     {
         "name": "CellBase",
-        "shortDescription": "RESTful Web Services for retrieving releant biological information"
+        "shortDescription": "RESTful Web Services for retrieving releant biological information",
+        "link": "http://docs.bioinfo.cipf.es/projects/cellbase"
     },
 
     {
         "name": "GenomeMaps",
-        "shortDescription": "Our highly efficient next generation genome viewer (used by the ICGC)"
+        "shortDescription": "Our highly efficient next generation genome viewer (used by the ICGC)",
+        "link": "http://www.genomemaps.org/"
     },
 
     {
         "name": "BiERapp",
-        "shortDescription": "Variant/gene prioritzation tool (from VCF to candidates)"
+        "shortDescription": "Variant/gene prioritzation tool (from VCF to candidates)",
+        "link": "http://bierapp.babelomics.org/"
     }
 ]
