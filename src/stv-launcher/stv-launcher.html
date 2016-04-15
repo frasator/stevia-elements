@@ -11,34 +11,32 @@
         <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
 
             #dropdown {
-                width: 220px;
                 background-color: #2F2F2F;
                 border: white solid 1px;
                 position: absolute;
                 margin-top: 20px;
-                box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
+                box-shadow: 0 2px 10px rgba(0,0,0,.2)
                 opacity: 0;
                 padding : 10px 10px 10px 10px;
             }
 
-            #dropdown > div {
+            .button {
                 margin: 4px 4px 4px 4px;
                 color: white;
                 text-align: center;
-                width: 100px;
                 border: transparent solid 1px;
-                padding: 10px 0 10px 0;
             }
 
-            #dropdown div:hover {
+            .button:hover {
                 border: white solid 1px;
             }
 
             .fa {
-                font-size: 4em;
+                font-size: 3em;
                 display: block;
-                margin-bottom: 5px;
             }
+
+
 
         </style>
         <content id="icon"></content>
@@ -58,7 +56,10 @@
             ready: function(){
                 var icon = Polymer.dom(this).children[0];
                 this._getAppInfo();
+
+                Polymer.dom(this).setAttribute("tabindex", -1);
                 icon.addEventListener("click", this._toogle.bind(this));
+                this.addEventListener("blur", this._hide.bind(this));
             },
 
             _toogle: function(){
@@ -67,12 +68,17 @@
                 if(dropdown.hidden){
                     dropdown.removeAttribute("hidden");
                     this._fadeIn(dropdown);
+                    this._setAppsDivWidth();
                 } else {
                     dropdown.setAttribute("hidden", true);
                     dropdown.style.opacity = 0;
                 }
 
                 this._setDropdownPosition();
+            },
+
+            _hide: function(){
+                Polymer.dom(this.$.dropdown).setAttribute("hidden", true);
             },
 
             _getAppInfo: function(){
@@ -91,21 +97,23 @@
 
             _writeApps: function(){
                 this._applicationsList.forEach(function(element){
+
                    var newListItem = document.createElement("i");
-                    var container = document.createElement("div");
+                    newListItem.className = "fa fa-empire";
+
                     var appName = document.createElement("span");
                     Polymer.dom(appName).textContent = element.name
 
-                   newListItem.className = "fa fa-empire";
+                    var button = document.createElement("div");
+                    button.className = "button layout vertical around-justified";
 
-                    Polymer.dom(container).appendChild(newListItem);
-                    Polymer.dom(container).appendChild(appName);
+                    Polymer.dom(button).appendChild(newListItem);
+                    Polymer.dom(button).appendChild(appName);
+                    Polymer.dom(this.$.dropdown).appendChild(button);
 
-                    Polymer.dom(this.$.dropdown).appendChild(container);
-
-
-                    container.addEventListener("click", function(){
-                        console.log("redirecting to: " + element.link);
+                    button.addEventListener("click", function(){
+                        var win = window.open(element.link, "_blank");
+                        win.focus();
                     })
 
                 }, this);
@@ -137,6 +145,27 @@
                 }else if(dropdownBCR.left - calcMargin >= 0){
                    this.$.dropdown.style.marginLeft = (- calcMargin) + "px";
                 }
+            },
+
+            _setAppsDivWidth: function() {
+                var appsDivs = Polymer.dom(this.$.dropdown).querySelectorAll("div");
+
+                var maxWidth = 0;
+
+                appsDivs.forEach(function(element){
+                   var appDivWidth = element.getBoundingClientRect().width;
+
+                    maxWidth = appDivWidth > maxWidth ? appDivWidth : maxWidth;
+                });
+
+                maxWidth = maxWidth + 5;
+
+                appsDivs.forEach(function(element){
+                    element.style.width = maxWidth + "px";
+                    element.style.height = maxWidth + "px";
+                });
+
+                this.$.dropdown.style.width = (maxWidth * 2.3) + "px";
             }
         })
     </script>
