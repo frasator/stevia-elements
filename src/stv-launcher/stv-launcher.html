@@ -111,6 +111,7 @@
                     Polymer.dom(button).appendChild(appName);
                     Polymer.dom(this.$.dropdown).appendChild(button);
 
+                    // Open link in a new tab
                     button.addEventListener("click", function(){
                         var win = window.open(element.link, "_blank");
                         win.focus();
@@ -165,7 +166,7 @@
                     element.style.height = maxWidth + "px";
                 });
 
-                this.$.dropdown.style.width = (maxWidth * 2.3) + "px";
+                this.$.dropdown.style.width = (maxWidth * 3.3) + "px";
             }
         })
     </script>
