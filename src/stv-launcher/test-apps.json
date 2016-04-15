@@ -21,5 +21,29 @@
         "name": "BiERapp",
         "shortDescription": "Variant/gene prioritzation tool (from VCF to candidates)",
         "link": "http://bierapp.babelomics.org/"
+    },
+
+    {
+        "name": "TEAM",
+        "shortDescription": "",
+        "link": "http://team.babelomics.org/"
+    },
+
+    {
+        "name": "RENATO",
+        "shortDescription": "",
+        "link": "http://renato.bioinfo.cipf.es/"
+    },
+
+    {
+        "name": "Snow",
+        "shortDescription": "",
+        "link": "http://snow.bioinfo.cipf.es/"
+    },
+
+    {
+        "name": "Network Miner",
+        "shortDescription": "",
+        "link": "http://www.babelomics.org/"
     }
 ]
