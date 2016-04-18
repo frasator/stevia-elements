@@ -35,7 +35,10 @@
                 width: 80px;
             }
 
-
+            .icon.fa {
+                color: white;
+                font-size: 3em;
+            }
 
         </style>
         <content id="icon"></content>
@@ -97,9 +100,15 @@
             _writeApps: function(){
                 this._applicationsList.forEach(function(element){
 
-                   var newListItem = document.createElement("img");
-                    newListItem.src = element.icon;
-                    newListItem.className = "icon";
+                    var newListItem;
+                    if(element.icon !== ""){
+                        newListItem = document.createElement("img");
+                        newListItem.src = element.icon;
+                    } else {
+                        newListItem = document.createElement("i");
+                        newListItem.className = "fa fa-empire";
+                    }
+                    newListItem.className += " icon";
 
                     var appName = document.createElement("span");
                     Polymer.dom(appName).textContent = element.name
