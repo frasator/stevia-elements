@@ -1,0 +1,182 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../fontawesome/css/font-awesome.min.css">
+
+<!--
+`stv-launcher`
+-->
+
+<dom-module id="stv-launcher">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+
+            #dropdown {
+                background-color: #2F2F2F;
+                border: white solid 1px;
+                position: absolute;
+                margin-top: 20px;
+                box-shadow: 0 2px 10px rgba(0,0,0,.2)
+                opacity: 0;
+                padding : 10px 10px 10px 10px;
+            }
+
+            .button {
+                margin: 4px 4px 4px 4px;
+                color: white;
+                text-align: center;
+                border: transparent solid 1px;
+            }
+
+            .button:hover {
+                border: white solid 1px;
+            }
+
+            .icon {
+                width: 80px;
+            }
+
+            .icon.fa {
+                color: white;
+                font-size: 3em;
+            }
+
+        </style>
+        <content id="icon"></content>
+        <div id="dropdown" hidden class="layout horizontal wrap around-justified">
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: "stv-launcher",
+
+            properties:{
+                dataSrc: String,
+
+                _applicationsList: Object
+            },
+
+            ready: function(){
+                var icon = Polymer.dom(this).children[0];
+                this._getAppInfo();
+
+                Polymer.dom(this).setAttribute("tabindex", -1);
+                icon.addEventListener("click", this._toogle.bind(this));
+                this.addEventListener("blur", this._hide.bind(this));
+            },
+
+            _toogle: function(){
+
+                var dropdown = this.$.dropdown;
+                if(dropdown.hidden){
+                    dropdown.removeAttribute("hidden");
+                    this._fadeIn(dropdown);
+                    this._setAppsDivWidth();
+                } else {
+                    dropdown.setAttribute("hidden", true);
+                    dropdown.style.opacity = 0;
+                }
+
+                this._setDropdownPosition();
+            },
+
+            _hide: function(){
+                Polymer.dom(this.$.dropdown).setAttribute("hidden", true);
+            },
+
+            _getAppInfo: function(){
+                var request = new XMLHttpRequest();
+
+                var that = this;
+
+                request.addEventListener("load", function(){
+                    that._applicationsList = JSON.parse(this.responseText);
+                    that._writeApps();
+                });
+
+                request.open("GET", this.dataSrc);
+                request.send();
+            },
+
+            _writeApps: function(){
+                this._applicationsList.forEach(function(element){
+
+                    var newListItem;
+                    if(element.icon !== ""){
+                        newListItem = document.createElement("img");
+                        newListItem.src = element.icon;
+                    } else {
+                        newListItem = document.createElement("i");
+                        newListItem.className = "fa fa-empire";
+                    }
+                    newListItem.className += " icon";
+
+                    var appName = document.createElement("span");
+                    Polymer.dom(appName).textContent = element.name
+
+                    var button = document.createElement("div");
+                    button.className = "button layout vertical around-justified center";
+
+                    Polymer.dom(button).appendChild(newListItem);
+                    Polymer.dom(button).appendChild(appName);
+                    Polymer.dom(this.$.dropdown).appendChild(button);
+
+                    // Open link in a new tab
+                    button.addEventListener("click", function(){
+                        var win = window.open(element.link, "_blank");
+                        win.focus();
+                    })
+
+                }, this);
+            },
+
+             _fadeIn: function(el) {
+                 el.style.opacity = 0;
+
+                 var last = +new Date();
+                 var tick = function() {
+                     el.style.opacity = +el.style.opacity + (new Date() - last) / 400;
+                     last = +new Date();
+
+                     if (+el.style.opacity < 1) {
+                         (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+                     }
+                 };
+
+                 tick();
+             },
+
+            _setDropdownPosition: function(){
+                var dropdownBCR = this.$.dropdown.getBoundingClientRect();
+                var iconBCR = Polymer.dom(this).children[0].getBoundingClientRect();
+                var calcMargin = dropdownBCR.width/2 - iconBCR.width/2;
+
+                if(dropdownBCR.right + calcMargin  > window.innerWidth){
+                   this.$.dropdown.style.marginLeft = (- dropdownBCR.width + iconBCR.width) + "px";
+                }else if(dropdownBCR.left - calcMargin >= 0){
+                   this.$.dropdown.style.marginLeft = (- calcMargin) + "px";
+                }
+            },
+
+            _setAppsDivWidth: function() {
+                var appsDivs = Polymer.dom(this.$.dropdown).querySelectorAll("div");
+
+                var maxWidth = 0;
+
+                appsDivs.forEach(function(element){
+                   var appDivWidth = element.getBoundingClientRect().width;
+
+                    maxWidth = appDivWidth > maxWidth ? appDivWidth : maxWidth;
+                });
+
+                maxWidth = maxWidth + 5;
+
+                appsDivs.forEach(function(element){
+                    element.style.width = maxWidth + "px";
+                    element.style.height = maxWidth + "px";
+                });
+
+                this.$.dropdown.style.width = (maxWidth * 3.3) + "px";
+            }
+        })
+    </script>
+</dom-module>

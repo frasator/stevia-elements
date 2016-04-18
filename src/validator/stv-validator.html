@@ -1,5 +1,6 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../iron-list/iron-list.html">
 
 <script src="../../../client-line-navigator/line-navigator.js"></script>
 <script src="../../../client-line-navigator/file-navigator.js"></script>
@@ -12,14 +13,15 @@
             display: block;
             position: relative;
             box-sizing: border-box;
-            height: 100%;
+            height: 300px;
         }
 
         #header,
         #footer {
             box-sizing: border-box;
             background-color: var(--light-secondary-color);
-            padding: 3px 7px;
+            padding: 0 7px;
+            height: 24px;
         }
 
         #header {
@@ -58,8 +60,42 @@
             /*position: relative;*/
             /*box-sizing: border-box;*/
             /*height: auto;*/
-            margin: 3px;
-            padding: 3px;
+            /*margin: 3px;*/
+            padding: 1px 2px;
+            height: 50px;
+            border-left: 2px solid transparent;
+        }
+
+        .item:hover {
+            border-left: 2px solid var(--divider-color);
+        }
+
+        .view {
+            cursor: pointer;
+            visibility: hidden;
+        }
+
+        .item:hover > .view {
+            visibility: visible;
+        }
+
+        .view > i:hover {
+            color: var(--dark-button-color);
+        }
+
+        .line {
+            padding-right: 1px;
+            text-align: center;
+        }
+
+        .type {
+            padding: 0 1px;
+            text-align: center;
+        }
+
+        .msg {
+            word-break: break-all;
+            font-size: .95em;
         }
 
         .item[type="error"] {
@@ -72,9 +108,9 @@
             border: 1px solid rgba(255, 191, 0, 0.3);
         }
 
-        .log {
+        #log {
             position: relative;
-            height: 200px;
+            height: calc(100% - 48px);
             overflow-y: auto;
             /*background-color: #FAFAFA;*/
             background-color: white;
@@ -90,10 +126,11 @@
 
         .uploadbar {
             position: relative;
-            height: 20px;
+            height: 18px;
+            width: 100px;
             background-color: var(--light-primary-color);
-            line-height: 20px;
-            border-top: 1px solid var(--divider-color);
+            line-height: 18px;
+            border: 1px solid var(--divider-color);
         }
 
         .uploadprogress {
@@ -102,7 +139,7 @@
             left: 0px;
             height: 100%;
             width: 100%;
-            background-color: var(--divider-color);
+            background-color: var(--hover-color);
             /*margin-top: 10px;*/
         }
 
@@ -121,10 +158,10 @@
 
         .wrapped-text {
             white-space: pre-wrap;
-            min-height: 100px;
-            max-width: 800px;
             padding: 10px;
             overflow-y: auto;
+            min-width: 400px;
+            min-height: 150px;
         }
     </style>
     <template>
@@ -134,17 +171,17 @@
             <div class="type">Type</div>
             <div class="msg flex">Message</div>
         </div>
-        <div class="log">
-            <template is="dom-repeat" items="{{log}}">
-                <div class="horizontal layout item" type$="{{item.type}}" on-mouseover="handleLogHover" on-mouseout="handleLogHoverOut">
+        <iron-list id="log" items="[[log]]" as="item">
+            <template>
+                <div class="horizontal layout center item" type$="{{item.type}}">
                     <div class="line">{{item.line}}</div>
                     <div class="type" type$="{{item.type}}">{{item.type}}</div>
                     <div class="msg flex">{{item.msg}}</div>
-                    <div class="stv-btn view" line="{{item.line}}" on-click="handleLogViewClick" hidden>View</div>
+                    <div class="view" line="{{item.line}}" on-click="handleLogViewClick" title="View line"><i class="fa fa-search"></i></div>
                 </div>
             </template>
-        </div>
-        <div id="footer" class="counts horizontal layout">
+        </iron-list>
+        <div id="footer" class="counts horizontal layout center">
             <div class="error-count count">Errors:
                 <span>{{errorCount}}</span>
             </div>
@@ -154,24 +191,27 @@
             <div class="info-count count">Info:
                 <span>{{infoCount}}</span>
             </div>
-
+            <div class="count">Lines:
+                <span>{{numLines}}</span>
+            </div>
+            <div class="flex"></div>
+            <div class="uploadbar" hidden$="{{!uploading}}">
+                <div id="progressBar" class="uploadprogress"></div>
+                <div class="uploadtext">
+                    <i hidden$="{{computeSpin(progress)}}" class="fa fa-spinner fa-spin"></i>
+                    <span>{{progress}}</span> %
+                </div>
+                <br>
+            </div>
         </div>
 
-        <stv-panel modal movable closable hidden id="linePreview" on-close="handleCloseLinePreview">
+        <jso-panel modal movable closable hidden id="linePreview" on-close="handleCloseLinePreview">
             <div class="header">
                 <i class="fa fa-view"></i> &nbsp; View line
             </div>
             <div class="container wrapped-text">{{linePreview}}</div>
-        </stv-panel>
+        </jso-panel>
 
-        <div class="uploadbar" hidden$="{{!uploading}}">
-            <div id="progressBar" class="uploadprogress"></div>
-            <div class="uploadtext">
-                <i hidden$="{{computeSpin(progress)}}" class="fa fa-spinner fa-spin"></i>
-                <span>{{progress}}</span> %
-            </div>
-            <br>
-        </div>
 
     </template>
     <script>
@@ -193,10 +233,7 @@
                     observer: 'validatorChanged'
                 },
                 log: {
-                    type: Array,
-                    value: function() {
-                        return [];
-                    }
+                    type: Array
                 },
                 errorCount: {
                     type: Number,
@@ -207,6 +244,10 @@
                     value: 0
                 },
                 infoCount: {
+                    type: Number,
+                    value: 0
+                },
+                numLines: {
                     type: Number,
                     value: 0
                 },
@@ -221,12 +262,22 @@
             },
             reset: function() {
                 this.progress = 0;
+                this.set("log", []);
+                this.errorCount = 0;
+                this.warningCount = 0;
+                this.infoCount = 0;
+                this.numLines = 0;
+                if (this.validator) {
+                    this.validator.init();
+                }
+                this.setFile();
             },
             validate: function() {
                 this.set("log", []);
                 this.errorCount = 0;
                 this.warningCount = 0;
                 this.infoCount = 0;
+                this.numLines = 0;
                 this.validator.validate();
             },
             setFile: function(file) {
@@ -235,6 +286,7 @@
             validatorChanged: function(neo, old) {
                 var me = this;
                 neo.on("end", function(e) {
+                    me.numLines = me.validator.numLines;
                     me.fire("end");
                 });
 
@@ -256,7 +308,7 @@
 
                 neo.on("progress", function(e) {
                     me.progress = Math.ceil(e);
-                })
+                });
 
                 neo.init();
 
@@ -275,7 +327,7 @@
                 }
             },
             progressChanged: function(neo, old) {
-                console.log("progress : " + neo);
+                // console.log("progress : " + neo);
                 this.$.progressBar.style.width = neo + '%';
             },
             computeSpin: function(progress) {
@@ -301,21 +353,8 @@
 
                 });
             },
-            handleLogHover: function(e) {
-
-                var elem = e.currentTarget;
-
-                var view = elem.getElementsByClassName("view")[0];
-                view.hidden = false;
-            },
-            handleLogHoverOut: function(e) {
-
-                var elem = e.currentTarget;
-
-                var view = elem.getElementsByClassName("view")[0];
-                view.hidden = true;
-            },
             handleCloseLinePreview: function(e) {
+                e.stopPropagation();
                 this.linePreview = "";
             }
 
