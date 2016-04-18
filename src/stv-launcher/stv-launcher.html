@@ -31,9 +31,8 @@
                 border: white solid 1px;
             }
 
-            .fa {
-                font-size: 3em;
-                display: block;
+            .icon {
+                width: 80px;
             }
 
 
@@ -98,14 +97,15 @@
             _writeApps: function(){
                 this._applicationsList.forEach(function(element){
 
-                   var newListItem = document.createElement("i");
-                    newListItem.className = "fa fa-empire";
+                   var newListItem = document.createElement("img");
+                    newListItem.src = element.icon;
+                    newListItem.className = "icon";
 
                     var appName = document.createElement("span");
                     Polymer.dom(appName).textContent = element.name
 
                     var button = document.createElement("div");
-                    button.className = "button layout vertical around-justified";
+                    button.className = "button layout vertical around-justified center";
 
                     Polymer.dom(button).appendChild(newListItem);
                     Polymer.dom(button).appendChild(appName);

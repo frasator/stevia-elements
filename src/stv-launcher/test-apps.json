@@ -2,48 +2,56 @@
     {
         "name": "VARIANT",
         "shortDescription": "Fast and accurate functional characterization of variants in VCF files",
-        "link": "http://variant.bioinfo.cipf.es/"
+        "link": "http://variant.bioinfo.cipf.es/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "CellBase",
         "shortDescription": "RESTful Web Services for retrieving releant biological information",
-        "link": "http://docs.bioinfo.cipf.es/projects/cellbase"
+        "link": "http://docs.bioinfo.cipf.es/projects/cellbase",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "GenomeMaps",
         "shortDescription": "Our highly efficient next generation genome viewer (used by the ICGC)",
-        "link": "http://www.genomemaps.org/"
+        "link": "http://www.genomemaps.org/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "BiERapp",
         "shortDescription": "Variant/gene prioritzation tool (from VCF to candidates)",
-        "link": "http://bierapp.babelomics.org/"
+        "link": "http://bierapp.babelomics.org/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "TEAM",
         "shortDescription": "",
-        "link": "http://team.babelomics.org/"
+        "link": "http://team.babelomics.org/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "RENATO",
         "shortDescription": "",
-        "link": "http://renato.bioinfo.cipf.es/"
+        "link": "http://renato.bioinfo.cipf.es/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "Snow",
         "shortDescription": "",
-        "link": "http://snow.bioinfo.cipf.es/"
+        "link": "http://snow.bioinfo.cipf.es/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     },
 
     {
         "name": "Network Miner",
         "shortDescription": "",
-        "link": "http://www.babelomics.org/"
+        "link": "http://www.babelomics.org/",
+        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
     }
 ]
