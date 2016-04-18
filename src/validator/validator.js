@@ -11,6 +11,7 @@ function Validator(options) {
     this.progress = 0;
     this._readBytes = 0;
     this._events = {};
+    this.numLines = 0;
 }
 
 Validator.prototype = {
@@ -18,6 +19,7 @@ Validator.prototype = {
         this.file = null;
         this.log = [];
         this.line = 0;
+        this.numLines = 0;
         this.progress = 0;
         this._readBytes = 0;
     },

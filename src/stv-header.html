@@ -445,7 +445,7 @@
                                 if (response.response[0].error == null && response.response[0].results.length > 0) {
                                     me.userData = response.response[0].results[0];
                                     me.userText = me._checkUserName(me.userData);
-                                    console.log("userData has been modified since last call");
+                                    console.info("userData has been modified since last call");
                                 }
                                 if (response.response[0].error != null) {
                                     me.sessionFinished()
