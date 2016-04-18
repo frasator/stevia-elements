@@ -128,7 +128,6 @@
         stv-file-upload {
             box-sizing: border-box;
             background-color: #fafafa;
-            padding: 20px 30px;
         }
 
         .bar > div {
@@ -396,9 +395,12 @@
             }
         },
         handleFileSelect: function(e) {
-            console.log(e.detail.file);
-            this.selectedFile = e.detail.file;
+            var file = e.detail.file;
+            this.selectedFile = file;
             this._checkCustomButtons();
+            if (file != null) {
+                console.log(e.detail.file);
+            }
         },
         handleOpenFolder: function(e) {
             var me = this;

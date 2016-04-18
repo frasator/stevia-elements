@@ -117,7 +117,7 @@
                                 <span style="margin-right:5px;"></span>
                             </template>
                             <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
-                            <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{disableRelaunch}}"></i>
+                            <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
                             <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i>
                             <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
                             <i class="fa fa-bug" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
@@ -189,6 +189,12 @@
                     return job.execution;
                 }
                 return job.tool;
+            },
+            hideRelaunch: function(job) {
+                if((job.status === "DONE" || job.status.indexOf("ERROR") != -1) && this.disableRelaunch == false){
+                    return false;
+                }
+                return true;
             },
             isRunning: function(job) {
                 return job.status == "RUNNING";
