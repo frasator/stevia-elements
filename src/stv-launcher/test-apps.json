@@ -57,7 +57,7 @@
         "name": "Babelomics",
         "shortDescription": "A program suite for advanced functional genomic data analysis",
         "link": "http://www.babelomics.org/",
-        "icon": "http://babelomics.bioinfo.cipf.es/images/logoBabelomics_positive_trans.svg"
+        "icon": "http://bioinfo.cipf.es/apps-beta/babelomics/produccion/images/logoBabelomics_negative.svg"
     },
     {
         "name": "Phylemon",
