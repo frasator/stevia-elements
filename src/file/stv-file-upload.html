@@ -125,7 +125,7 @@
                             Re-check
                         </div>
                     </div>
-                    <input type="file" hidden id="fileInput" required on-change="handleInputChange" disabled$="{{uploading}}">
+                    <input type="file" hidden id="fileInput" on-change="handleInputChange" disabled$="{{uploading}}">
                 </div>
             </div>
 
@@ -148,10 +148,8 @@
 
             <br>
             <div class="horizontal layout">
-                <form id="form">
-                    <div id="uploadButton" class="stv-btn stv-btn-shdw" on-click="handleUpload"><i class="fa fa-cloud-upload"></i> Upload</div>
-                    <!-- <div class="stv-btn stv-btn-shdw" on-click="handleValidate" hidden$="{{computeStatusButton(status, 'validation')}}">Validate</div> -->
-                </form>
+                <div id="uploadButton" class="stv-btn stv-btn-shdw" on-click="handleUpload"><i class="fa fa-cloud-upload"></i> Upload</div>
+                <!-- <div class="stv-btn stv-btn-shdw" on-click="handleValidate" hidden$="{{computeStatusButton(status, 'validation')}}">Validate</div> -->
                 <div class="flex" style="margin-left:15px;position:relative;">
                     <div class="uploadbar flex">
                         <div id="progressBar" class="uploadprogress"></div>
@@ -223,6 +221,9 @@
             }
         },
         handleSelectedBioformatChange: function(e) {
+            if (this.$.fileInput.files[0] != null) {
+                this.handleRecheck();
+            }
             // if (this.$.bioformatSelect.selectedBioformat != null && this.$.bioformatSelect.selectedBioformat.validator != null) {
             //     this.hideValidationLog = false;
             // } else {
@@ -294,7 +295,7 @@
                 if (this.selectedFolder != null) {
                     folder = this.selectedFolder.path;
                 }
-                if (this.$.form.checkValidity()) {
+                if (this.$.fileInput.files[0] != null) {
                     this.uploading = true;
                     this.message = '';
                     var config = {
