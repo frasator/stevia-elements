@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>dropdown test</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>dropdown test</title>
 
-    <!--Fonts-->
-    <link href='../../fonts/fonts.css' rel='stylesheet' type='text/css'>
-    <link href='../../../fontawesome/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+        <!--Fonts-->
+        <link href='../../fonts/fonts.css' rel='stylesheet' type='text/css'>
+        <link href='../../../fontawesome/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
 
-    <!--Web Components-->
-    <script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
+        <!--Web Components-->
+        <script src="../../../webcomponentsjs/webcomponents-lite.min.js"></script>
 
-    <link rel="import" href="stv-dropdown.html">
+        <link rel="import" href="stv-dropdown.html">
 
-    <link rel="import" href="../../conf/theme.html">
+        <link rel="import" href="../../conf/theme.html">
 
-</head>
+    </head>
 
-<body>
-    <stv-dropdown>
-        <div id="button" class="button" data-button>Menu Button</div>
-        <ul id="menu" class="menu" data-menu>
-            <li> A level 0 </li>
-            <li> B level 0 </li>
-            <li data-divider></li>
-            <li data-sub> C level 0
-                <ul>
-                    <li> D level 1 </li>
-                    <li> E level 1 </li>
-                    <li data-divider></li>
-                </ul>
-            </li>
-        </ul>
-    </stv-dropdown>
+    <body>
+        <stv-dropdown>
+            <div data-button>Menu Button</div>
+            <ul data-menu>
+                <li> A level 0 </li>
+                <li> B level 0 </li>
+                <li data-divider></li>
+                <li data-sub> C level 0
+                    <ul>
+                        <li> D level 1 </li>
+                        <li> E level 1 </li>
+                        <li data-divider></li>
+                    </ul>
+                </li>
+            </ul>
+        </stv-dropdown>
 
-    <script>
-        var el = document.querySelector('stv-dropdown');
-    </script>
-</body>
+        <script>
+            var el = document.querySelector('stv-dropdown');
+        </script>
+    </body>
 
 </html>

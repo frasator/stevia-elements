@@ -48,10 +48,10 @@ Validator.prototype = {
                 me.progress = (me._readBytes / me._totalBytes) * 100;
                 me.validateLine(line);
             }
-            me._emit("progress", [me.progress]);
+            me._emit("progress", me.progress);
 
             if (eof) {
-                me._emit("progress", [100]);
+                me._emit("progress", 100);
                 me._emit("end");
                 return;
             }
@@ -71,16 +71,14 @@ Validator.prototype = {
             line: this.line
         };
         this.log.push(log);
-        this._emit("log", [log]);
+        this._emit("log", log);
     },
     on: function (eventName, cb) {
         this._events[eventName] = cb;
     },
-    _emit: function (event, args) {
-
-        var boundEvents = this._events;
-        if (typeof boundEvents[event] === 'function') {
-            boundEvents[event].apply(this, args);
+    _emit: function (event) {
+        if (typeof this._events[event] === 'function') {
+            this._events[event].apply(this, Array.prototype.slice.call(arguments, 1));
         }
     }
 }

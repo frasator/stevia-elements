@@ -6,19 +6,21 @@
             position: relative;
             display: block;
             box-sizing: border-box;
-            margin-right: 5px;
-            margin-left: 5px;
-            border: 1px solid #afafaf;
-            box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2);
-            background-color: var(--dark-primary-color);
-            color: var(--text-primary-color);
-            width: 150px;
+            /*margin-right: 5px;*/
+            /*margin-left: 5px;*/
+            /*border: 1px solid #afafaf;*/
+            color: var(--primary-text-color);
         }
 
-        :host::content > .button {
-            padding: 5px;
+        :host::content > [data-button] {
+            /*padding: 5px;*/
             height: 100%;
             cursor: pointer;
+            outline: transparent solid 0px;
+        }
+
+        :host::content > [data-button]:hover {
+            background-color: var(--hover-color);
         }
 
         :host::content ul {
@@ -29,12 +31,12 @@
             text-decoration: none;
             z-index: 100000;
             border: 1px solid #afafaf;
-            background-color: var(--dark-primary-color);
-            color: var(--text-primary-color);
+            background-color: var(--light-primary-color);
+            color: var(--primary-text-color);
             line-height: 22px;
-            width: 200px;
-            padding: 10px 10px;
-            box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            padding: 0;
+            box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2);
             text-align: left;
             cursor: pointer;
             text-transform: none;
@@ -71,7 +73,7 @@
             margin: 3px 0;
             padding: 0;
             overflow: hidden;
-            background-color: var(--light-secondary-color);
+            background-color: var(--divider-color);
         }
 
         :host::content ul li[data-sub]:after {
@@ -102,21 +104,13 @@
             background-color: var(--light-secondary-color) !important;
         }
 
-        :host::content > .button:hover {
-            background-color: var(--dark-button-color);
-        }
-
         :host::content > ul li:hover > ul {
             display: block;
         }
     </style>
     <template>
-        <!-- <div id="button" on-click="handleShowMenu"> -->
-        <content select=".button" on-click="handleShowMenu"></content>
-        <!-- </div> -->
-        <!-- <div id="menu" hidden> -->
-        <content select=".menu"></content>
-        <!-- </div> -->
+        <content select="[data-button]" on-click="handleShowMenu"></content>
+        <content select="[data-menu]"></content>
     </template>
 
     <script>
@@ -134,23 +128,49 @@
                 click: 'clickHandler'
             },
             ready: function() {
+                var me = this;
                 this.button = this.children[0];
                 this.menu = this.children[1];
+
+                document.body.addEventListener('click', function(e) {
+                    if (!me.contains(e.target)) {
+                        me.hideMenu();
+                    }
+                });
             },
             clickHandler: function(e) {
-                if (e.target.dataset.button != null) {
+                // e.stopPropagation();
+                if (this.button != null) {
                     this.handleShowMenu(e);
                 };
+                if (this.menu.contains(e.target)) {
+                    this.async(function() {
+                        this.hideMenu();
+                    }, 100);
+                }
             },
             handleShowMenu: function(e) {
-                e.stopPropagation();
-                if (this.menu.style.display == "none" || this.menu.style.display == "") {
-                    this.menu.style.display = "block";
-                } else if (this.menu.style.display == "block") {
-                    this.menu.style.display = "none";
+                this.toggleMenu();
+            },
+            toggleMenu: function() {
+                if (this.isMenuHidden()) {
+                    this.showMenu();
+                } else {
+                    this.hideMenu();
                 }
-                // this._getPosition();
-
+            },
+            isMenuHidden: function() {
+                if (this.menu.style.display != "block") {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            hideMenu: function() {
+                this.menu.style.display = "none";
+            },
+            showMenu: function() {
+                this.menu.style.display = "block";
             },
             _getPosition: function() {
                 var bcr = this.getBoundingClientRect();
