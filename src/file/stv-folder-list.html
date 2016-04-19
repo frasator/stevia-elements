@@ -395,29 +395,31 @@
             handleDrop: function(e) {
                 e.preventDefault();
                 console.log("DROP");
-                var newParentId = e.currentTarget.file._id;
-                console.log(newParentId);
-                var fileId = e.dataTransfer.getData("text");
-                SteviaManager.files.move({
-                    query: {
-                        sid: Cookies("bioinfo_sid"),
-                        fileId: fileId,
-                        newId: newParentId
-                    },
-                    request: {
-                        success: function(response) {
-                            if (response.response[0].error == null) {
-                                console.log(response.response[0].results[0])
-                            } else {
-                                console.log(response.response[0].error)
-                            }
+                if (e.currentTarget.file.type == 'FOLDER') {
+                    var newParentId = e.currentTarget.file._id;
+                    console.log(newParentId);
+                    var fileId = e.dataTransfer.getData("text");
+                    SteviaManager.files.move({
+                        query: {
+                            sid: Cookies("bioinfo_sid"),
+                            fileId: fileId,
+                            newId: newParentId
                         },
-                        error: function() {
-                            console.log('Server error, try again later')
+                        request: {
+                            success: function(response) {
+                                if (response.response[0].error == null) {
+                                    console.log(response.response[0].results[0])
+                                } else {
+                                    console.log(response.response[0].error)
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later')
+                            }
                         }
-                    }
-                });
-                this.fire('need-refresh');
+                    });
+                    this.fire('need-refresh');
+                }
             },
         });
     </script>
