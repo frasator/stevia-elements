@@ -79,7 +79,6 @@
             border-bottom-width: 1px;
         }
 
-        #help,
         #user {
             border-bottom: none !important;
         }
@@ -157,6 +156,16 @@
         :host[small] div.description {
             font-size: 15px;
         }
+        /*Help menu*/
+        
+        :host::content .helpmenu {
+            margin: 0 10px;
+        }
+
+        :host::content .helpmenu > [data-menu] {
+            margin-top: 10px;
+            padding: 5px;
+        }
     </style>
     <template>
         <div id="tools">
@@ -222,9 +231,7 @@
                     <content select=".launcher"></content>
                 </div>
 
-                <div id="help">
-                    <content select=".helpmenu"></content>
-                </div>
+                <content select=".helpmenu"></content>
             </div>
         </div>
     </template>

@@ -30,10 +30,9 @@
             list-style: none;
             text-decoration: none;
             z-index: 100000;
-            border: 1px solid #afafaf;
+            border: 1px solid var(--divider-color);
             background-color: var(--light-primary-color);
             color: var(--primary-text-color);
-            line-height: 22px;
             min-width: 200px;
             padding: 0;
             box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2);
@@ -64,7 +63,7 @@
         :host::content ul li {
             position: relative;
             text-align: left;
-            padding: 2px 30px 2px 10px;
+            padding: 3px 30px 4px 10px;
             white-space: nowrap;
         }
 
@@ -101,11 +100,45 @@
         }
 
         :host::content ul li[data-divider]:hover {
-            background-color: var(--light-secondary-color) !important;
+            background-color: var(--divider-color) !important;
         }
 
         :host::content > ul li:hover > ul {
             display: block;
+        }
+        /**/
+        /* dark */
+        /**/
+
+        :host[dark] {
+            /*margin: 0 10px;*/
+            color: var(--text-primary-color);
+        }
+
+        :host[dark]::content > [data-button]:hover {
+            background-color: transparent;
+        }
+
+        :host[dark]::content > [data-button]:hover > * {
+            color: var(--accent-color);
+        }
+        /*:host::content > [data-menu] {
+            margin-top: 10px;
+            padding:5px;
+        }*/
+
+        :host[dark]::content ul {
+            background-color: var(--dark-primary-color);
+            color: var(--text-primary-color);
+            border-color: var(--default-primary-color);
+        }
+
+        :host[dark]::content ul li[data-divider] {
+            background-color: var(--default-primary-color);
+        }
+
+        :host[dark]::content ul li[data-divider]:hover {
+            background-color: var(--default-primary-color) !important;
         }
     </style>
     <template>
@@ -171,21 +204,27 @@
             },
             showMenu: function() {
                 this.menu.style.display = "block";
+                this._getPosition();
             },
             _getPosition: function() {
-                var bcr = this.getBoundingClientRect();
-                var msg = this.$.menu.getBoundingClientRect();
+                var bcrButton = this.button.getBoundingClientRect();
+                var bcrMenu = this.menu.getBoundingClientRect();
                 var windowHeight = window.innerHeight;
                 var windowWidth = window.innerWidth;
 
-                this.$.menu.style.top = (bcr.bottom) + 'px';
-                this.$.menu.style.left = (bcr.left) + 'px';
-                if ((bcr.bottom + msg.height) > window.innerHeight) {
-                    this.$.menu.style.top = (bcr.top - msg.height) + 'px';
+                // this.menu.style.top = (bcrButton.bottom) + 'px';
+                // this.menu.style.left = (bcrButton.left) + 'px';
+
+                var t;
+                var l;
+                if ((bcrButton.bottom + bcrMenu.height) > window.innerHeight) {
+                    t = (bcrMenu.height - bcrButton.height) + 'px';
                 }
-                if ((bcr.right + msg.width) > window.innerWidth) {
-                    this.$.menu.style.left = (bcr.left - msg.width) + 'px';
+                if ((bcrButton.right + bcrMenu.width) > window.innerWidth) {
+                    l = -(bcrMenu.width - bcrButton.width) + 'px';
                 }
+                this.menu.style.top = t;
+                this.menu.style.left = l;
 
             }
         })

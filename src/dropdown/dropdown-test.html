@@ -21,7 +21,7 @@
     </head>
 
     <body>
-        <stv-dropdown>
+        <stv-dropdown style="width:100px;">
             <div data-button>Menu Button</div>
             <ul data-menu>
                 <li> A level 0 </li>
@@ -36,6 +36,29 @@
                 </li>
             </ul>
         </stv-dropdown>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div style="background-color:black; width:500px; height:500px;">
+            <stv-dropdown dark style="width:100px;">
+                <div data-button>Menu Button</div>
+                <ul data-menu>
+                    <li> A level 0 </li>
+                    <li> B level 0 </li>
+                    <li data-divider></li>
+                    <li data-sub> C level 0
+                        <ul>
+                            <li> D level 1 </li>
+                            <li> E level 1 </li>
+                            <li data-divider></li>
+                        </ul>
+                    </li>
+                </ul>
+            </stv-dropdown>
+        </div>
 
         <script>
             var el = document.querySelector('stv-dropdown');
