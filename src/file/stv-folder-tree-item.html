@@ -63,7 +63,7 @@
         </div>
         <div style="margin-left:7px;" hidden$="{{!file.open}}">
             <template is="dom-repeat" items="{{file.f}}" as="f">
-                <stv-folder-tree-item file="{{f}}" on-drop="handleDrop" on-dragover="allowDrop">
+                <stv-folder-tree-item file="{{f}}">
                 </stv-folder-tree-item>
             </template>
         </div>
@@ -75,6 +75,10 @@
                 file: {
                     type: Object
                 }
+            },
+            listeners: {
+                'drop': 'handleDrop',
+                'dragover': 'allowDrop'
             },
             isEmpty: function(f) {
                 return f.length == 0;
