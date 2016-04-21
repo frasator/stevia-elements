@@ -75,6 +75,11 @@
             height: 70px;
         }
 
+        stv-folder-list-item.dragover {
+            background-color: var(--accent-color);
+            color: var(--text-primary-color);
+        }
+
         #createfolder {
             box-sizing: border-box;
             width: 300px;
@@ -153,7 +158,7 @@
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
                 <template is="dom-repeat" items="{{files}}" filter="checkFilters" observe="type">
-                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDrag" draggable="true" on-drop="handleDrop" on-dragover="allowDrop">
+                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
             </div>
@@ -384,17 +389,29 @@
                     this.showInfo = !this.showInfo;
                 }
             },
-            allowDrop: function(e) {
+            handleDragOver: function(e) {
                 e.preventDefault();
-                console.log("allow drop 1");
+                e.stopPropagation();
+                var el = e.currentTarget;
+                el.classList.add('dragover');
+                // console.log('Drag over');
             },
-            handleDrag: function(e) {
-                console.log('DRAG');
+            handleDragLeave: function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var el = e.currentTarget;
+                el.classList.remove('dragover');
+            },
+            handleDragStart: function(e) {
+                // console.log('Drag start');
                 e.dataTransfer.setData("text/plain", e.currentTarget.file._id);
             },
-            handleDrop: function(e) {
+            handleDragDrop: function(e) {
                 e.preventDefault();
-                console.log("DROP");
+                e.stopPropagation();
+                var el = e.currentTarget;
+                el.classList.remove('dragover');
+                // console.log("Drag drop");
                 if (e.currentTarget.file.type == 'FOLDER') {
                     var newParentId = e.currentTarget.file._id;
                     console.log(newParentId);
