@@ -1,6 +1,9 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../iron-list/iron-list.html">
 <link rel="import" href="stv-job-item.html">
+
+
 <dom-module id="stv-job-browser">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
         :host {
@@ -33,15 +36,19 @@
         }
 
         #content {
+            display: block;
+            width: 100%;
             height: calc(100% - 60px);
             /*height: 100%;*/
-            overflow-y: scroll;
-            overflow-x: hidden;
+            overflow-x: hidden !important;
         }
+        /*.item {*/
+        /*}*/
 
         stv-job-item {
-            margin: 2px;
+            margin: 2px 2px 0 2px;
             padding: 3px 7px;
+            height: 42px;
             border: 1px solid rgba(125, 125, 125, 0.3);
         }
 
@@ -84,6 +91,16 @@
                 <stv-job-item class="jobItem" job="{{item}}" on-click="handleSelect" disable-relaunch="{{disableRelaunch}}">
                 </stv-job-item>
             </template>
+
+            <!-- <iron-list id="content" items="{{filteredJobs}}" as="item">
+            <template>
+                <div class="item">
+                    <stv-job-item class="jobItem" job="{{item}}" on-click="handleSelect" disable-relaunch="{{disableRelaunch}}">
+                    </stv-job-item>
+                </div>
+            </template>
+        </iron-list> -->
+
         </div>
         <div id="footer" class="horizontal layout center">
             <div>
@@ -105,9 +122,6 @@
                 jobs: {
                     type: Array,
                     notify: true,
-                    value: function() {
-                        return [];
-                    },
                     observer: 'jobsChanged'
                 },
                 filteredJobs: {
@@ -152,6 +166,14 @@
                     value: false
                 }
             },
+            ready: function() {
+                // var me = this;
+                // if (this._parentPanel != null) {
+                //     this._parentPanel.addEventListener('hidden', function(e) {
+                //         me.updateFilteredJobs();
+                //     });
+                // }
+            },
             handleSelect: function(e) {
                 e.stopPropagation();
                 var job = e.currentTarget.job;
@@ -170,7 +192,7 @@
                 return folder == null;
             },
             searchNameChanged: function(neo, old) {
-                this.jobsChanged();
+                this.updateFilteredJobs();
             },
             userDataChanged: function(neo, old) {
                 if (neo) {
@@ -185,57 +207,43 @@
                 this.set('selected', null);
             },
             jobsChanged: function(neo, old) {
+                this.updateFilteredJobs();
+            },
+            updateFilteredJobs: function() {
                 var me = this;
+                if (Array.isArray(this.jobs) && this.jobs.length > 0) {
+                    var jobs;
+                    if (this.toolFilterValue == 'all') {
+                        var jobs = this.jobs.filter(function(item) {
+                            if (me.allowedTools.indexOf(item.tool) != -1) {
+                                return true;
+                            }
+                            if (me.allowedTools.indexOf(item.tool + '.' + item.execution) != -1) {
+                                return true;
+                            }
+                        });
+                    } else {
+                        var jobs = this.jobs.filter(function(item) {
+                            if (item.tool === me.toolFilterValue) {
+                                return true;
+                            }
+                            if (item.execution === me.toolFilterValue) {
+                                return true;
+                            }
+                            if (item.tool + '.' + item.execution === me.toolFilterValue) {
+                                return true;
+                            }
+                        });
+                    }
 
-                //Para que desaparezca el filtro de error cuando no hay errores
-                // var error = 0;
-                // for (var i = 0; i < this.jobs.length; i++) {
-                //     var job = this.jobs[i];
-                //     if (job.status == "ERROR") {
-                //         error++;
-                //     }
-                // }
-                //
-                // if (error == 0) {
-                //     this.$.errorBtn.hidden = true;
-                // } else {
-                //     this.$.errorBtn.hidden = false;
-                // }
-
-                var jobs;
-                if (this.toolFilterValue == 'all') {
-                    var jobs = this.jobs.filter(function(item) {
-                        if (me.allowedTools.indexOf(item.tool) != -1) {
-                            return true;
-                        }
-                        if (me.allowedTools.indexOf(item.tool + '.' + item.execution) != -1) {
-                            return true;
-                        }
-                    });
-                } else {
-                    var jobs = this.jobs.filter(function(item) {
-                        if (item.tool === me.toolFilterValue) {
-                            return true;
-                        }
-                        if (item.execution === me.toolFilterValue) {
-                            return true;
-                        }
-                        if (item.tool + '.' + item.execution === me.toolFilterValue) {
-                            return true;
-                        }
-                    });
+                    var filtertedJobs = this._filterByStatus(jobs);
+                    filtertedJobs = this._filterBySearch(filtertedJobs);
+                    this.set('filteredJobs', filtertedJobs);
                 }
-                var statusFilterJobs = this._filterByStatus(jobs);
-                this.set('filteredJobs', statusFilterJobs);
-
-                // console.log(this.search);
-                var searchFilterJobs = this._filterBySearch(statusFilterJobs);
-                this.set('filteredJobs', searchFilterJobs);
-
             },
             handleFilterSelect: function(e) {
                 this.set('toolFilterValue', e.currentTarget.value);
-                this.jobsChanged();
+                this.updateFilteredJobs();
             },
             computeTotalJobs: function(jobs) {
                 return jobs.length;
@@ -259,7 +267,7 @@
             },
             viewChanged: function(neo, old) {
                 if (neo != null) {
-                    this.jobsChanged();
+                    this.updateFilteredJobs();
                 }
             },
             _filterByStatus: function(filteredJobs) {

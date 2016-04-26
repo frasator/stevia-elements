@@ -56,9 +56,9 @@
             padding: 2px 2px 2px 0;
         }
 
-        .name.dragover {
-            background-color: var(--accent-color);
-            color: var(--text-primary-color);
+        .name.dragover,
+        .arrow:hover {
+            color: var(--accent-color);
         }
     </style>
     <template>
@@ -67,7 +67,7 @@
             <div id="name" class="name flex" on-click="handleClick" on-dblclick="handleDblclick">{{computeName(file.n)}}</div>
         </div>
         <div style="margin-left:7px;" hidden$="{{!file.open}}">
-            <template is="dom-repeat" items="{{file.f}}" as="f">
+            <template is="dom-repeat" items="{{fileItems}}" as="f">
                 <stv-folder-tree-item file="{{f}}">
                 </stv-folder-tree-item>
             </template>
@@ -78,13 +78,22 @@
             is: "stv-folder-tree-item",
             properties: {
                 file: {
-                    type: Object
+                    type: Object,
+                    observer: 'handleFileChanged'
+                },
+                fileItems: {
+                    type: Array
                 }
             },
             listeners: {
                 'drop': 'handleDrop',
                 'dragover': 'handleDragOver',
                 'dragleave': 'handleDragLeave'
+            },
+            handleFileChanged: function(neo, old) {
+                if (neo) {
+                    this.computeOpen();
+                }
             },
             isEmpty: function(f) {
                 return f.length == 0;
@@ -109,6 +118,14 @@
             toggleOpen: function() {
                 if (this.file.f.length > 0) {
                     this.set('file.open', !this.file.open);
+                }
+                this.computeOpen();
+            },
+            computeOpen: function() {
+                if (this.file.open == true) {
+                    this.set('fileItems', this.file.f);
+                } else {
+                    this.set('fileItems', []);
                 }
             },
             handleDragOver: function(e) {

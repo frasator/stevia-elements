@@ -291,11 +291,8 @@
                 var file = e.currentTarget.file;
                 if (file.type == 'FOLDER') {
                     this.set('selected', null);
-                    this.fire('openfolder', file);
-                } else if (file.type == "FILE") {
-                    this.fire('previewfile', file);
                 }
-
+                this.fire('filedblclick', file);
             },
             handlePreviewFile: function(e) {
                 if (this.selected) {

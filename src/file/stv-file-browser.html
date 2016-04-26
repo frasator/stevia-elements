@@ -167,7 +167,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-openfolder="handleOpenFolder" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" on-previewfile="handlePreviewFile" folder="{{folder}}" files="{{files}}" mode="{{mode}}" disable-icon-view="{{disableIconView}}">
+                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -384,6 +384,29 @@
             }
             return false;
         },
+        handleFileDblClick: function(e) {
+            var file = e.detail;
+            if (file.type == 'FOLDER') {
+                this.openFolder(file._id)
+            } else if (file.type == "FILE") {
+                if (this.mode == '') {
+                    this.previewFile(file._id);
+                }
+                if (this.mode == 'file') {
+                    if (this.checkFileModeOk(this.mode, this.selectedFile)) {
+                        this._parentPanel.hidden = true;
+                        this.fire('ok-click');
+                    }
+                }
+            }
+        },
+        previewFile: function(fileId) {
+            this.$.filePreviewPanel.show();
+            this.$.filePreview.fileId = this.selectedFile._id;
+        },
+        handlePreviewFile: function(e) {
+            this.previewFile(this.selectedFile._id);
+        },
         handleFileModeOk: function(e) {
             this._parentPanel.hidden = true;
             this.fire('ok-click');
@@ -402,9 +425,7 @@
                 console.log(e.detail.file);
             }
         },
-        handleOpenFolder: function(e) {
-            var me = this;
-            var folderId = e.detail._id;
+        openFolder: function(folderId) {
             this.files = [];
             this.refreshFolderFiles(folderId);
         },
@@ -570,10 +591,6 @@
                 filesFiltered.push(file);
             }
             return filesFiltered;
-        },
-        handlePreviewFile: function(e) {
-            this.$.filePreviewPanel.show();
-            this.$.filePreview.fileId = this.selectedFile._id;
         },
         _checkCustomButtons: function() {
             var els = this.$.botbar.querySelectorAll('.custom-button');
