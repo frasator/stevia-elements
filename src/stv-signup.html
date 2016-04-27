@@ -108,7 +108,7 @@
                         password: CryptoJS.SHA1(this.password).toString()
                     },
                     request: {
-                        async: false,
+                        async: true,
                         success: function(response) {
                             if (response.response[0].error == null) {
                                 var email = response.response[0].results[0].email;

@@ -162,6 +162,16 @@ input.stv[type=password]:focus {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
+textarea.stv:invalid,
+input.stv[type=text]:invalid,
+input.stv[type=email]:invalid,
+input.stv[type=number]:invalid,
+input.stv[type=color]:invalid,
+input.stv[type=password]:invalid {
+    border-color: rgb(232, 106, 52);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(232, 106, 52, .6);
+}
+
 input.stv[type=text]:invalid:focus,
 input.stv[type=email]:invalid:focus,
 input.stv[type=number]:invalid:focus,
