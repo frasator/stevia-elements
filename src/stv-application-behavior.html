@@ -10,8 +10,7 @@
                 type: String,
                 value: "home",
                 notify: true,
-                reflectToAttribute: true,
-                observer: 'selectedOptionChanged'
+                reflectToAttribute: true
             },
             userData: {
                 type: Object,
@@ -37,7 +36,11 @@
                 type: Object
             }
         },
-        selectedOptionChanged: function(neo, old) {
+        observers: [
+            '_selectedOptionChanged(selectedOption)',
+            'selectedOptionChanged(selectedOption)'
+        ],
+        _selectedOptionChanged: function(neo, old) {
             var menuItems = Polymer.dom(this.root).querySelectorAll('[menu-option]');
             for (var i = 0; i < menuItems.length; i++) {
                 var item = menuItems[i];
@@ -59,6 +62,7 @@
                 }
             }
         },
+        selectedOptionChanged: function() {},
         handleMenuOption: function(e) {
             var option = e.currentTarget.dataset['option'];
             this.setMenu(option);
@@ -114,8 +118,7 @@
         },
         userDataChanged: function(neo, old) {
             var me = this;
-            if (this.userData) {
-            } else {
+            if (this.userData) {} else {
                 console.log("no user data")
             }
         },
@@ -180,7 +183,7 @@
                     var panel = this.$[elem.dataset.panel];
                     if (!this.$.stvHeader.isLogged) {
                         elem.hidden = true;
-                        if(panel != null){
+                        if (panel != null) {
                             panel.hide();
                         }
                     } else {

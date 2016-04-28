@@ -148,11 +148,11 @@
                                 me.fire('login', {
                                     status: true
                                 });
+                                me.email = null;
                             } else {
                                 console.log(response.response[0].error);
                                 me.message = response.response[0].error;
                             }
-                            me.email = null;
                             me.password = null;
                         },
                         error: function(response) {

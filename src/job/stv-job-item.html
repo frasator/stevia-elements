@@ -111,26 +111,26 @@
                     <div style="padding-right:5px;" class="date flex">{{computeDate(job)}}</div>
                     <div class="bar" id="bar">
                         <template is="dom-if" if="{{!isRunning(job)}}">
-                            <template is="dom-if" if="{{hasError(job)}}">
+                            <template is="dom-if" if="{{showError(job)}}">
                                 <i class="fa fa-file-o log-file" title="View log file" on-click="handleViewLogFile"></i>
                                 <i class="fa fa-file error-file" title="View error file" on-click="handleViewErrorFile"></i>
                                 <span style="margin-right:5px;"></span>
                             </template>
                             <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
-                            <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i>
+                            <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
                             <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
                             <i class="fa fa-bug" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
                         </template>
                     </div>
                 </div>
             </div>
-            <div id="fileInfo" class="vertical layout flex" hidden="{{!showInfo}}">
+            <!-- <div id="fileInfo" class="vertical layout flex" hidden="{{!showInfo}}">
                 <div class="horizontal layout">
                     <span class="data">Description:&nbsp;</span>
                     <span class="value">{{job.description}}</span>
                 </div>
-            </div>
+            </div> -->
             <stv-panel modal fixed closable hidden id="filePreviewPanel">
                 <div class="header">
                     <i class="fa fa-eye"></i> File Preview
@@ -191,13 +191,20 @@
                 return job.tool;
             },
             hideRelaunch: function(job) {
-                if((job.status === "DONE" || job.status.indexOf("ERROR") != -1) && this.disableRelaunch == false){
+                if ((job.status === "DONE" || job.status.indexOf("ERROR") != -1) && this.disableRelaunch == false) {
                     return false;
                 }
                 return true;
             },
             isRunning: function(job) {
                 return job.status == "RUNNING";
+            },
+            showError: function(job) {
+                if (typeof window.STEVIA_SHOW_JOB_ERROR_FILES === 'undefined') {
+                    return false;
+                } else {
+                    return this.hasError(job);
+                }
             },
             hasError: function(job) {
                 return job.status.indexOf("ERROR") != -1;
@@ -267,10 +274,10 @@
                 }
             },
 
-            handleJobInformation: function(e) {
-                e.stopPropagation();
-                this.showInfo = !this.showInfo;
-            },
+            // handleJobInformation: function(e) {
+            //     e.stopPropagation();
+            //     this.showInfo = !this.showInfo;
+            // },
 
             handleViewLogFile: function(e) {
                 e.stopPropagation();
