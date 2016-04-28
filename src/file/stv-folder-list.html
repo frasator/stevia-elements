@@ -422,9 +422,10 @@
                         request: {
                             success: function(response) {
                                 if (response.response[0].error == null) {
-                                    console.log(response.response[0].results[0])
+                                    console.log(response.response[0].results[0]);
+                                    me.fire('need-refresh');
                                 } else {
-                                    console.log(response.response[0].error)
+                                    console.log(response.response[0].error);
                                 }
                             },
                             error: function() {

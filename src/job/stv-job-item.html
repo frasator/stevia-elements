@@ -55,18 +55,10 @@
         }
 
         .log-file {
-            color: #6d9ac6 !important;
-        }
-
-        .error-file {
-            color: #af5959 !important;
+            color: #ad2a2a !important;
         }
 
         .log-file:hover {
-            color: #0068cc !important;
-        }
-
-        .error-file:hover {
             color: #b30000 !important;
         }
 
@@ -113,7 +105,6 @@
                         <template is="dom-if" if="{{!isRunning(job)}}">
                             <template is="dom-if" if="{{showError(job)}}">
                                 <i class="fa fa-file-o log-file" title="View log file" on-click="handleViewLogFile"></i>
-                                <i class="fa fa-file error-file" title="View error file" on-click="handleViewErrorFile"></i>
                                 <span style="margin-right:5px;"></span>
                             </template>
                             <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
@@ -282,11 +273,6 @@
             handleViewLogFile: function(e) {
                 e.stopPropagation();
                 this.$.filePreview.fileId = this.job.olog;
-                this.$.filePreviewPanel.show();
-            },
-            handleViewErrorFile: function(e) {
-                e.stopPropagation();
-                this.$.filePreview.fileId = this.job.elog;
                 this.$.filePreviewPanel.show();
             },
             handleReportError: function(e) {

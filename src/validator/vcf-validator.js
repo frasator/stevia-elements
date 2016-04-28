@@ -25,7 +25,7 @@ function VCFValidator(options) {
         "headerNumber": /Number=(\w+|\.)/,
         "headerType": /Type=(\w+)/,
         "headerDesc": /Description=\"(.+)\"/,
-        "actg": /^[ACGTN]+$/,
+        "actg": /^[ACGTNactgn\.]+$/,
         "gt": /^(\.|\d+)([|/](\.|\d+))?$/,
         "alpha": /^(\w+)$/,
         "idSemiColon": /^(\w+(;\w+)?)$/
@@ -192,6 +192,10 @@ VCFValidator.prototype.parseData = function (line) {
         this.addLog("error", "Chromosome must not contain whitespaces");
     }
 
+    if (this._contigs[chr] == null) {
+        this.addLog("error", "Chromosome must be present on contig tags in header.")
+    }
+
     // Position
     var pos = columns[1]
     if (pos == "") {
@@ -201,7 +205,6 @@ VCFValidator.prototype.parseData = function (line) {
     if (isNaN(pos)) {
         this.addLog("error", "Position must be numeric");
     }
-
 
     // Check duplicates
     var chr_pos = chr + "_" + pos;
@@ -221,10 +224,9 @@ VCFValidator.prototype.parseData = function (line) {
         }
 
         if (!this._regExp["idSemiColon"].test(id)) {
-            this.addLog("error", "If more than one ID is specified, the must be semo-colon separated");
+            this.addLog("error", "If more than one ID is specified, they must be semi-colon separated");
         }
     }
-
 
     // ref
 
@@ -234,14 +236,13 @@ VCFValidator.prototype.parseData = function (line) {
     }
 
     if (!this._regExp["actg"].test(ref)) {
-        this.addLog("error", "Reference allele must match the regular expression /^[ACTGN]+$/");
+        this.addLog("error", "Reference allele must match the regular expression /^[ACTGN.]+$/");
     }
 
     // alt
     var alt = columns[4];
 
     if (alt == undefined) {
-        debugger
     }
 
     var altSplits = alt.split(",");
@@ -264,7 +265,7 @@ VCFValidator.prototype.parseData = function (line) {
             this.addLog("error", "Alternate allele must match the regular expression /^[ACTGN]+$/")
         }
 
-        if (altElem.length != ref.length) {
+        if (altElem.length != ref.length) { // TODO aaleman: Check this
             if (altElem.charAt(0) != ref.charAt(0)) {
                 this.addLog("warning", "The first base of each allele must match the reference if their lengths are different");
             }
@@ -282,13 +283,83 @@ VCFValidator.prototype.parseData = function (line) {
     }
 
     // Filter
-
     var filter = columns[6];
+    if (filter == "") {
+        this.addLog("error", "Filter status field must not be empty");
+    }
+    if (filter != 'PASS' && filter != ".") {
+        var filterIds = filter.split(";");
+        for (var i = 0; i < filterIds.length; i++) {
+            var id = filterIds[i];
+            if (this._filter[id] == null) {
+                this.addLog("warning", "Filter status must be specified in header, be PASS or be set to the missing value '.'");
+            }
+        }
+    }
 
     // Info
     var info = columns[7];
+    if (info == "") {
+        this.addLog("error", "Info field must not be empty");
+    }
+    var infoFields = info.split(";");
+    // if (infoFields.length != Object.keys(this._info).length) {
+    //   this.addLog("error", "Info must have the same number of fields specified in header");
+    // }
+    if (infoFields.length != 1 || infoFields[0] != '.') {
+        for (var i = 0; i < infoFields.length; i++) {
+            var field = infoFields[i];
+            if (field.indexOf("=") > 0) {
+                var key = field.substring(0, field.indexOf("="));
+                var value = field.substring(field.indexOf("=") + 1);
+                if (this._info[key] == null) {
+                    this.addLog("warning", "Info field must be specified in header");
+                } else {
+                    var v = value.split(",");
+                    if (v.length > 1) {
+                        if (this._info[key].number == 'A') {
+                            //'A': one value per alternate
+                            var n = alt.split(",").length;
+                            if (n != v.length) {
+                                this.addLog("warning", "If Info number is 'A', value must have one value per alternate");
+                            }
+                            //TODO: 'R': one value for each posible allele
+                            //TODO: 'G': one value for each posible genotype
 
-    if (!columns.length > 8) {
+                        } else if (this._info[key].number < v.length) {
+                            this.addLog("warning", "Number of values in info must be less or equal than Number in Info field");
+                        }
+                        if (this._info[key].type == 'Flag') {
+                            this.addLog("warning", "Flag type must not have value");
+                        } else {
+                            for (var j = 0; j < v.length; j++) {
+                                var auxV = v[j];
+                            }
+                            if (this._info[key].type == 'Integer' && Number.isInteger(auxV) == false) {
+                                this.addLog("warning", "Info type and value type must be the same");
+                            } else if (this._info[key].type == 'String' && isNaN(auxV) == false) {
+                                this.addLog("warning", "Info type and value type must be the same");
+                                // } else if (this._info[key].type == 'Float' && Number.isFloat(auxV) == false) {
+                                //     this.addLog("error", "Info type and value type must be the same");
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (this._info[field] == null) {
+                    this.addLog("warning", "Info field must be specified in header");
+                } else if (this._info[field].type != "Flag") {
+                    this.addLog("warning", "Info field must be a Flag type or have a data value");
+                } else {
+                    if (this._info[field].number != 0) {
+                        this.addLog("warning", "In Info, Number must be 0 for a Flag type");
+                    }
+                }
+            }
+        }
+    }
+
+    if (!(columns.length > 8)) {
         return;
     }
 
@@ -296,14 +367,15 @@ VCFValidator.prototype.parseData = function (line) {
     var format = columns[8];
 
     if (this._samples.length > 0 && format == "") {
-        this.addLog("eror", "Must not be empty if the file contains any samples");
+        this.addLog("error", "Must not be empty if the file contains any samples");
     }
 
-    if (format != "" && !format.startsWith("GT")) {
-        this.addLog("error", "GT must be the first field");
+    if (format != "" && format.indexOf("GT") >= 0 && !format.startsWith("GT")) {
+        this.addLog("error", "GT must be the first field if it is present");
     }
 
     var formatSplits = format.split(":");
+    // ...
 
     // Samples
     var samplesData = [];

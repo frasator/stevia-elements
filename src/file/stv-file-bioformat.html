@@ -139,7 +139,7 @@
             },
             selectedBioformat: {
                 type: Object,
-                observer: 'selectedDioformatsChanged'
+                observer: 'selectedBioformatChanged'
             }
         },
         isChecked: function(bioformats, bioformat) {
@@ -169,7 +169,7 @@
             }
 
         },
-        selectedDioformatsChanged: function(neo, old) {
+        selectedBioformatChanged: function(neo, old) {
             this.fire('selected-bioformat-change');
         },
         handleRadioChange: function(e) {
