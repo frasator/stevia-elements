@@ -335,6 +335,7 @@
                 });
 
                 neo.on("progress", function(e) {
+                    me.numLines = me.validator.numLines;
                     me.progress = Math.ceil(e);
                 });
 

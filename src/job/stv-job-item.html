@@ -252,6 +252,7 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log(response);
+                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
