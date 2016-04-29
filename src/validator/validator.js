@@ -13,7 +13,7 @@ function Validator(options) {
     this._events = {};
     this.numLines = 0;
 
-    this.linesToRead = 5000;
+    this.linesToRead = 2000;
 }
 
 Validator.prototype = {
