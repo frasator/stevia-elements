@@ -122,7 +122,7 @@
                     <div class="horizontal layout flex">
                         <div id="filename" class="flex">{{fileName}}</div>
                         <div id="recheckButton" class="stv-btn stv-btn-shdw" on-click="handleRecheck">
-                            Re-check
+                            Revalidate
                         </div>
                     </div>
                     <input type="file" hidden id="fileInput" on-change="handleInputChange" disabled$="{{uploading}}">
@@ -142,7 +142,7 @@
                 <!-- <div hidden$="{{hideValidationLog}}" class="right vertical layout"> -->
                 <div class="right vertical layout">
                     <label class="stv">File validation log:</label>
-                    <stv-validator id="validator" bioformats="{{bioformats}}" on-end="handleValidatorEnd"></stv-validator>
+                    <stv-validator id="validator" bioformats="{{bioformats}}" on-end="handleValidatorEnd" on-stop="handleValidatorStop"></stv-validator>
                 </div>
             </div>
 
@@ -249,7 +249,7 @@
                 var inputFile = this.$.fileInput.files[0];
                 this.fileName = inputFile.name
 
-                this.validate();
+                this.handleRecheck();
 
                 // console.log(inputFile.type)
             }
@@ -264,18 +264,19 @@
                 this.message = "Upload already in progress."
                 return;
             }
-            if (this.$.validator.errorCount > 0) {
-                this.message = "The file contains errors."
-                return;
-            }
-            if (this.$.validator.warningCount > 0) {
-                if (confirm("File contains warning messages, are you sure?")) {
-                    this.handleForm();
+            if (this.validating == false) {
+                if (this.$.validator.errorCount > 0) {
+                    this.message = "The file contains errors."
                     return;
                 }
+                if (this.$.validator.warningCount > 0) {
+                    if (confirm("File contains warning messages, are you sure?")) {
+                        this.handleForm();
+                        return;
+                    }
+                }
+                this.handleForm();
             }
-
-            this.handleForm();
         },
         handleForm: function() {
             var me = this;
@@ -397,12 +398,28 @@
         handleValidatorEnd: function(e) {
             this.validating = false;
         },
+        handleValidatorStop: function(e) {
+            this.validating = false;
+
+            if (this._wantRevalidate == true) {
+                this._wantRevalidate = null;
+                this.revalidate();
+            }
+        },
 
         tplEq: function(prop, value) {
             return prop == value;
         },
 
         handleRecheck: function() {
+            if (this.validating == true) {
+                this._wantRevalidate = true;
+                this.$.validator.stop();
+            } else {
+                this.revalidate();
+            }
+        },
+        revalidate: function() {
             this.$.validator.reset();
             this.validate();
         }

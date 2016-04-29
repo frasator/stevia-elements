@@ -25,6 +25,11 @@ Validator.prototype = {
         this.progress = 0;
         this._readBytes = 0;
     },
+    stop: function (cb) {
+        if (this._navigator != null) {
+            this._navigator._stop = true;
+        }
+    },
 
     validate: function () {
         var me = this;
@@ -48,8 +53,8 @@ Validator.prototype = {
                     me._emit("err");
                     return;
                 }
-                console.log(lines.length);
-                console.log(progress);
+                // console.log(lines.length);
+                // console.log(progress);
 
                 for (var i = 0; i < lines.length; i++) {
                     var line = lines[i];
@@ -69,8 +74,12 @@ Validator.prototype = {
                     return;
                 }
 
-                me._navigator.readLines(index + lines.length, me.linesToRead, linesReadHandler);
-
+                if (me._navigator._stop != true) {
+                    me._navigator.readLines(index + lines.length, me.linesToRead, linesReadHandler);
+                } else {
+                    me._emit("stop");
+                    console.log("STOP!!!!!");
+                }
             });
         });
     },
