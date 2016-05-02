@@ -51,7 +51,7 @@
         <div id="dropdown" hidden class="layout horizontal wrap around-justified">
             <template is="dom-repeat" items="{{_applicationsList}}">
                 <div class="button layout vertical around-justified center">
-                    <img src="{{item.icon}}" alt="" class="icon">
+                    <img src="{{_handleAppImage(item.icon)}}" alt="" class="icon">
                     <span>{{item.name}}</span>
                 </div>
             </template>
@@ -72,7 +72,7 @@
                 this._getAppInfo();
 
                 icon.addEventListener("click", this._toogle.bind(this));
-                
+
                 Polymer.dom(this).setAttribute("tabindex", -1); // To make blur work
                 this.addEventListener("blur", this._hide.bind(this));
             },
@@ -106,6 +106,15 @@
 
                 request.open("GET", this.dataSrc);
                 request.send();
+            },
+
+            _handleAppImage: function(appIcon){
+                if(appIcon === ""){
+                    //TODO: Fix default img
+                    return "bower_components/stevia-components/src/stv-launcher/defaultWhite.svg";
+                }else {
+                    return appIcon;
+                }
             },
 
              _fadeIn: function(el) {
