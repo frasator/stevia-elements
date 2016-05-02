@@ -60,6 +60,7 @@
                         <img src="{{item.icon}}" alt="" class="icon">
                     </template>
                     <template is="dom-if" if="[[!_hasIconUrl(item.icon)]]">
+                        <!-- Default Icon if there is no icon link -->
                         <svg class="icon"
                              viewBox="0 0 1000 1000"
                              sodipodi:docname="default.svg"><path
@@ -104,13 +105,11 @@
 
                 icon.addEventListener("click", this._toogle.bind(this));
 
-                Polymer.dom(this.$.dropdown).setAttribute("tabindex", -1); // To make blur work
-                this.$.dropdown.focus();
-                this.$.dropdown.addEventListener("blur", this._hide.bind(this));
+                Polymer.dom(this).setAttribute("tabindex", -1); // To make blur work
+                this.addEventListener("blur", this._hide.bind(this));
             },
 
             _toogle: function(){
-
                 var dropdown = this.$.dropdown;
                 if(dropdown.hidden){
                     dropdown.removeAttribute("hidden");
@@ -119,12 +118,14 @@
                     dropdown.setAttribute("hidden", true);
                     dropdown.style.opacity = 0;
                 }
-
                 this._setDropdownPosition();
             },
 
             _hide: function(){
-                Polymer.dom(this.$.dropdown).setAttribute("hidden", true);
+                // Made async function to allow link to work
+                this.async(function(){
+                    Polymer.dom(this.$.dropdown).setAttribute("hidden", true);
+                }, 200);
             },
 
             _getAppInfo: function(){
@@ -159,10 +160,6 @@
 
                  tick();
              },
-
-            _handleClick: function(item){
-                console.log(item.target.dataset);
-            },
 
             _setDropdownPosition: function(){
                 var dropdownBCR = this.$.dropdown.getBoundingClientRect();
