@@ -28,7 +28,10 @@ function VCFValidator(options) {
         "actg": /^[ACGTNactgn\.]+$/,
         "gt": /^(\.|\d+)([|/](\.|\d+))?$/,
         "alpha": /^(\w+)$/,
-        "idSemiColon": /^(\w+(;\w+)?)$/
+        "idSemiColon": /^(\w+(;\w+)?)$/,
+        "integer": /^(\d+)$/,
+        "float": /^(\d+(\.\d+)?)$/
+
     }
 }
 
@@ -50,11 +53,11 @@ VCFValidator.prototype.validateLine = function (line) {
         this.parseData(line);
     }
 
-}
+};
 
 VCFValidator.prototype.isHeaderLine = function (line) {
     return line.startsWith("#");
-}
+};
 
 VCFValidator.prototype.parseHeader = function (line) {
     if (this.line == 0) { // parse fileformat
@@ -145,7 +148,7 @@ VCFValidator.prototype.parseHeader = function (line) {
     } else {
         this.addLog("error", "All header lines must be prefixed by '##");
     }
-}
+};
 
 VCFValidator.prototype._getDataFromRegExp = function (data, regExpId) {
     var regExp = this._regExp[regExpId];
@@ -323,8 +326,16 @@ VCFValidator.prototype.parseData = function (line) {
                             if (n != v.length) {
                                 this.addLog("warning", "If Info number is 'A', value must have one value per alternate");
                             }
-                            //TODO: 'R': one value for each posible allele
+                        } else if (this._info[key].number == 'R') {
+                            //'R': one value for each posible allele
+                            var n = alt.split(",").length + 1;
+                            if (n != v.length) {
+                                this.addLog("warning", "If Info number is 'R', value must have one value per allele");
+                            }
+                        } else if (this._info[key].number == "G") {
                             //TODO: 'G': one value for each posible genotype
+                            debugger
+
 
                         } else if (this._info[key].number < v.length) {
                             this.addLog("warning", "Number of values in info must be less or equal than Number in Info field");
@@ -377,6 +388,13 @@ VCFValidator.prototype.parseData = function (line) {
     var formatSplits = format.split(":");
     // ...
 
+    for (var i = 0; i < formatSplits.length; i++) {
+        var formatKey = formatSplits[i];
+        if (this._format[formatKey] == null) {
+            this.addLog("warning", "FORMAT field '" + formatKey + "'must be specified in header");
+        }
+    }
+
     // Samples
     var samplesData = [];
 
@@ -391,6 +409,68 @@ VCFValidator.prototype.parseData = function (line) {
             this.addLog("error", "Sample fields must be not empty");
         } else {
             var sampleDataSplit = sampleData.split(":");
+
+            for (var j = 0; j < sampleDataSplit.length; j++) {
+                var sampleValue = sampleDataSplit[j];
+                var formatKey = formatSplits[j];
+                var formatElem = this._format[formatKey];
+
+                if (formatElem == null) {
+                    continue;
+                }
+
+                if (j == 0) { // GT must be the first.
+
+                    var gtGroups = this._regExp["gt"].exec(sampleValue);
+                    if (gtGroups.length == 4) { // GT=0/0,0/1....
+                        this._ploidy = 2;
+
+                    } else if (gtGroups.length == 2) {
+                        this._ploidy = 1;
+                        debugger
+                    } else {
+                        debugger
+                    }
+                }
+
+                // Check Number
+                var found = sampleValue.split(",").length;
+
+                switch (formatElem.number) {
+                    case ".":
+                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        break;
+                    case "A":
+                        var expected = altSplits.length;
+                        if (expected != found) {
+                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected one value per alternate)");
+                        }
+                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        break;
+                    case "R":
+                        var expected = altSplits.length + 1;
+                        if (expected != found) {
+                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected one value for each possible  allele, including the reference)");
+                        }
+                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        break;
+                    case "G":
+                        var expected = this._binomial(altSplits.length + this._ploidy, this._ploidy);
+                        if (expected != found) {
+                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each posiible genotype");
+                        }
+                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        break;
+                    default :
+                        var expected = parseInt(formatElem.number);
+                        if (expected != found) {
+                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected: '" + expected + "', found: '" + found + "'.");
+                        }
+                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        break;
+                }
+            }
+
             var gt = sampleDataSplit[0];
             if (!this._regExp["gt"].test(gt)) {
                 this.addLog("error", "GT must match the regular expression ^(\.|\d+)([|/]?)");
@@ -417,7 +497,7 @@ VCFValidator.prototype.parseData = function (line) {
             }
         }
     }
-}
+};
 
 VCFValidator.prototype._checkReferenceTag = function () {
 
@@ -429,4 +509,52 @@ VCFValidator.prototype._checkReferenceTag = function () {
     }
     this.addLog("warning", "The tag 'reference' must be present");
 
-}
+};
+
+VCFValidator.prototype._binomial = function (n, k) {
+    if ((typeof n !== 'number') || (typeof k !== 'number'))
+        return false;
+    var coeff = 1;
+    for (var x = n - k + 1; x <= n; x++) coeff *= x;
+    for (x = 1; x <= k; x++) coeff /= x;
+    return coeff;
+};
+
+VCFValidator.prototype._isInt = function (value) {
+    var x;
+    if (isNaN(value)) {
+        return false;
+    }
+    x = parseFloat(value);
+    return (x | 0) === x;
+};
+
+
+VCFValidator.prototype._isInt = function (n) {
+    return this._regExp["integer"].test(n);
+};
+
+VCFValidator.prototype._isFloat = function (n) {
+    return this._regExp["float"].test(n);
+};
+
+VCFValidator.prototype._checkFormatDataType = function (data, formatElem) {
+    for (var i = 0; i < data.length; i++) {
+        var elem = data[i];
+
+        if (formatElem.type === "Integer") {
+            if (!this._isInt(elem)) {
+                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
+            }
+        } else if (formatElem.type === "Float") {
+            if (!this._isFloat(elem)) {
+                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
+            }
+        } else if (formatElem.type === "Character") {
+            if (elem.length > 1) {
+                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Expected one character, found '" + elem.length + "'");
+            }
+        }
+    }
+};
+
