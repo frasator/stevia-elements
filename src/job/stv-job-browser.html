@@ -196,7 +196,11 @@
             },
             userDataChanged: function(neo, old) {
                 if (neo) {
-                    this.set('jobs', neo.jobs);
+                    if(neo.jobs.length > 0 ){
+                        this.set('jobs', neo.jobs);
+                    }else{
+                        this.clean();
+                    }
                 } else {
                     this.clean();
                 }

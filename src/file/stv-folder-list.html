@@ -333,7 +333,7 @@
             /**/
             _deleteFile: function() {
                 var me = this;
-                if (this.selected) {
+                if (this.selected && this.selected.job && this.selected.job.status !== "RUNNING") {
                     SteviaManager.files.delete({
                         id: this.selected._id,
                         query: {
@@ -345,10 +345,10 @@
                                     console.log("delete:");
                                     console.log(response);
                                     me.set('selected', null);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 alert('Server error, try again later.');
@@ -404,6 +404,7 @@
                 e.dataTransfer.setData("text/plain", e.currentTarget.file._id);
             },
             handleDragDrop: function(e) {
+                var me = this;
                 e.preventDefault();
                 e.stopPropagation();
                 var el = e.currentTarget;
@@ -423,17 +424,16 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log(response.response[0].results[0]);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 console.log('Server error, try again later')
                             }
                         }
                     });
-                    this.fire('need-refresh');
                 }
             },
         });

@@ -213,10 +213,10 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log('Job deleted');
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 console.log('Server error, try again later.');
@@ -252,10 +252,10 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log(response);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                                 me.fire('job-launched');
                             },
                             error: function() {
