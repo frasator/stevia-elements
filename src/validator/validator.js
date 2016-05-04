@@ -12,6 +12,7 @@ function Validator(options) {
     this._readBytes = 0;
     this._events = {};
     this.numLines = 0;
+
 }
 
 Validator.prototype = {
@@ -33,7 +34,6 @@ Validator.prototype = {
     validate: function () {
         var me = this;
 
-
         /*Check if file is \r or \n , \r\n */
         this._detectCRSeparator(this.file, function (res) {
             var lastReadBytes = null;
@@ -46,17 +46,18 @@ Validator.prototype = {
             } else {
                 me._navigator = new FileNavigator(me.file);
             }
-
             me._totalBytes = me.file.size;
             var indexToStartWith = 0;
+
+            lastReadBytes = 0;
 
             me._navigator.readLines(indexToStartWith, me.linesToRead, function linesReadHandler(err, index, lines, eof, progress) {
                 if (err) {
                     me._emit("err");
                     return;
                 }
-
-                // lastProgress = me.progress;
+                // console.log(lines.length);
+                console.log(progress);
 
                 for (var i = 0; i < lines.length; i++) {
                     var line = lines[i];
@@ -68,7 +69,6 @@ Validator.prototype = {
                     me.validateLine(line);
                 }
                 me._emit("progress", me.progress);
-
 
                 if (lastReadBytes == me._readBytes) {
                     me._emit("progress", 100);
@@ -86,7 +86,9 @@ Validator.prototype = {
                     console.log("STOP!!!!!");
                 }
             });
+
         });
+        // });
     },
     validateLine: function (line) {
         return true;

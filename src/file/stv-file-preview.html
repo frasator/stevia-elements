@@ -90,6 +90,7 @@
             }
         },
         handleScroll: function(e) {
+            e.stopPropagation();
             var el = e.currentTarget;
             if (el.offsetHeight + el.scrollTop >= el.scrollHeight) {
                 if (!this._end) {
