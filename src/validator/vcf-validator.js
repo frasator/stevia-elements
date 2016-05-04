@@ -25,7 +25,7 @@ function VCFValidator(options) {
         "headerNumber": /Number=(\w+|\.)/,
         "headerType": /Type=(\w+)/,
         "headerDesc": /Description=\"(.+)\"/,
-        "actg": /^[ACGTNactgn\.]+$/,
+        "actg": /^[ACGTNactgn]+$/,
         "gt": /^(\.|\d+)([|/](\.|\d+))?$/,
         "alpha": /^(\w+)$/,
         "idSemiColon": /^(\w+(;\w+)?)$/,
@@ -299,7 +299,7 @@ VCFValidator.prototype.parseData = function (line) {
         }
     }
 
-    var aggregate = columns.length == 7;
+    var aggregate = columns.length == 8;
 
     // Info
     var info = columns[7];
