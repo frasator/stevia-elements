@@ -173,7 +173,7 @@ VCFValidator.prototype.parseData = function (line) {
 
     var columns = line.split("\t");
 
-    if (columns.length < 9) {
+    if (columns.length < 8) {
         this.addLog("error", "Must contain at least 8 columns(CHROM to INFO)");
     } else if (columns.length - 9 != this._samples.length) {
         this.addLog("error", "The number of samples must match those listed in the header");
@@ -245,8 +245,7 @@ VCFValidator.prototype.parseData = function (line) {
     // alt
     var alt = columns[4];
 
-    if (alt == undefined) {
-    }
+    if (alt == undefined) {}
 
     var altSplits = alt.split(",");
     var altSplitsUnique = altSplits.filter(function (item, pos) {
@@ -300,6 +299,8 @@ VCFValidator.prototype.parseData = function (line) {
         }
     }
 
+    var aggregate = columns.length == 7;
+
     // Info
     var info = columns[7];
     if (info == "") {
@@ -309,6 +310,7 @@ VCFValidator.prototype.parseData = function (line) {
     // if (infoFields.length != Object.keys(this._info).length) {
     //   this.addLog("error", "Info must have the same number of fields specified in header");
     // }
+
     if (infoFields.length != 1 || infoFields[0] != '.') {
         for (var i = 0; i < infoFields.length; i++) {
             var field = infoFields[i];
@@ -316,43 +318,43 @@ VCFValidator.prototype.parseData = function (line) {
                 var key = field.substring(0, field.indexOf("="));
                 var value = field.substring(field.indexOf("=") + 1);
                 if (this._info[key] == null) {
-                    this.addLog("warning", "Info field must be specified in header");
+                    this.addLog("warning", "Info field '" + key + "' must be specified in header");
                 } else {
                     var v = value.split(",");
                     if (v.length > 1) {
-                        if (this._info[key].number == 'A') {
+                        switch (this._info[key].number) {
+                        case "A":
                             //'A': one value per alternate
-                            var n = alt.split(",").length;
-                            if (n != v.length) {
-                                this.addLog("warning", "If Info number is 'A', value must have one value per alternate");
+                            var expected = altSplits.length;
+                            if (expected != v.length) {
+                                this.addLog("error", "Wrong number of values in INFO field '" + Key + " (expected one value per alternate)");
                             }
-                        } else if (this._info[key].number == 'R') {
-                            //'R': one value for each posible allele
-                            var n = alt.split(",").length + 1;
-                            if (n != v.length) {
-                                this.addLog("warning", "If Info number is 'R', value must have one value per allele");
+                            break;
+                        case "R":
+                            //'R': one value for each possible allele
+                            var expected = altSplits.length + 1;
+                            if (expected != v.length) {
+                                this.addLog("error", "Wrong number of values in INFO field '" + Key + " (expected one value for each possible  allele, including the reference)");
                             }
-                        } else if (this._info[key].number == "G") {
-                            //TODO: 'G': one value for each posible genotype
-                            debugger
+                            break;
+                        case "G":
+                            //'G': one value for each possible genotype
+                            // var expected = altSplits.length * (altSplits.length + 1) / 2;
+                            var typeMSG = aggregate ? "warning" : "error";
+                            if (!aggregate) {
+                                var expected = this._binomial(altSplits.length + this._ploidy, this._ploidy);
+                                if (expected != found) {
 
-
-                        } else if (this._info[key].number < v.length) {
-                            this.addLog("warning", "Number of values in info must be less or equal than Number in Info field");
+                                }
+                            }
+                            this.addLog(typeMSG, "Wrong number of values in INFO field '" + Key + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each possible genotype");
+                            break;
                         }
+
                         if (this._info[key].type == 'Flag') {
                             this.addLog("warning", "Flag type must not have value");
                         } else {
-                            for (var j = 0; j < v.length; j++) {
-                                var auxV = v[j];
-                            }
-                            if (this._info[key].type == 'Integer' && Number.isInteger(auxV) == false) {
-                                this.addLog("warning", "Info type and value type must be the same");
-                            } else if (this._info[key].type == 'String' && isNaN(auxV) == false) {
-                                this.addLog("warning", "Info type and value type must be the same");
-                                // } else if (this._info[key].type == 'Float' && Number.isFloat(auxV) == false) {
-                                //     this.addLog("error", "Info type and value type must be the same");
-                            }
+                            this._checkFormatDataType(v.split(","), this._info[key], 'INFO');
                         }
                     }
                 }
@@ -370,132 +372,135 @@ VCFValidator.prototype.parseData = function (line) {
         }
     }
 
-    if (!(columns.length > 8)) {
-        return;
-    }
+    // if (!(columns.length > 8)) {
+    //     return;
+    // }
 
-    // Format
-    var format = columns[8];
+    if (columns.length > 8) {
+        // Format
+        var format = columns[8];
 
-    if (this._samples.length > 0 && format == "") {
-        this.addLog("error", "Must not be empty if the file contains any samples");
-    }
-
-    if (format != "" && format.indexOf("GT") >= 0 && !format.startsWith("GT")) {
-        this.addLog("error", "GT must be the first field if it is present");
-    }
-
-    var formatSplits = format.split(":");
-    // ...
-
-    for (var i = 0; i < formatSplits.length; i++) {
-        var formatKey = formatSplits[i];
-        if (this._format[formatKey] == null) {
-            this.addLog("warning", "FORMAT field '" + formatKey + "'must be specified in header");
+        if (this._samples.length > 0 && format == "") {
+            this.addLog("error", "Must not be empty if the file contains any samples");
         }
-    }
 
-    // Samples
-    var samplesData = [];
+        if (format != "" && format.indexOf("GT") >= 0 && !format.startsWith("GT")) {
+            this.addLog("error", "GT must be the first field if it is present");
+        }
 
-    for (var i = 9; i < columns.length; i++) {
-        samplesData.push(columns[i]);
-    }
+        var formatSplits = format.split(":");
+        // ...
 
-    for (var i = 0; i < samplesData.length; i++) {
-        var sampleData = samplesData[i];
+        for (var i = 0; i < formatSplits.length; i++) {
+            var formatKey = formatSplits[i];
+            if (this._format[formatKey] == null) {
+                this.addLog("warning", "FORMAT field '" + formatKey + "'must be specified in header");
+            }
+        }
 
-        if (sampleData == "") {
-            this.addLog("error", "Sample fields must be not empty");
-        } else {
-            var sampleDataSplit = sampleData.split(":");
+        // Samples
+        var samplesData = [];
 
-            for (var j = 0; j < sampleDataSplit.length; j++) {
-                var sampleValue = sampleDataSplit[j];
-                var formatKey = formatSplits[j];
-                var formatElem = this._format[formatKey];
+        for (var i = 9; i < columns.length; i++) {
+            samplesData.push(columns[i]);
+        }
 
-                if (formatElem == null) {
-                    continue;
-                }
+        for (var i = 0; i < samplesData.length; i++) {
+            var sampleData = samplesData[i];
 
-                if (j == 0) { // GT must be the first.
+            if (sampleData == "") {
+                this.addLog("error", "Sample fields must be not empty");
+            } else {
+                var sampleDataSplit = sampleData.split(":");
 
-                    var gtGroups = this._regExp["gt"].exec(sampleValue);
-                    if (gtGroups.length == 4) { // GT=0/0,0/1....
-                        this._ploidy = 2;
+                for (var j = 0; j < sampleDataSplit.length; j++) {
+                    var sampleValue = sampleDataSplit[j];
+                    var formatKey = formatSplits[j];
+                    var formatElem = this._format[formatKey];
 
-                    } else if (gtGroups.length == 2) {
-                        this._ploidy = 1;
-                        debugger
-                    } else {
-                        debugger
+                    if (formatElem == null) {
+                        continue;
                     }
-                }
 
-                // Check Number
-                var found = sampleValue.split(",").length;
+                    if (j == 0) { // GT must be the first.
 
-                switch (formatElem.number) {
+                        var gtGroups = this._regExp["gt"].exec(sampleValue);
+                        if (gtGroups.length == 4) { // GT=0/0,0/1....
+                            this._ploidy = 2;
+
+                        } else if (gtGroups.length == 2) {
+                            this._ploidy = 1;
+                            debugger
+                        } else {
+                            debugger
+                        }
+                    }
+
+                    // Check Number
+                    var found = sampleValue.split(",").length;
+
+                    switch (formatElem.number) {
                     case ".":
-                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        this._checkFormatDataType(sampleValue.split(","), formatElem, 'FORMAT');
                         break;
                     case "A":
                         var expected = altSplits.length;
                         if (expected != found) {
                             this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected one value per alternate)");
                         }
-                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        this._checkFormatDataType(sampleValue.split(","), formatElem, 'FORMAT');
                         break;
                     case "R":
                         var expected = altSplits.length + 1;
                         if (expected != found) {
                             this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected one value for each possible  allele, including the reference)");
                         }
-                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        this._checkFormatDataType(sampleValue.split(","), formatElem, 'FORMAT');
                         break;
                     case "G":
                         var expected = this._binomial(altSplits.length + this._ploidy, this._ploidy);
                         if (expected != found) {
-                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each posiible genotype");
+                            this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each possible genotype");
                         }
-                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        this._checkFormatDataType(sampleValue.split(","), formatElem, 'FORMAT');
                         break;
-                    default :
+                    default:
                         var expected = parseInt(formatElem.number);
                         if (expected != found) {
                             this.addLog("error", "Wrong number of values in FORMAT field '" + formatKey + " (expected: '" + expected + "', found: '" + found + "'.");
                         }
-                        this._checkFormatDataType(sampleValue.split(","), formatElem);
+                        this._checkFormatDataType(sampleValue.split(","), formatElem, 'FORMAT');
                         break;
-                }
-            }
-
-            var gt = sampleDataSplit[0];
-            if (!this._regExp["gt"].test(gt)) {
-                this.addLog("error", "GT must match the regular expression ^(\.|\d+)([|/]?)");
-            } else {
-                var gtGroups = this._regExp["gt"].exec(gt);
-                if (gtGroups.length == 2) { // GT = 0,1
-                    var gtAllele = parseInt(gtGroups[1]);
-                    if (gtAllele > altSplits.length) {
-                        this.addLog("error", "An allele index must not be greater than the number of alleles in that variant");
                     }
-                } else if (gtGroups.length == 4) { // GT = 0/0,0/1,....
-                    var gtAllele0 = parseInt(gtGroups[1]);
-                    var gtAllele1 = parseInt(gtGroups[3]);
-
-                    if (gtAllele0 > altSplits.length || gtAllele1 > altSplits.length) {
-                        this.addLog("error", "An allele index must not be greater than the number of alleles in that variant");
-                    }
-
                 }
-            }
 
-            if (sampleDataSplit.length != formatSplits.length) {
-                this.addLog("error", "The number of sub-fields can not be greater than the number in the FORMAT column. Expected : " + formatSplits.length + ", found: " + sampleDataSplit.length);
+                var gt = sampleDataSplit[0];
+                if (!this._regExp["gt"].test(gt)) {
+                    this.addLog("error", "GT must match the regular expression ^(\.|\d+)([|/]?)");
+                } else {
+                    var gtGroups = this._regExp["gt"].exec(gt);
+                    if (gtGroups.length == 2) { // GT = 0,1
+                        var gtAllele = parseInt(gtGroups[1]);
+                        if (gtAllele > altSplits.length) {
+                            this.addLog("error", "An allele index must not be greater than the number of alleles in that variant");
+                        }
+                    } else if (gtGroups.length == 4) { // GT = 0/0,0/1,....
+                        var gtAllele0 = parseInt(gtGroups[1]);
+                        var gtAllele1 = parseInt(gtGroups[3]);
+
+                        if (gtAllele0 > altSplits.length || gtAllele1 > altSplits.length) {
+                            this.addLog("error", "An allele index must not be greater than the number of alleles in that variant");
+                        }
+
+                    }
+                }
+
+                if (sampleDataSplit.length != formatSplits.length) {
+                    this.addLog("error", "The number of sub-fields can not be greater than the number in the FORMAT column. Expected : " + formatSplits.length + ", found: " + sampleDataSplit.length);
+                }
             }
         }
+
     }
 };
 
@@ -529,7 +534,6 @@ VCFValidator.prototype._isInt = function (value) {
     return (x | 0) === x;
 };
 
-
 VCFValidator.prototype._isInt = function (n) {
     return this._regExp["integer"].test(n);
 };
@@ -538,23 +542,22 @@ VCFValidator.prototype._isFloat = function (n) {
     return this._regExp["float"].test(n);
 };
 
-VCFValidator.prototype._checkFormatDataType = function (data, formatElem) {
+VCFValidator.prototype._checkFormatDataType = function (data, formatElem, field) {
     for (var i = 0; i < data.length; i++) {
         var elem = data[i];
 
         if (formatElem.type === "Integer") {
             if (!this._isInt(elem)) {
-                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
+                this.addLog("error", field + " field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
             }
         } else if (formatElem.type === "Float") {
             if (!this._isFloat(elem)) {
-                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
+                this.addLog("error", field + " field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Value '" + elem + "' is not '" + formatElem.type + "'.");
             }
         } else if (formatElem.type === "Character") {
             if (elem.length > 1) {
-                this.addLog("error", "FORMAT field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Expected one character, found '" + elem.length + "'");
+                this.addLog("error", field + " field '" + formatElem.id + "' defined as '" + formatElem.type + "' . Expected one character, found '" + elem.length + "'");
             }
         }
     }
 };
-
