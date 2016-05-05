@@ -267,7 +267,14 @@
             if (this.validating == false) {
                 if (this.$.validator.errorCount > 0) {
                     this.message = "The file contains errors."
-                    return;
+                    if (window.UPLOAD_FILES_WITH_ERRORS !== true) {
+                        return;
+                    } else {
+                        if (confirm("File contains error messages, if you use this file on a job the execution may fail, are you sure?")) {
+                            this.handleForm();
+                            return;
+                        }
+                    }
                 }
                 if (this.$.validator.warningCount > 0) {
                     if (confirm("File contains warning messages, are you sure?")) {
@@ -304,7 +311,6 @@
                         name: this.fileName,
                         parentId: this.selectedFolder._id,
                         userId: Cookies("bioinfo_user"),
-                        sid: Cookies("bioinfo_sid"),
                         format: 'PLAIN',
                         bioFormat: selBioformat.value,
                         callbackProgress: function(chunk, total, response) {

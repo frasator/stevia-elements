@@ -333,12 +333,9 @@
             /**/
             _deleteFile: function() {
                 var me = this;
-                if (this.selected && this.selected.job && this.selected.job.status !== "RUNNING") {
+                if (this.selected) {
                     SteviaManager.files.delete({
                         id: this.selected._id,
-                        query: {
-                            sid: Cookies('bioinfo_sid'),
-                        },
                         request: {
                             success: function(response) {
                                 if (response.response[0].error == null) {
@@ -416,7 +413,6 @@
                     var fileId = e.dataTransfer.getData("text");
                     SteviaManager.files.move({
                         query: {
-                            sid: Cookies("bioinfo_sid"),
                             fileId: fileId,
                             newId: newParentId
                         },

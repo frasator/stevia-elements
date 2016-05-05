@@ -105,8 +105,8 @@
                 SteviaManager.users.create({
                     query: {
                         email: this.email,
-                        password: CryptoJS.SHA1(this.password).toString()
                     },
+                    sid: CryptoJS.SHA1(this.password).toString(),
                     request: {
                         async: true,
                         success: function(response) {

@@ -133,7 +133,6 @@ var SteviaManager = {
         upload: function (args) {
             var url = SteviaManager._url({
                 query: {
-                    sid: args.sid,
                     name: args.name,
                     parentId: args.parentId
                 },
@@ -176,7 +175,6 @@ var SteviaManager = {
             if (typeof args.request.async !== 'undefined' && args.request.async != null) {
                 async = args.request.async;
             }
-
             if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
                 console.log(url);
             }
@@ -211,6 +209,14 @@ var SteviaManager = {
                 for (var header in args.request.headers) {
                     request.setRequestHeader(header, args.request.headers[header]);
                 }
+            }
+
+            if (args.sid == null) {
+                args.sid = Cookies("bioinfo_sid");
+            }
+            if (args.sid != null) {
+                request.setRequestHeader("Authorization", "sid " + args.sid);
+                request.withCredentials = true;
             }
             var body = null;
             if (args.request.body != null) {
@@ -250,6 +256,8 @@ var SteviaManager = {
         var getResumeInfo = function (formData, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true); //false = sync call
+            xhr.setRequestHeader("Authorization", "sid " + Cookies("bioinfo_sid"));
+            xhr.withCredentials = true;
             xhr.onload = function (e) {
                 console.log(xhr.responseText);
                 callback(JSON.parse(xhr.responseText));
@@ -259,6 +267,8 @@ var SteviaManager = {
         var uploadChunk = function (formData, chunk, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
+            xhr.setRequestHeader("Authorization", "sid " + Cookies("bioinfo_sid"));
+            xhr.withCredentials = true;
             xhr.onload = function (e) {
                 chunk.done = true;
                 console.log('chunk ' + chunk.id + ' done');
@@ -389,9 +399,6 @@ var SteviaManager = {
     getFileContent: function (fileId, cb) {
         SteviaManager.files.content({
             id: fileId,
-            query: {
-                sid: Cookies('bioinfo_sid')
-            },
             request: {
                 async: true,
                 success: function (response) {
@@ -406,9 +413,6 @@ var SteviaManager = {
     getPlainFolderFiles: function (fileId, cb) {
         SteviaManager.files.filesByFolder({
             id: fileId,
-            query: {
-                sid: Cookies('bioinfo_sid')
-            },
             request: {
                 async: true,
                 success: function (response) {

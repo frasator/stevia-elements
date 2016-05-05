@@ -159,9 +159,6 @@ var Utils = {
     getUrl: function (fileId) {
         return SteviaManager.files.download({
             id: fileId,
-            query: {
-                sid: Cookies("bioinfo_sid")
-            },
             request: {
                 url: true
             }
@@ -170,9 +167,6 @@ var Utils = {
     getFileContent: function (callback, fileId) {
         SteviaManager.files.content({
             id: fileId,
-            query: {
-                sid: Cookies("bioinfo_sid")
-            },
             request: {
                 success: function (response) {
                     callback(response);

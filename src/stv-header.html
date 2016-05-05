@@ -29,6 +29,14 @@
             color: var(--text-primary-color);
         }
 
+        #left,
+        #right,
+        #center,
+        #menu-wrapper,
+        #menu-wrapper::content > .menu {
+            height: 100%;
+        }
+
         #tools {
             position: absolute;
             top: 60px;
@@ -37,10 +45,11 @@
 
         #left > div,
         #right > div,
-        #menu-wrapper >::content > .menu div.option {
+        #menu-wrapper::content > .menu div.option {
             box-sizing: border-box;
             cursor: pointer;
             text-align: center;
+            border-top: 2px solid transparent;
             border-bottom: 2px solid transparent;
             white-space: nowrap;
             overflow: hidden;
@@ -80,7 +89,9 @@
         }
 
         #user {
-            border-bottom: none !important;
+            color: var(--accent-color);
+            /*font-weight: normal;*/
+            border-bottom: 2px solid transparent !important;
         }
 
         div.title {
@@ -126,11 +137,6 @@
             .option-text {
                 display: none;
             }
-        }
-
-        #user {
-            color: var(--accent-color);
-            font-weight: normal;
         }
 
         #icon {
@@ -198,7 +204,7 @@
                 </div>
             </div>
             <div id="center" class="horizontal layout flex center">
-                <div id="menu-wrapper" hidden$="{{computeMenu(showMenuOnLogin, isLogged)}}" class="horizontal layout flex">
+                <div id="menu-wrapper" hidden$="{{computeMenu(showMenuOnLogin, isLogged)}}" class="horizontal layout center flex">
                     <content select=".menu"></content>
                 </div>
             </div>
@@ -447,7 +453,6 @@
                     SteviaManager.users.read({
                         id: user,
                         query: {
-                            sid: Cookies('bioinfo_sid'),
                             updatedAt: updatedAt
                         },
                         request: {
@@ -476,9 +481,6 @@
                 } else {
                     SteviaManager.users.logout({
                         id: user,
-                        query: {
-                            sid: Cookies('bioinfo_sid')
-                        },
                         request: {
                             success: function(response) {
                                 console.log(response);
