@@ -577,6 +577,9 @@ VCFValidator.prototype._isFloat = function (n) {
 VCFValidator.prototype._checkFormatDataType = function (data, formatElem, field) {
     for (var i = 0; i < data.length; i++) {
         var elem = data[i];
+        if(elem=="."){
+          continue;
+        }
 
         if (formatElem.type === "Integer") {
             if (!this._isInt(elem)) {
