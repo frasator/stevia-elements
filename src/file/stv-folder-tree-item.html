@@ -148,6 +148,7 @@
                 this.$.name.classList.remove('dragover');
             },
             handleDrop: function(e) {
+                var me = this;
                 this.$.name.classList.remove('dragover');
                 e.preventDefault();
                 e.stopPropagation();
