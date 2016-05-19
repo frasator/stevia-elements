@@ -39,6 +39,9 @@ var SteviaManager = {
         create: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'create');
         },
+        run: function (args) {
+            return SteviaManager._doRequest(args, 'jobs', 'run');
+        },
         delete: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'delete');
         },
@@ -121,8 +124,8 @@ var SteviaManager = {
         downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
-        update: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'update');
+        updateAttributes: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'attributes');
         },
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
@@ -415,6 +418,24 @@ var SteviaManager = {
             id: fileId,
             request: {
                 async: true,
+                success: function (response) {
+                    cb(response.response[0].results);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    updateFileAttributes: function (fileId, attributes, cb) {
+        SteviaManager.files.updateAttributes({
+            id: fileId,
+            request: {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(attributes),
                 success: function (response) {
                     cb(response.response[0].results);
                 },
