@@ -10,8 +10,7 @@
 <script src="experimental-design-validator.js"></script>
 
 <dom-module name="stv-validator" noscript>
-    <style is="custom-style"
-           include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
         :host {
             display: block;
             position: relative;
@@ -201,8 +200,7 @@
                     <div class="line">{{item.line}}</div>
                     <div class="type" type$="{{item.type}}">{{item.type}}</div>
                     <div class="msg flex">{{item.msg}}</div>
-                    <div class="view" line="{{item.line}}" on-click="handleLogViewClick" title="View line"><i
-                            class="fa fa-search"></i></div>
+                    <div class="view" line="{{item.line}}" on-click="handleLogViewClick" title="View line"><i class="fa fa-search"></i></div>
                 </div>
             </template>
         </iron-list>
@@ -237,14 +235,14 @@
             properties: {
                 file: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return {};
                     },
                     observer: 'fileChanged'
                 },
                 validator: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return new Validator({});
                     },
                     observer: 'validatorChanged'
@@ -274,10 +272,10 @@
                     observer: 'progressChanged'
                 }
             },
-            ready: function () {
+            ready: function() {
 
             },
-            reset: function () {
+            reset: function() {
                 this.progress = 0;
                 this.set("log", []);
                 this.errorCount = 0;
@@ -289,7 +287,7 @@
                 }
                 this.setFile();
             },
-            validate: function () {
+            validate: function() {
                 this.set("log", []);
                 this.errorCount = 0;
                 this.warningCount = 0;
@@ -297,34 +295,34 @@
                 this.numLines = 0;
                 this.validator.validate();
             },
-            handleStop: function (e) {
+            handleStop: function(e) {
                 this.stop();
             },
-            stop: function () {
+            stop: function() {
                 if (this.validator) {
                     this.validator.stop();
                 }
             },
-            setFile: function (file) {
+            setFile: function(file) {
                 this.fileChanged(file);
             },
-            validatorChanged: function (neo, old) {
+            validatorChanged: function(neo, old) {
                 var me = this;
-                neo.on("end", function (e) {
+                neo.on("end", function(e) {
                     me.numLines = me.validator.numLines;
                     me.fire("end");
                 });
 
-                neo.on("err", function (e) {
+                neo.on("err", function(e) {
                     me.fire("err");
                 });
 
-                neo.on("stop", function (e) {
+                neo.on("stop", function(e) {
                     me.$.spin.setAttribute('hidden', '');
                     me.fire("stop");
                 });
 
-                neo.on("log", function (e) {
+                neo.on("log", function(e) {
                     switch (e.type) {
                         case "error":
                             me.errorCount++;
@@ -340,7 +338,7 @@
                     me.push("log", e);
                 });
 
-                neo.on("progress", function (e) {
+                neo.on("progress", function(e) {
                     console.log(e);
                     me.numLines = me.validator.numLines;
                     me.progress = Math.ceil(e);
@@ -349,27 +347,27 @@
                 neo.init();
 
             },
-            fileChanged: function (neo, old) {
+            fileChanged: function(neo, old) {
                 if (neo && this.validator) {
                     this.validator.init();
                     this.validator.file = neo;
                 }
             },
-            computeLog: function (validator) {
+            computeLog: function(validator) {
                 if (validator) {
                     return validator.log;
                 } else {
                     return [];
                 }
             },
-            progressChanged: function (neo, old) {
+            progressChanged: function(neo, old) {
                 // console.log("progress : " + neo);
                 this.$.progressBar.style.width = neo + '%';
             },
-            computeSpin: function (progress) {
+            computeSpin: function(progress) {
                 return progress >= 100 || progress <= 0;
             },
-            handleLogViewClick: function (e) {
+            handleLogViewClick: function(e) {
                 var me = this;
                 var elem = e.currentTarget;
                 var line = elem.line - 1;
@@ -389,7 +387,7 @@
 
                 });
             },
-            handleCloseLinePreview: function (e) {
+            handleCloseLinePreview: function(e) {
                 e.stopPropagation();
                 this.linePreview = "";
             }

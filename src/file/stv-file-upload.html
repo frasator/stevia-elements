@@ -379,14 +379,17 @@
 
                 if (selBioformat != null && file != null) {
                     this.$.validator.reset();
-                    var validator;
 
+                    var bioformatValidator;
                     if (selBioformat.validator) {
-                        if (typeof selBioformat.validator !== "function") {
-                            alert("Validator '" + selBioformat.validator + "' not recognized.");
+                        var globalContext = Function('return this')();
+                        var bioformatValidator = globalContext[selBioformat.validator];
+
+                        if (typeof bioformatValidator !== "function") {
+                            alert("Validator '" + bioformatValidator + "' not recognized.");
                             return;
                         }
-                        validator = new selBioformat.validator({});
+                        validator = new bioformatValidator({});
                     } else {
                         validator = new Validator({});
                     }
