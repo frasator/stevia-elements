@@ -103,7 +103,7 @@
                     <div style="padding-right:5px;" class="date flex">{{computeDate(job)}}</div>
                     <div class="bar" id="bar">
                         <template is="dom-if" if="{{!isRunning(job)}}">
-                            <template is="dom-if" if="{{showError(job)}}">
+                            <template is="dom-if" if="{{showLogFile(job)}}">
                                 <i class="fa fa-file-o log-file" title="View log file" on-click="handleViewLogFile"></i>
                                 <span style="margin-right:5px;"></span>
                             </template>
@@ -190,11 +190,11 @@
             isRunning: function(job) {
                 return job.status == "RUNNING";
             },
-            showError: function(job) {
+            showLogFile: function(job) {
                 if (window.STEVIA_SHOW_JOB_ERROR_FILES !== true) {
                     return false;
                 } else {
-                    return this.hasError(job);
+                    return true;
                 }
             },
             hasError: function(job) {
