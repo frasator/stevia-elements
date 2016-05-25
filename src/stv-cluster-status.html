@@ -1,0 +1,59 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="stylesheet" href="../../fontawesome/css/font-awesome.css">
+<link rel="import" href="./dropdown/stv-dropdown.html">
+<dom-module id="stv-cluster-status">
+    <style is="custom-style">
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
+        }
+
+        .fa {
+            color:red;
+        }
+
+    </style>
+    <template>
+        <stv-dropdown>
+            <div data-button>
+                <i class="fa fa-empire"></i>
+            </div>
+            <ul>
+                <li>CPU</li>
+                <li>RAM</li>
+                <li>Latency</li>
+            </ul>
+        </stv-dropdown>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: "stv-cluster-status",
+            properties: {
+                _serverStatusObject: JSON
+
+            },
+            ready: function() {},
+
+            retrieveServerStatus: function(){
+                var oReq = new XMLHttpRequest();
+
+                function reqListener() {
+                    var jsonObject = JSON.parse(this.responseText);
+                    cb(jsonObject);
+                }
+
+                oReq.open("GET", url);
+                oReq.send();
+
+                oReq.addEventListener("load", reqListener);
+                oReq.addEventListener("error", function() {
+                    alert("Server currently unavailable")
+                });
+            }
+        })
+    </script>
+</dom-module>
