@@ -336,19 +336,16 @@
                 if (this.selected) {
                     SteviaManager.files.delete({
                         id: this.selected._id,
-                        query: {
-                            sid: Cookies('bioinfo_sid'),
-                        },
                         request: {
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log("delete:");
                                     console.log(response);
                                     me.set('selected', null);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 alert('Server error, try again later.');
@@ -404,6 +401,7 @@
                 e.dataTransfer.setData("text/plain", e.currentTarget.file._id);
             },
             handleDragDrop: function(e) {
+                var me = this;
                 e.preventDefault();
                 e.stopPropagation();
                 var el = e.currentTarget;
@@ -415,7 +413,6 @@
                     var fileId = e.dataTransfer.getData("text");
                     SteviaManager.files.move({
                         query: {
-                            sid: Cookies("bioinfo_sid"),
                             fileId: fileId,
                             newId: newParentId
                         },
@@ -423,17 +420,16 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log(response.response[0].results[0]);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 console.log('Server error, try again later')
                             }
                         }
                     });
-                    this.fire('need-refresh');
                 }
             },
         });

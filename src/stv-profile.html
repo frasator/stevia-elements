@@ -99,12 +99,11 @@
                 if (this.$.formPassword.checkValidity() && (this.password === this.passwordCheck)) {
                     SteviaManager.users.updatePassword({
                         id: Cookies('bioinfo_user'),
-                        query: {
-                            password: CryptoJS.SHA1(this.oldpassword).toString(),
-                            npassword: CryptoJS.SHA1(this.password).toString(),
-                            sid: Cookies('bioinfo_sid')
-                        },
                         request: {
+                            headers: {
+                                'x-stv-1': CryptoJS.SHA1(this.oldpassword).toString(),
+                                'x-stv-2': CryptoJS.SHA1(this.password).toString()
+                            },
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     me.message = 'Password updated';
@@ -127,8 +126,7 @@
                     SteviaManager.users.updateEmail({
                         id: Cookies('bioinfo_user'),
                         query: {
-                            nemail: this.email,
-                            sid: Cookies('bioinfo_sid')
+                            nemail: this.email
                         },
                         request: {
                             success: function(response) {

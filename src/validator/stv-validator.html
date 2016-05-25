@@ -180,7 +180,7 @@
     <template>
 
         <div id="header" class="horizontal layout center">
-            <div class="line">Line </div>
+            <div class="line">Line</div>
             <div class="type">Type</div>
             <div class="msg">Message</div>
             <div class="flex"></div>
@@ -339,6 +339,7 @@
                 });
 
                 neo.on("progress", function(e) {
+                    console.log(e);
                     me.numLines = me.validator.numLines;
                     me.progress = Math.ceil(e);
                 });

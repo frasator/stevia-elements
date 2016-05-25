@@ -132,10 +132,7 @@
                 // console.log(this.password)
                 SteviaManager.users.login({
                     id: this.email,
-                    query: {
-                        // password: this.password
-                        password: CryptoJS.SHA1(this.password).toString()
-                    },
+                    sid: CryptoJS.SHA1(this.password).toString(),
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {

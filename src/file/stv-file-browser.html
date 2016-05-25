@@ -73,17 +73,18 @@
             border-left: 1px solid #DDD;
         }
 
-        #mainmenubar {
+        /*#mainmenubar {
             box-sizing: border-box;
             background-color: rgba(125, 125, 125, 0.1);
             padding: 3px 7px;
             height: 30px;
             border-bottom: 1px solid rgba(125, 125, 125, 0.5);
-        }
+        }*/
 
         #mainmenucontent {
             position: relative;
-            height: calc(100% - 30px);
+            /*height: calc(100% - 30px);*/
+            height: 100%;
             overflow-y: auto;
             width: 100%;
         }
@@ -155,12 +156,12 @@
 
         <div id="main" class="horizontal layout flex">
             <div id="mainmenu">
-                <div id="mainmenubar" class="horizontal layout">
+                <!-- <div id="mainmenubar" class="horizontal layout">
                     <div class="bar horizontal layout flex">
                     </div>
                     <div class="bar horizontal layout">
                     </div>
-                </div>
+                </div> -->
                 <div id="mainmenucontent">
                     <stv-folder-tree tree="{{userData.tree}}" on-treeitemclick="handleTreeItemClick"></stv-folder-tree>
                 </div>
@@ -511,7 +512,6 @@
             }
 
             var query = {
-                sid: Cookies('bioinfo_sid'),
                 //                    status:'READY,STAGED,MISSING',
                 status: 'READY',
                 type: 'FILE,FOLDER'

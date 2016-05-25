@@ -191,7 +191,7 @@
                 return job.status == "RUNNING";
             },
             showError: function(job) {
-                if (typeof window.STEVIA_SHOW_JOB_ERROR_FILES === 'undefined') {
+                if (window.STEVIA_SHOW_JOB_ERROR_FILES !== true) {
                     return false;
                 } else {
                     return this.hasError(job);
@@ -207,16 +207,15 @@
                     SteviaManager.jobs.delete({
                         query: {
                             jobId: this.job._id,
-                            sid: Cookies("bioinfo_sid")
                         },
                         request: {
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log('Job deleted');
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                             },
                             error: function() {
                                 console.log('Server error, try again later.');
@@ -230,7 +229,6 @@
                 var me = this;
                 if (confirm("You are going to relaunch this Job. Are you sure?")) {
                     var query = {
-                        sid: Cookies("bioinfo_sid"),
                         name: this.job.name,
                         description: this.job.description,
                         outdirId: this.job.folder.parent
@@ -252,10 +250,10 @@
                             success: function(response) {
                                 if (response.response[0].error == null) {
                                     console.log(response);
-                                    me.fire('need-refresh');
                                 } else {
                                     console.log(response.response[0].error);
                                 }
+                                me.fire('need-refresh');
                                 me.fire('job-launched');
                             },
                             error: function() {
@@ -281,9 +279,6 @@
                 var jobId = this.job._id;
                 SteviaManager.jobs.reportError({
                     id: jobId,
-                    query: {
-                        sid: Cookies('bioinfo_sid')
-                    },
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {

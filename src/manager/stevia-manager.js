@@ -39,6 +39,9 @@ var SteviaManager = {
         create: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'create');
         },
+        run: function (args) {
+            return SteviaManager._doRequest(args, 'jobs', 'run');
+        },
         delete: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'delete');
         },
@@ -121,8 +124,8 @@ var SteviaManager = {
         downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
-        update: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'update');
+        updateAttributes: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'attributes');
         },
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
@@ -133,7 +136,6 @@ var SteviaManager = {
         upload: function (args) {
             var url = SteviaManager._url({
                 query: {
-                    sid: args.sid,
                     name: args.name,
                     parentId: args.parentId
                 },
@@ -176,7 +178,6 @@ var SteviaManager = {
             if (typeof args.request.async !== 'undefined' && args.request.async != null) {
                 async = args.request.async;
             }
-
             if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
                 console.log(url);
             }
@@ -211,6 +212,14 @@ var SteviaManager = {
                 for (var header in args.request.headers) {
                     request.setRequestHeader(header, args.request.headers[header]);
                 }
+            }
+
+            if (args.sid == null) {
+                args.sid = Cookies("bioinfo_sid");
+            }
+            if (args.sid != null) {
+                request.setRequestHeader("Authorization", "sid " + args.sid);
+                request.withCredentials = true;
             }
             var body = null;
             if (args.request.body != null) {
@@ -250,6 +259,8 @@ var SteviaManager = {
         var getResumeInfo = function (formData, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true); //false = sync call
+            xhr.setRequestHeader("Authorization", "sid " + Cookies("bioinfo_sid"));
+            xhr.withCredentials = true;
             xhr.onload = function (e) {
                 console.log(xhr.responseText);
                 callback(JSON.parse(xhr.responseText));
@@ -259,6 +270,8 @@ var SteviaManager = {
         var uploadChunk = function (formData, chunk, callback) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
+            xhr.setRequestHeader("Authorization", "sid " + Cookies("bioinfo_sid"));
+            xhr.withCredentials = true;
             xhr.onload = function (e) {
                 chunk.done = true;
                 console.log('chunk ' + chunk.id + ' done');
@@ -389,9 +402,6 @@ var SteviaManager = {
     getFileContent: function (fileId, cb) {
         SteviaManager.files.content({
             id: fileId,
-            query: {
-                sid: Cookies('bioinfo_sid')
-            },
             request: {
                 async: true,
                 success: function (response) {
@@ -406,11 +416,26 @@ var SteviaManager = {
     getPlainFolderFiles: function (fileId, cb) {
         SteviaManager.files.filesByFolder({
             id: fileId,
-            query: {
-                sid: Cookies('bioinfo_sid')
-            },
             request: {
                 async: true,
+                success: function (response) {
+                    cb(response.response[0].results);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    updateFileAttributes: function (fileId, attributes, cb) {
+        SteviaManager.files.updateAttributes({
+            id: fileId,
+            request: {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(attributes),
                 success: function (response) {
                     cb(response.response[0].results);
                 },
