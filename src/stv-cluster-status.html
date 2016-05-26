@@ -59,13 +59,14 @@
             attached: function() {
                 this.retrieveServerStatus(this.clusterApi);
 
-//                this._timer = setInterval(function(){
-//                    console.log("retrieving");
-//                    this.retrieveServerStatus(this.clusterApi);
-//                }.bind(this), 5000);
+                this._timer = setInterval(function(){
+                    console.log("retrieving");
+                    this.retrieveServerStatus(this.clusterApi);
+                }.bind(this), 5000);
             },
 
             retrieveServerStatus: function(url){
+                url = url + "?rand=" + new Date().getTime();
                 var oReq = new XMLHttpRequest();
                 var that = this;
 
