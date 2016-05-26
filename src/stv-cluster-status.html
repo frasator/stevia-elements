@@ -27,16 +27,13 @@
             --button-style-color: lightgrey;
         }
 
-        stv-tooltip {
+        ul {
+            list-style: none;
             color: black;
         }
 
-        ul {
-            list-style: none;
-        }
-
     </style>
-        <stv-tooltip icon="database">
+        <stv-tooltip icon="database" class$="{{_computeStatusClass(_serverStatusObject)}}">
             <ul>
                 <li>CPU: </li>
                 <li>Memory Usage: </li>
@@ -51,16 +48,21 @@
             properties: {
                 clusterApi: String,
                 _serverStatusObject: {
-                    type: JSON,
-                    observer: '_checkServerStatus'
+                    type: JSON
+//                    observer: '_checkServerStatus'
                 }
-
             },
             ready: function() {
+
             },
 
             attached: function() {
                 this.retrieveServerStatus(this.clusterApi);
+
+//                this._timer = setInterval(function(){
+//                    console.log("retrieving");
+//                    this.retrieveServerStatus(this.clusterApi);
+//                }.bind(this), 5000);
             },
 
             retrieveServerStatus: function(url){
@@ -81,43 +83,28 @@
                 });
             },
 
-            _checkServerStatus(newVal){
-                var iconStatus = Polymer.dom(this.root).querySelector("stv-tooltip");
-                if(newVal !== undefined){
-                    if(this._checkStatusThreshold(0.8)){
-                        this._changeClassStatus("status_danger", iconStatus);
-                    } else if(this._checkStatusThreshold(0.5)){
-                        this._changeClassStatus("status_warning", iconStatus);
+            _computeStatusClass(serverStats){
+                console.log(serverStats);
+                var newClass = "";
+                    if(this._checkStatusThreshold(serverStats, 0.8)){
+                        newClass = "status_danger";
+                    } else if(this._checkStatusThreshold(serverStats, 0.5)){
+                        newClass = "status_warning";
                     }else {
-                        this._changeClassStatus("status_ok", iconStatus);
+                        newClass = "status_ok";
                     }
-                }else {
-                    this._changeClassStatus("status_default", iconStatus);
-                }
 
-                iconStatus.updateStyles();
+                this.async(function(){
+                    this.updateStyles();
+                }.bind(this), 200);
+                return newClass;
+
+//                iconStatus.updateStyles();
+
             },
 
-            _checkStatusThreshold(threshold){
-                return this._serverStatusObject.cpuUsage >= threshold || this._serverStatusObject.memUsage >= threshold;
-            },
-
-            _changeClassStatus(newStatus, target){
-                var elClassList = Polymer.dom(target).classList;
-                var statusClassIndex = this._getClassByPrefix("status", elClassList);
-
-                if(statusClassIndex >= 0){
-                    Polymer.dom(target).classList.remove(elClassList[statusClassIndex]);
-                }
-                Polymer.dom(target).classList.add(newStatus);
-            },
-
-            _getClassByPrefix(prefix, classList){
-                var re = new RegExp("^" + prefix + "*");
-                var foundClassIndex = Array.prototype.findIndex.call(classList, function(el){
-                    return re.test(el);
-                });
-                return foundClassIndex;
+            _checkStatusThreshold(serverStats ,threshold){
+                return serverStats.cpuUsage >= threshold || serverStats.memUsage >= threshold;
             }
         })
     </script>
