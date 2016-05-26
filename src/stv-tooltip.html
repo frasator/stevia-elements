@@ -47,9 +47,13 @@
         .error {
             color: #bf4747;
         }
+
+        .button {
+            color: var(--button-style-color);
+        }
     </style>
     <template>
-        <span on-click="showInfo"><i on-click="showInfo" class$="{{computeIcon(type, icon)}}"></i> {{text}}</span>
+        <span on-click="showInfo"><i on-click="showInfo" class$="button {{computeIcon(type, icon)}}"></i> {{text}}</span>
         <div id="messageInfo" class$="{{computeClass(type)}}" hidden>
             <i class="fa fa-times closeInfo" on-click="handleClose"></i>
             <content></content>
