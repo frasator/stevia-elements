@@ -2,48 +2,57 @@
 <link rel="stylesheet" href="../../fontawesome/css/font-awesome.css">
 <link rel="import" href="./dropdown/stv-dropdown.html">
 <dom-module id="stv-cluster-status">
-    <style is="custom-style">
+    <style>
         :host {
-            display: block;
             position: relative;
+            display: block;
             box-sizing: border-box;
             box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
         }
 
-        .fa {
+        .status_danger {
             color:red;
+        }
+
+        .status_warning {
+            color: yellow;
+        }
+
+        .status_ok {
+            color: greenyellow;
+        }
+
+        .status_default {
+            color: lightgrey;
         }
 
     </style>
     <template>
-        <stv-dropdown>
-            <div data-button>
-                <i class="fa fa-database"></i>
-            </div>
-            <ul>
-                <li>CPU</li>
-                <li>RAM</li>
-                <li>Latency</li>
-            </ul>
-        </stv-dropdown>
-
+        <i id="statusIcon" class="fa fa-database"></i>
     </template>
 
     <script>
         Polymer({
             is: "stv-cluster-status",
             properties: {
-                _serverStatusObject: JSON
+                clusterApi: String,
+                _serverStatusObject: {
+                    type: JSON,
+                    observer: '_checkServerStatus'
+                }
 
             },
-            ready: function() {},
+            ready: function() {
+                this.retrieveServerStatus(this.clusterApi);
+            },
 
-            retrieveServerStatus: function(){
+            retrieveServerStatus: function(url){
                 var oReq = new XMLHttpRequest();
+                var that = this;
 
                 function reqListener() {
                     var jsonObject = JSON.parse(this.responseText);
-                    cb(jsonObject);
+                    that._serverStatusObject = jsonObject;
                 }
 
                 oReq.open("GET", url);
@@ -51,8 +60,47 @@
 
                 oReq.addEventListener("load", reqListener);
                 oReq.addEventListener("error", function() {
-                    alert("Server currently unavailable")
+                    console.error("Server currently unavailable at" + url);
                 });
+            },
+
+            _checkServerStatus(newVal){
+                if(newVal !== undefined){
+                    var iconStatus = this.$.statusIcon;
+                    if(this._checkStatusThreshold(0.8)){
+                        this._changeClassStatus("status_danger", iconStatus);
+                    } else if(this._checkStatusThreshold(0.5)){
+                        this._changeClassStatus("status_warning", iconStatus);
+                    }else {
+                        this._changeClassStatus("status_ok", iconStatus);
+                    }
+                }else {
+                    this._changeClassStatus("status_default", iconStatus);
+                }
+            },
+
+            _checkStatusThreshold(threshold){
+                return this._serverStatusObject.cpuUsage >= threshold || this._serverStatusObject.memUsage >= threshold;
+            },
+
+            _changeClassStatus(newStatus, target){
+                var elClassList = target.classList;
+                var statusClassIndex = this._getClassByPrefix("status", elClassList);
+
+                if(statusClassIndex >= 0){
+                    Polymer.dom(target).classList.remove(elClassList[statusClassIndex]);
+                }
+                Polymer.dom(target).classList.add(newStatus);
+                this.updateStyles();
+            },
+
+            _getClassByPrefix(prefix, classList){
+                var re = new RegExp("^" + prefix + "*");
+                var foundClassIndex = Array.prototype.findIndex.call(classList, function(el){
+                    return re.test(el);
+                });
+
+                return foundClassIndex;
             }
         })
     </script>
