@@ -1,7 +1,8 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="stylesheet" href="../../fontawesome/css/font-awesome.css">
-<link rel="import" href="./dropdown/stv-dropdown.html">
+<link rel="import" href="./stv-tooltip.html">
 <dom-module id="stv-cluster-status">
+    <template>
     <style>
         :host {
             position: relative;
@@ -11,24 +12,37 @@
         }
 
         .status_danger {
-            color:red;
+            --button-style-color: red;
         }
 
         .status_warning {
-            color: yellow;
+            --button-style-color: yellow;
         }
 
-        .status_ok {
-            color: greenyellow;
+        .status_ok{
+            --button-style-color: yellowgreen;
         }
 
         .status_default {
-            color: lightgrey;
+            --button-style-color: lightgrey;
+        }
+
+        stv-tooltip {
+            color: black;
+        }
+
+        ul {
+            list-style: none;
         }
 
     </style>
-    <template>
-        <i id="statusIcon" class="fa fa-database"></i>
+        <stv-tooltip icon="database">
+            <ul>
+                <li>CPU: </li>
+                <li>Memory Usage: </li>
+                <li>Latency: </li>
+            </ul>
+        </stv-tooltip>
     </template>
 
     <script>
@@ -43,6 +57,9 @@
 
             },
             ready: function() {
+            },
+
+            attached: function() {
                 this.retrieveServerStatus(this.clusterApi);
             },
 
@@ -65,8 +82,8 @@
             },
 
             _checkServerStatus(newVal){
+                var iconStatus = Polymer.dom(this.root).querySelector("stv-tooltip");
                 if(newVal !== undefined){
-                    var iconStatus = this.$.statusIcon;
                     if(this._checkStatusThreshold(0.8)){
                         this._changeClassStatus("status_danger", iconStatus);
                     } else if(this._checkStatusThreshold(0.5)){
@@ -77,6 +94,8 @@
                 }else {
                     this._changeClassStatus("status_default", iconStatus);
                 }
+
+                iconStatus.updateStyles();
             },
 
             _checkStatusThreshold(threshold){
@@ -84,14 +103,13 @@
             },
 
             _changeClassStatus(newStatus, target){
-                var elClassList = target.classList;
+                var elClassList = Polymer.dom(target).classList;
                 var statusClassIndex = this._getClassByPrefix("status", elClassList);
 
                 if(statusClassIndex >= 0){
                     Polymer.dom(target).classList.remove(elClassList[statusClassIndex]);
                 }
                 Polymer.dom(target).classList.add(newStatus);
-                this.updateStyles();
             },
 
             _getClassByPrefix(prefix, classList){
@@ -99,7 +117,6 @@
                 var foundClassIndex = Array.prototype.findIndex.call(classList, function(el){
                     return re.test(el);
                 });
-
                 return foundClassIndex;
             }
         })
