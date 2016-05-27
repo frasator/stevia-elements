@@ -58,8 +58,8 @@
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i>
                     CPU: <span class="cluster_data">{{_roundNumber(_serverStatusObject.cpuUsage, 2)}}</span></li>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_roundNumber(_serverStatusObject.memUsage, 2)}}</span></li>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i> Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
-                <li><i class$="{{_computeSingleElementStatusClass(_connexionLatency, _statusThresholds.latency)}} fa"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i>Cluster Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
+                <li><i class="fa fa-globe"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
                 <hr>
                 <li>Jobs Running: <span class="cluster_data">{{_serverStatusObject.jobsRunning}}</span></li>
                 <li>Jobs Awaiting: <span class="cluster_data">{{_serverStatusObject.jobsWaiting}}</span></li>
@@ -125,9 +125,9 @@
             _computeStatusClass(serverStats){
                 if(serverStats){
                     var newClass = "";
-                    if(this._checkStatusThreshold(serverStats, 0.8)){
+                    if(this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.danger)){
                         newClass = "status_danger";
-                    } else if(this._checkStatusThreshold(serverStats, 0.5)){
+                    } else if(this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.warning)){
                         newClass = "status_warning";
                     }else {
                         newClass = "status_ok";
@@ -137,8 +137,8 @@
                 }
 
                 this.async(function(){
-                        this.updateStyles();
-                    }.bind(this), 10);
+                        this.updateStyles(); // Necessary for the custom css variable to apply when update
+                }.bind(this), 10);
 
                 return newClass;
 
