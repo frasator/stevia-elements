@@ -12,25 +12,30 @@
         }
 
         .status_danger {
-            --button-style-color: red;
+            --button-style-color: #e60000;
+            color: #e60000;
         }
 
         .status_warning {
-            --button-style-color: yellow;
+            --button-style-color: #ffcc00;
+            color: #ffcc00;
         }
 
         .status_ok{
-            --button-style-color: yellowgreen;
+            --button-style-color: #00ff00;
+            color: #00ff00;
         }
 
         .status_default {
             --button-style-color: #a8a8a8;
+            color: #a8a8a8;
         }
 
         ul {
             list-style: none;
             color: black;
             text-align: left;
+            min-width: 300px;
             margin: 0;
             padding: 0.5em 1em;
         }
@@ -50,11 +55,14 @@
         <stv-tooltip icon="database" class$="{{_computeStatusClass(_serverStatusObject)}}">
             <h1>Cluster Status</h1>
             <ul>
-                <li>CPU: <span class="cluster_data">{{_roundNumber(_serverStatusObject.cpuUsage, 2)}}</span></li>
-                <li>Memory Usage: <span class="cluster_data">{{_roundNumber(_serverStatusObject.memUsage, 2)}}</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i>
+                    CPU: <span class="cluster_data">{{_roundNumber(_serverStatusObject.cpuUsage, 2)}}</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_roundNumber(_serverStatusObject.memUsage, 2)}}</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i> Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_connexionLatency, _statusThresholds.latency)}} fa"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
+                <hr>
                 <li>Jobs Running: <span class="cluster_data">{{_serverStatusObject.jobsRunning}}</span></li>
                 <li>Jobs Awaiting: <span class="cluster_data">{{_serverStatusObject.jobsWaiting}}</span></li>
-                <li>Latency: <span class="cluster_data">{{_serverStatusObject.latency}}</span></li>
             </ul>
         </stv-tooltip>
     </template>
@@ -66,7 +74,18 @@
                 clusterApi: String,
                 _serverStatusObject: {
                     type: JSON
-                }
+                },
+
+                _statusThresholds: {
+                    value: function() {
+                        return {
+                            cpu_Mem: {danger: 0.9, warning: 0.5},
+                            latency: {danger: 1000, warning: 500}
+                        }
+                    }
+                },
+
+                _connexionLatency: Number,
             },
             ready: function() {
 
@@ -81,13 +100,16 @@
             },
 
             retrieveServerStatus: function(url){
-                url = url + "?rand=" + new Date().getTime();
+                var startRequestTime = new Date();
+                url = url + "?rand=" + startRequestTime.getTime();
                 var oReq = new XMLHttpRequest();
                 var that = this;
 
                 function reqListener() {
                     var jsonObject = JSON.parse(this.responseText);
                     that._serverStatusObject = jsonObject;
+                    that._connexionLatency = new Date() - startRequestTime;
+                    console.log(that._serverStatusObject);
                 }
 
                 oReq.open("GET", url);
@@ -101,7 +123,6 @@
             },
 
             _computeStatusClass(serverStats){
-                console.log(serverStats);
                 if(serverStats){
                     var newClass = "";
                     if(this._checkStatusThreshold(serverStats, 0.8)){
@@ -121,8 +142,6 @@
 
                 return newClass;
 
-//                iconStatus.updateStyles();
-
             },
 
             _checkStatusThreshold(serverStats ,threshold){
@@ -131,6 +150,17 @@
 
             _roundNumber: function(number ,digits){
                 return number.toFixed(digits);
+            },
+
+            _computeSingleElementStatusClass(value, thresholds){
+                if(value >= thresholds.danger){
+                    return "status_danger fa-warning";
+                }else if(value >= thresholds.warning){
+                    return "status_warning fa-warning";
+                }else if(value < thresholds.warning){
+                    return "status_ok fa-check";
+                }
+                return "status_default fa-circle";
             }
         })
     </script>
