@@ -24,20 +24,37 @@
         }
 
         .status_default {
-            --button-style-color: lightgrey;
+            --button-style-color: #a8a8a8;
         }
 
         ul {
             list-style: none;
             color: black;
+            text-align: left;
+            margin: 0;
+            padding: 0.5em 1em;
+        }
+
+        h1 {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: black;
+        }
+
+        .cluster_data {
+            margin-left: 10px;
+            float: right;
         }
 
     </style>
         <stv-tooltip icon="database" class$="{{_computeStatusClass(_serverStatusObject)}}">
+            <h1>Cluster Status</h1>
             <ul>
-                <li>CPU: </li>
-                <li>Memory Usage: </li>
-                <li>Latency: </li>
+                <li>CPU: <span class="cluster_data">{{_roundNumber(_serverStatusObject.cpuUsage, 2)}}</span></li>
+                <li>Memory Usage: <span class="cluster_data">{{_roundNumber(_serverStatusObject.memUsage, 2)}}</span></li>
+                <li>Jobs Running: <span class="cluster_data">{{_serverStatusObject.jobsRunning}}</span></li>
+                <li>Jobs Awaiting: <span class="cluster_data">{{_serverStatusObject.jobsWaiting}}</span></li>
+                <li>Latency: <span class="cluster_data">{{_serverStatusObject.latency}}</span></li>
             </ul>
         </stv-tooltip>
     </template>
@@ -49,7 +66,6 @@
                 clusterApi: String,
                 _serverStatusObject: {
                     type: JSON
-//                    observer: '_checkServerStatus'
                 }
             },
             ready: function() {
@@ -60,7 +76,6 @@
                 this.retrieveServerStatus(this.clusterApi);
 
                 this._timer = setInterval(function(){
-                    console.log("retrieving");
                     this.retrieveServerStatus(this.clusterApi);
                 }.bind(this), 5000);
             },
@@ -80,13 +95,15 @@
 
                 oReq.addEventListener("load", reqListener);
                 oReq.addEventListener("error", function() {
-                    console.error("Server currently unavailable at" + url);
-                });
+                    console.error("Server currently unavailable at " + url);
+                    that._serverStatusObject = null;
+                }.bind(this));
             },
 
             _computeStatusClass(serverStats){
                 console.log(serverStats);
-                var newClass = "";
+                if(serverStats){
+                    var newClass = "";
                     if(this._checkStatusThreshold(serverStats, 0.8)){
                         newClass = "status_danger";
                     } else if(this._checkStatusThreshold(serverStats, 0.5)){
@@ -94,10 +111,14 @@
                     }else {
                         newClass = "status_ok";
                     }
+                }else {
+                    newClass = "status_default";
+                }
 
                 this.async(function(){
-                    this.updateStyles();
-                }.bind(this), 200);
+                        this.updateStyles();
+                    }.bind(this), 10);
+
                 return newClass;
 
 //                iconStatus.updateStyles();
@@ -106,6 +127,10 @@
 
             _checkStatusThreshold(serverStats ,threshold){
                 return serverStats.cpuUsage >= threshold || serverStats.memUsage >= threshold;
+            },
+
+            _roundNumber: function(number ,digits){
+                return number.toFixed(digits);
             }
         })
     </script>
