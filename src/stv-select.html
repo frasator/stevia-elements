@@ -130,7 +130,7 @@
             select: function(option, notify) {
                 if (this.selectedOption !== option) {
                     this.set('selectedOption', option);
-                    this.set('selectedOptionText', option.value);
+                    this.set('selectedOptionText', option.innerText);
                     this.set('value', option.value);
                     if (notify !== false) {
                         this.fire('change');
