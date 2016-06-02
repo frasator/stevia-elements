@@ -410,6 +410,20 @@ var SteviaManager = {
             }
         });
     },
+    getFile: function (fileId, cb) {
+        SteviaManager.files.info({
+            id: fileId,
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response.response[0].results[0]);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
     getPlainFolderFiles: function (fileId, cb) {
         SteviaManager.files.filesByFolder({
             id: fileId,
@@ -453,10 +467,34 @@ var SteviaManager = {
             }
         });
     },
+    getExampleFileURL: function (tool, file) {
+        return SteviaManager.files.downloadExample({
+            query: {
+                sid: Cookies("bioinfo_sid"),
+                tool: tool,
+                file:file
+            },
+            request: {
+                url: true
+            }
+        });
+    },
 
     //Download the file given a file Id.
     downloadFile: function (fileId) {
         var url = this.getFileURL(fileId);
+        var link = document.createElement('a');
+        link.href = url;
+        var event = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        });
+        link.dispatchEvent(event);
+    },
+
+    downloadExampleFile: function (tool, filename) {
+        var url = this.getExampleFileURL(tool, filename);
         var link = document.createElement('a');
         link.href = url;
         var event = new MouseEvent('click', {
