@@ -373,7 +373,7 @@ var SteviaManager = {
                         }, 50);
                     }
                 } else {
-                    console.log('Upload error: ' + response.response[0].error);
+                    console.log('Upload error: ' + response.error);
                 }
             });
         }
