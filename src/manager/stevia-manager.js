@@ -178,9 +178,6 @@ var SteviaManager = {
             if (typeof args.request.async !== 'undefined' && args.request.async != null) {
                 async = args.request.async;
             }
-            if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
-                console.log(url);
-            }
             var request = new XMLHttpRequest();
             request.onload = function () {
                 var contentType = this.getResponseHeader('Content-Type');
@@ -189,7 +186,7 @@ var SteviaManager = {
                     if (json.error == null) {
                         args.request.success(json, this);
                     } else {
-                        if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
+                        if (window.STEVIA_MANAGER_LOG === true) {
                             console.log('! ----    SteviaManager -------');
                             console.log(json.error);
                             console.log(json);
