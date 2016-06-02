@@ -124,8 +124,8 @@ var SteviaManager = {
         downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
-        updateAttributes: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'attributes');
+        addAttribute: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'add-attribute');
         },
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
@@ -439,7 +439,7 @@ var SteviaManager = {
         });
     },
     updateFileAttributes: function (fileId, attributes, cb) {
-        SteviaManager.files.updateAttributes({
+        SteviaManager.files.addAttribute({
             id: fileId,
             request: {
                 method: 'POST',
