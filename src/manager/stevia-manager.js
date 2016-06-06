@@ -124,8 +124,8 @@ var SteviaManager = {
         downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
-        updateAttributes: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'attributes');
+        addAttribute: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'add-attribute');
         },
         download: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download');
@@ -178,9 +178,6 @@ var SteviaManager = {
             if (typeof args.request.async !== 'undefined' && args.request.async != null) {
                 async = args.request.async;
             }
-            if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
-                console.log(url);
-            }
             var request = new XMLHttpRequest();
             request.onload = function () {
                 var contentType = this.getResponseHeader('Content-Type');
@@ -189,7 +186,7 @@ var SteviaManager = {
                     if (json.error == null) {
                         args.request.success(json, this);
                     } else {
-                        if (window.STEVIA_MANAGER_LOG != null && STEVIA_MANAGER_LOG === true) {
+                        if (window.STEVIA_MANAGER_LOG === true) {
                             console.log('! ----    SteviaManager -------');
                             console.log(json.error);
                             console.log(json);
@@ -373,7 +370,7 @@ var SteviaManager = {
                         }, 50);
                     }
                 } else {
-                    console.log('Upload error: ' + response.response[0].error);
+                    console.log('Upload error: ' + response.error);
                 }
             });
         }
@@ -413,6 +410,20 @@ var SteviaManager = {
             }
         });
     },
+    getFile: function (fileId, cb) {
+        SteviaManager.files.info({
+            id: fileId,
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response.response[0].results[0]);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
     getPlainFolderFiles: function (fileId, cb) {
         SteviaManager.files.filesByFolder({
             id: fileId,
@@ -428,7 +439,7 @@ var SteviaManager = {
         });
     },
     updateFileAttributes: function (fileId, attributes, cb) {
-        SteviaManager.files.updateAttributes({
+        SteviaManager.files.addAttribute({
             id: fileId,
             request: {
                 method: 'POST',
@@ -456,10 +467,34 @@ var SteviaManager = {
             }
         });
     },
+    getExampleFileURL: function (tool, file) {
+        return SteviaManager.files.downloadExample({
+            query: {
+                sid: Cookies("bioinfo_sid"),
+                tool: tool,
+                file:file
+            },
+            request: {
+                url: true
+            }
+        });
+    },
 
     //Download the file given a file Id.
     downloadFile: function (fileId) {
         var url = this.getFileURL(fileId);
+        var link = document.createElement('a');
+        link.href = url;
+        var event = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        });
+        link.dispatchEvent(event);
+    },
+
+    downloadExampleFile: function (tool, filename) {
+        var url = this.getExampleFileURL(tool, filename);
         var link = document.createElement('a');
         link.href = url;
         var event = new MouseEvent('click', {

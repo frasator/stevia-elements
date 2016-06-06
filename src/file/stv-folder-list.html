@@ -135,6 +135,9 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile">
                     <i class="fa fa-eye"></i>
                 </div>
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile">
+                    <i class="fa fa-download"></i>
+                </div>
             </div>
             <div class="horizontal layout">
                 <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}">
@@ -330,6 +333,9 @@
                 return mode === 'folder';
             },
 
+            handleDownloadFile: function(e) {
+                SteviaManager.downloadFile(this.selected._id);
+            },
             /**/
             _deleteFile: function() {
                 var me = this;

@@ -72,7 +72,6 @@
             background-color: #E1E3E5;
             border-left: 1px solid #DDD;
         }
-
         /*#mainmenubar {
             box-sizing: border-box;
             background-color: rgba(125, 125, 125, 0.1);
@@ -544,6 +543,7 @@
         },
         _filterFiles: function(files) {
             var bfList = [];
+            var showHiddenFiles = window["STEVIA_SHOW_HIDDEN_FILES"] === true;
             for (var i = 0; i < this.bioformats.length; i++) {
                 var bf = this.bioformats[i];
                 bfList.push(bf.value);
@@ -557,25 +557,9 @@
                 var file = files[i];
                 // console.log(file.name + ' ' + file.id);
                 // console.log(file);
-                if (
-                    // file.bioformat == 'ALIGNMENT' &&
-                    (
-                        file.name.charAt(0) == '.' ||
-                        // file.name == 'command_line.sh' ||
-                        file.name.indexOf('sge_err.job') != -1 ||
-                        file.name.indexOf('sge_out.job') != -1
-                        // Utils.endsWith(file.name, '.annot.json.gz') ||
-                        // Utils.endsWith(file.name, '.file.json.gz') ||
-                        // Utils.endsWith(file.name, '.variants.stats.json.gz') ||
-                        // Utils.endsWith(file.name, '.source.stats.json.gz') ||
-                        // Utils.endsWith(file.name, '.bam.bai') ||
-                        // Utils.endsWith(file.name, '.bam.coverage.json.gz') ||
-                        // Utils.endsWith(file.name, '.bam.mean-coverage.json.gz') ||
-                        // Utils.endsWith(file.name, '.snappy') ||
-                        // (file.bioformat == 'VARIANT' && file.format == 'AVRO')
-                    )
-                ) {
-                    continue;
+
+                if(!showHiddenFiles && file.name.charAt(0) == '.'){
+                    continue
                 }
 
                 if (this.mode == 'folder') {
