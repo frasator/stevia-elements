@@ -135,6 +135,9 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile">
                     <i class="fa fa-eye"></i>
                 </div>
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile">
+                    <i class="fa fa-download"></i>
+                </div>
             </div>
             <div class="horizontal layout">
                 <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}">
@@ -173,6 +176,8 @@
             <div class="horizontal layout">
                 <span class="data">Type: &nbsp;</span>
                 <span class="value lowercase">{{fileType}}</span>
+                <!-- <span class="data">Format: &nbsp;</span>
+                <span class="value lowercase">{{fileFormat}}</span> -->
                 <span class="data">Bioformat: &nbsp;</span>
                 <span class="value lowercase">{{fileBioformat}}</span>
             </div>
@@ -258,6 +263,7 @@
                 this.fileName = "";
                 this.fileType = "";
                 this.fileBioformat = "";
+                this.fileFormat = "";
                 this.fileDate = "";
 
                 var sel = this.querySelector("stv-folder-list-item[selected]");
@@ -279,6 +285,7 @@
                 } else {
                     this.isFile = false;
                 }
+                this.fileFormat = this.selected.format;
                 this.fileBioformat = this.selected.bioformat;
 
                 var date = new Date(Date.parse(this.selected.createdAt));
@@ -330,6 +337,9 @@
                 return mode === 'folder';
             },
 
+            handleDownloadFile: function(e) {
+                SteviaManager.downloadFile(this.selected._id);
+            },
             /**/
             _deleteFile: function() {
                 var me = this;

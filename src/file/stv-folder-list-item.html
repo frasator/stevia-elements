@@ -104,6 +104,7 @@
             }) + " " + date.getDate() + ", " + date.getFullYear();
         },
         computeIcon: function(file) {
+            var icon
             if (file.job != null) {
                 return 'fa fa-flask';
             }
@@ -111,7 +112,11 @@
                 "FOLDER": 'fa fa-folder',
                 "FILE": 'fa fa-file-o'
             };
-            return iconMap[file.type];
+            icon = iconMap[file.type];
+            if (window.BIOFORMATS != null && window.BIOFORMATS[file.bioformat] != null && window.BIOFORMATS[file.bioformat].icon != null) {
+                icon = "fa fa-" + window.BIOFORMATS[file.bioformat].icon
+            }
+            return icon;
         },
         computeJobIcon: function(job) {
             if (job) {
