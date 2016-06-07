@@ -164,7 +164,9 @@
         }
         /*Help menu*/
 
-        :host::content .helpmenu {
+        :host::content .helpmenu,
+        :host::content .launcher,
+        :host::content .cluster_stats {
             margin: 0 10px;
         }
 
@@ -233,13 +235,9 @@
                     <span class="option-text"> Sign up </span>
                 </div>
 
-                <div id="launcher">
-                    <content select=".launcher"></content>
-                </div>
+                <content select=".launcher"></content>
 
-                <div id="clusterStatus">
-                    <content select=".cluster_stats"></content>
-                </div>
+                <content select=".cluster_stats"></content>
 
                 <content select=".helpmenu"></content>
             </div>

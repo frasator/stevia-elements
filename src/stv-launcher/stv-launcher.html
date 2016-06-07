@@ -15,11 +15,12 @@
             }
 
             #dropdown {
-                background-color: #2F2F2F;
-                border: white solid 1px;
+                background-color: var(--launcher-bg, #2F2F2F);
+                border: solid 1px;
+                border-color: var(border-color, white);
                 position: absolute;
                 margin-top: 20px;
-                box-shadow: 0 2px 10px rgba(0,0,0,.2)
+                box-shadow: 0 2px 10px rgba(0,0,0,.2);
                 opacity: 0;
                 padding : 10px 10px 10px 10px;
 
@@ -43,7 +44,8 @@
             }
 
             .button:hover {
-                border: white solid 1px;
+                border: solid 1px;
+                border-color: var(border-color, white);
             }
 
             .icon {
