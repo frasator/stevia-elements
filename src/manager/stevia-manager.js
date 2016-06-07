@@ -222,6 +222,9 @@ var SteviaManager = {
             if (args.request.body != null) {
                 body = args.request.body;
             }
+            if (args.request.responseType != null) {
+                request.responseType = args.request.responseType;
+            }
             request.send(body);
             return url;
         }
@@ -397,12 +400,12 @@ var SteviaManager = {
 
     /*HELP METHODS*/
     getFileContent: function (fileId, cb) {
-        SteviaManager.files.content({
+        SteviaManager.files.download({
             id: fileId,
             request: {
                 async: true,
-                success: function (response) {
-                    cb(response);
+                success: function (response, req) {
+                    cb(response, req);
                 },
                 error: function (response) {
 
@@ -472,7 +475,7 @@ var SteviaManager = {
             query: {
                 sid: Cookies("bioinfo_sid"),
                 tool: tool,
-                file:file
+                file: file
             },
             request: {
                 url: true
@@ -481,7 +484,7 @@ var SteviaManager = {
     },
 
     //Download the file given a file Id.
-    downloadFile: function (fileId) {
+    downloadFile: function (fileId, getContent) {
         var url = this.getFileURL(fileId);
         var link = document.createElement('a');
         link.href = url;

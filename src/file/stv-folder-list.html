@@ -176,6 +176,8 @@
             <div class="horizontal layout">
                 <span class="data">Type: &nbsp;</span>
                 <span class="value lowercase">{{fileType}}</span>
+                <!-- <span class="data">Format: &nbsp;</span>
+                <span class="value lowercase">{{fileFormat}}</span> -->
                 <span class="data">Bioformat: &nbsp;</span>
                 <span class="value lowercase">{{fileBioformat}}</span>
             </div>
@@ -261,6 +263,7 @@
                 this.fileName = "";
                 this.fileType = "";
                 this.fileBioformat = "";
+                this.fileFormat = "";
                 this.fileDate = "";
 
                 var sel = this.querySelector("stv-folder-list-item[selected]");
@@ -282,6 +285,7 @@
                 } else {
                     this.isFile = false;
                 }
+                this.fileFormat = this.selected.format;
                 this.fileBioformat = this.selected.bioformat;
 
                 var date = new Date(Date.parse(this.selected.createdAt));
