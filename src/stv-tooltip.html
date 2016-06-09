@@ -21,7 +21,13 @@
 
         .default {
             background-color: var(--light-primary-color);
+            color: var(--primary-text-color);
             padding: 5px;
+        }
+
+        .dark {
+            background-color: var(--dark-primary-color);
+            color: var(--text-primary-color);
         }
 
         .closeInfo {
@@ -32,8 +38,13 @@
             color: var(--secondary-text-color);
         }
 
-        .closeInfo:hover {
-            color: var(--primary-text-color);
+        .closeInfo:hover,
+        .dark > .closeInfo:hover {
+            color: var(--dark-button-color);
+        }
+
+        .dark > .closeInfo {
+            color: var(--text-primary-color);
         }
 
         .info {
@@ -68,7 +79,7 @@
                 type: {
                     type: String,
                     reflectToAttribute: true,
-                    value: ""
+                    value: "default"
                 },
                 icon: {
                     type: String,
@@ -118,7 +129,7 @@
                 } else if (type == "error") {
                     return "stv-note stv-note-error";
                 } else {
-                    return "default";
+                    return type;
                 }
             },
             computeIcon: function(type, icon) {

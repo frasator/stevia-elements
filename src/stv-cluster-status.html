@@ -3,61 +3,66 @@
 <link rel="import" href="./stv-tooltip.html">
 <dom-module id="stv-cluster-status">
     <template>
-    <style>
-        :host {
-            position: relative;
-            display: block;
-            box-sizing: border-box;
-            box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
-        }
+        <style>
+            :host {
+                position: relative;
+                display: block;
+                box-sizing: border-box;
+            }
 
-        .status_danger {
-            --button-style-color: #e60000;
-            color: #e60000;
-        }
+            .status_danger {
+                --button-style-color: #bf4747;
+            }
 
-        .status_warning {
-            --button-style-color: #ffcc00;
-            color: #ffcc00;
-        }
+            i.status_danger {
+                color: #bf4747;
+            }
 
-        .status_ok{
-            --button-style-color: #00ff00;
-            color: #00ff00;
-        }
+            .status_warning {
+                --button-style-color: #bf9947;
+            }
 
-        .status_default {
-            --button-style-color: #a8a8a8;
-            color: #a8a8a8;
-        }
+            i.status_warning {
+                color: #bf9947;
+            }
 
-        ul {
-            list-style: none;
-            color: black;
-            text-align: left;
-            min-width: 300px;
-            margin: 0;
-            padding: 0.5em 1em;
-        }
+            .status_ok {
+                --button-style-color: #65f45e;
+            }
 
-        h1 {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: black;
-        }
+            i.status_ok {
+                color: #65f45e;
+            }
 
-        .cluster_data {
-            margin-left: 10px;
-            float: right;
-        }
+            .status_default {
+                --button-style-color: #a8a8a8;
+                color: #a8a8a8;
+            }
 
-    </style>
-        <stv-tooltip icon="database" class$="{{_computeStatusClass(_serverStatusObject)}}">
+            ul {
+                list-style: none;
+                text-align: left;
+                min-width: 300px;
+                margin: 0;
+                padding: 0.5em 1em;
+            }
+
+            h1 {
+                font-size: 1.2em;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .cluster_data {
+                margin-left: 10px;
+                float: right;
+            }
+        </style>
+        <stv-tooltip icon="signal" type="{{type}}" class$="{{_computeStatusClass(_serverStatusObject)}}">
             <h1>Cluster Status</h1>
             <ul>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i>
-                    CPU: <span class="cluster_data">{{_roundNumber(_serverStatusObject.cpuUsage, 2)}}</span></li>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_roundNumber(_serverStatusObject.memUsage, 2)}}</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i> CPU: <span class="cluster_data">{{_computeNumber(_serverStatusObject.cpuUsage, 2)}} %</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_computeNumber(_serverStatusObject.memUsage, 2)}} %</span></li>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i>Cluster Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
                 <li><i class="fa fa-globe"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
                 <hr>
@@ -71,7 +76,14 @@
         Polymer({
             is: "stv-cluster-status",
             properties: {
-                clusterApi: String,
+                clusterApi: {
+                    type: String,
+                    value: function() {
+                        if (window.STEVIA_SERVER_HOST != null) {
+                            return STEVIA_SERVER_HOST + '/status';
+                        }
+                    }
+                },
                 _serverStatusObject: {
                     type: JSON
                 },
@@ -79,13 +91,25 @@
                 _statusThresholds: {
                     value: function() {
                         return {
-                            cpu_Mem: {danger: 0.9, warning: 0.5},
-                            latency: {danger: 1000, warning: 500}
+                            cpu_Mem: {
+                                danger: 0.9,
+                                warning: 0.5
+                            },
+                            latency: {
+                                danger: 1000,
+                                warning: 500
+                            }
                         }
                     }
                 },
 
                 _connexionLatency: Number,
+
+                type: {
+                    type: String,
+                    reflectToAttribute: true,
+                    value: "default"
+                },
             },
             ready: function() {
 
@@ -94,12 +118,12 @@
             attached: function() {
                 this.retrieveServerStatus(this.clusterApi);
 
-                this._timer = setInterval(function(){
+                this._timer = setInterval(function() {
                     this.retrieveServerStatus(this.clusterApi);
                 }.bind(this), 5000);
             },
 
-            retrieveServerStatus: function(url){
+            retrieveServerStatus: function(url) {
                 var startRequestTime = new Date();
                 url = url + "?rand=" + startRequestTime.getTime();
                 var oReq = new XMLHttpRequest();
@@ -122,42 +146,42 @@
                 }.bind(this));
             },
 
-            _computeStatusClass(serverStats){
-                if(serverStats){
+            _computeStatusClass(serverStats) {
+                if (serverStats) {
                     var newClass = "";
-                    if(this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.danger)){
+                    if (this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.danger)) {
                         newClass = "status_danger";
-                    } else if(this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.warning)){
+                    } else if (this._checkStatusThreshold(serverStats, this._statusThresholds.cpu_Mem.warning)) {
                         newClass = "status_warning";
-                    }else {
+                    } else {
                         newClass = "status_ok";
                     }
-                }else {
+                } else {
                     newClass = "status_default";
                 }
 
-                this.async(function(){
-                        this.updateStyles(); // Necessary for the custom css variable to apply when update
+                this.async(function() {
+                    this.updateStyles(); // Necessary for the custom css variable to apply when update
                 }.bind(this), 10);
 
                 return newClass;
 
             },
 
-            _checkStatusThreshold(serverStats ,threshold){
+            _checkStatusThreshold(serverStats, threshold) {
                 return serverStats.cpuUsage >= threshold || serverStats.memUsage >= threshold;
             },
 
-            _roundNumber: function(number ,digits){
-                return number.toFixed(digits);
+            _computeNumber: function(number, digits) {
+                return number.toFixed(digits) * 100;
             },
 
-            _computeSingleElementStatusClass(value, thresholds){
-                if(value >= thresholds.danger){
+            _computeSingleElementStatusClass(value, thresholds) {
+                if (value >= thresholds.danger) {
                     return "status_danger fa-warning";
-                }else if(value >= thresholds.warning){
+                } else if (value >= thresholds.warning) {
                     return "status_warning fa-warning";
-                }else if(value < thresholds.warning){
+                } else if (value < thresholds.warning) {
                     return "status_ok fa-check";
                 }
                 return "status_default fa-circle";
