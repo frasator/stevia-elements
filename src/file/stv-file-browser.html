@@ -4,6 +4,7 @@
 <link rel="import" href="stv-file-upload.html">
 <link rel="import" href="stv-folder-list.html">
 <link rel="import" href="stv-file-preview.html">
+<link rel="import" href="stv-image-preview.html">
 <link rel="import" href="stv-folder-tree.html">
 
 
@@ -167,7 +168,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
+                <stv-folder-list id="folderList" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -175,10 +176,20 @@
 
         <div id="botbar" class="horizontal layout center">
             <div class="flex"></div>
+
+            <content id="customButtons" select=".custom-button"></content>
+            <div class="horizontal layout">
+                <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'all')}}" data-value="all">All</div>
+                <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'job')}}" data-value="job"><i class="fa fa-flask"></i></div>
+                <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'folder')}}" data-value="folder"><i class="fa fa-folder"></i></div>
+                <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'file')}}" data-value="file"><i class="fa fa-file"></i></div>
+                <div class="flex" style="margin-left:5px;">
+                    <input id="searchInput" class="stv" type="text" style="width:100%;" placeholder="Search by name..." value="{{searchBy::input}}">
+                </div>
+            </div>
             <div hidden$="{{!checkFileModeOk(mode,selectedFile)}}" class="stv-btn stv-btn-shdw" style="width:100px;" on-click="handleFileModeOk">
                 OK
             </div>
-            <content id="customButtons" select=".custom-button"></content>
         </div>
 
         <stv-panel modal fixed movable closable hidden id="uploadFilePanel">
@@ -196,6 +207,12 @@
             <!--<div class="container">-->
             <!--<code class="wrapped-text">{{contentData}}</code>-->
             <!--</div>-->
+        </stv-panel>
+        <stv-panel modal closable hidden id="imagePreviewPanel">
+            <div class="header">
+                <i class="fa fa-eye"></i> Image Preview
+            </div>
+            <stv-image-preview class="container" id="imagePreview"></stv-image-preview>
         </stv-panel>
 
     </template>
@@ -275,6 +292,16 @@
             enableAutoIndex: {
                 type: Boolean,
                 value: false,
+                reflectToAttribute: true
+            },
+            searchBy: {
+                type: String,
+                value: "",
+                notify: true
+            },
+            searchByType: {
+                type: String,
+                value: "all",
                 reflectToAttribute: true
             }
         },
@@ -390,7 +417,11 @@
                 this.openFolder(file._id)
             } else if (file.type == "FILE") {
                 if (this.mode == '') {
-                    this.previewFile(file._id);
+                    if (file.format.indexOf("image") == 0) {
+                        this.previewImage(file._id);
+                    } else {
+                        this.previewFile(file._id);
+                    }
                 }
                 if (this.mode == 'file') {
                     if (this.checkFileModeOk(this.mode, this.selectedFile)) {
@@ -402,10 +433,21 @@
         },
         previewFile: function(fileId) {
             this.$.filePreviewPanel.show();
-            this.$.filePreview.fileId = this.selectedFile._id;
+            this.$.filePreview.fileId = fileId;
+        },
+        previewImage: function(fileId) {
+            this.$.imagePreviewPanel.show();
+            this.$.imagePreview.fileId = fileId;
         },
         handlePreviewFile: function(e) {
-            this.previewFile(this.selectedFile._id);
+            var file = this.selectedFile;
+
+            if (file.format.indexOf("image") == 0) {
+                this.previewImage(file._id);
+            } else {
+
+                this.previewFile(file._id);
+            }
         },
         handleFileModeOk: function(e) {
             this._parentPanel.hidden = true;
@@ -558,7 +600,7 @@
                 // console.log(file.name + ' ' + file.id);
                 // console.log(file);
 
-                if(!showHiddenFiles && file.name.charAt(0) == '.'){
+                if (!showHiddenFiles && file.name.charAt(0) == '.') {
                     continue
                 }
 
@@ -595,7 +637,14 @@
                     el.setAttribute('hidden', '');
                 }
             }
+        },
+        handleSearchByType: function(e) {
+            this.searchByType = e.currentTarget.dataset.value;
 
+        },
+        computeSearchByType: function(type, value) {
+            // debugger
+            return type === value;
         }
     });
 </script>

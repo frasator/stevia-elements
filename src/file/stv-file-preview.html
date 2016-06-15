@@ -18,8 +18,20 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+
+        .topbar {
+            height: 50px;
+            width: 100%;
+        }
+
+        .download {
+            width: 100px;
+        }
     </style>
     <template>
+        <div class="horizontal layout center-justified topbar">
+            <div class="download stv-btn stv-btn-shdw" on-click="handleDownloadFile">Download <i class="fa fa-download"></i></div>
+        </div>
         <code class="wrapped-text">{{contentData}}</code>
     </template>
 </dom-module>
@@ -83,7 +95,7 @@
             });
 
             if (data) {
-                this.contentData =this.contentData = this.contentData + data;
+                this.contentData = this.contentData = this.contentData + data;
             } else {
                 this._end = true;
             }
@@ -111,6 +123,11 @@
             this._end = false;
             this.scrollTop = 0;
             this.fileId = null;
+        },
+        handleDownloadFile: function() {
+            if (this.fileId != null) {
+                SteviaManager.downloadFile(this.fileId);
+            }
         }
     });
 </script>
