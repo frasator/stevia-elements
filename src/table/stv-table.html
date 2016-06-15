@@ -3,8 +3,7 @@
 <script src="../../../file-saver.js/FileSaver.js"></script>
 
 <dom-module id="stv-table">
-    <style is="custom-style"
-           include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
         :host {
             display: block;
             position: relative;
@@ -358,21 +357,24 @@
         }
 
         #columnsMenu {
+            box-sizing: border-box;
             position: fixed;
             min-width: 200px;
             cursor: pointer;
             transition: opacity 0.1s, visibility 0.1s;
-        }
-
-        #columnsMenu {
             max-height: 300px;
             overflow-y: auto;
-        }
-
-        div.stv-dropdown ul li:hover,
-        ul.stv-context li:hover {
-            background-color: var(--default-primary-color);
-            color: var(--text-primary-color);
+            visibility: hidden;
+            opacity: 0;
+            list-style: none;
+            text-decoration: none;
+            z-index: 100000;
+            border: 1px solid #afafaf;
+            background-color: #fff;
+            line-height: 22px;
+            margin: 1px 0 0 0;
+            padding: 5px 0;
+            box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.2);
         }
 
         li.columnControl {
@@ -442,21 +444,19 @@
             <div class="stv-btn" style="margin:0 2px;" on-click="handleExportCSVMenuButton" hidden$="{{!enableExport}}">
                 <i class="fa fa-download"></i>
             </div>
-            <div class="stv-btn" style="margin:0 2px;" on-click="handleColumnsMenuButton"
-                 hidden$="{{hideColumnSelector}}">
+            <div class="stv-btn" style="margin:0 2px;" on-click="handleColumnsMenuButton" hidden$="{{hideColumnSelector}}">
                 <i class="fa fa-bars"></i>
             </div>
         </div>
 
 
-        <ul id="columnsMenu" class="stv-context" on-mouseleave="handleColumnsMenuLeave" on-wheel="handleMenuScroll">
+        <ul id="columnsMenu" on-mouseleave="handleColumnsMenuLeave" on-wheel="handleMenuScroll">
             <!-- <li>Export</li>
             <li data-divider></li> -->
             <template is="dom-repeat" items="{{columns}}">
                 <li class="columnControl">
                     <label class="stv-control">
-                        <input type="checkbox" checked$="{{isColumnVisible(item)}}"
-                               on-click="handleColumnVisibilityClick">
+                        <input type="checkbox" checked$="{{isColumnVisible(item)}}" on-click="handleColumnVisibilityClick">
                         <span>{{item.title}}</span>
                     </label>
                 </li>
@@ -471,21 +471,21 @@
                 columns: {
                     type: Array,
                     notify: true,
-                    value: function () {
+                    value: function() {
                         return [];
                     }
                 },
                 data: {
                     type: Array,
                     notify: true,
-                    value: function () {
+                    value: function() {
                         return [];
                     }
                 },
                 viewData: {
                     type: Array,
                     notify: true,
-                    value: function () {
+                    value: function() {
                         return [];
                     }
                 },
@@ -530,7 +530,7 @@
                 selected: {
                     type: Array,
                     notify: true,
-                    value: function () {
+                    value: function() {
                         return [];
                     }
                 },
@@ -555,7 +555,7 @@
                 },
                 filters: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return {};
                     }
                 },
@@ -602,7 +602,7 @@
                 },
                 exportParsers: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return {};
                     }
                 }
@@ -617,14 +617,14 @@
                 'wheel': 'handleScroll',
                 'mouseleave': 'handleColumnsMenuLeave',
             },
-            ready: function () {
+            ready: function() {
 
                 this.exportParsers.separator = "\t";
                 this.exportParsers.comment = "#";
                 this.exportParsers.chunkSize = 1000;
                 this.exportParsers.maxLimit = 1000;
 
-                this.exportParsers.headerParser = function (columns) {
+                this.exportParsers.headerParser = function(columns) {
                     var headerLine = this.comment;
                     for (var i = 0; i < columns.length; i++) {
                         if (columns[i].type === "action") {
@@ -634,7 +634,7 @@
                     }
                     return headerLine;
                 }
-                this.exportParsers.dataParser = function (columns, row) {
+                this.exportParsers.dataParser = function(columns, row) {
 
                     var dataLine = "";
                     for (var j = 0; j < columns.length; j++) {
@@ -658,16 +658,16 @@
                     return dataLine;
                 }
             },
-            isColumnVisible: function (v) {
+            isColumnVisible: function(v) {
                 return v.visible !== false;
             },
-            handleColumnVisibilityClick: function (e) {
+            handleColumnVisibilityClick: function(e) {
                 var columnIndex = this.columns.indexOf(e.model.item);
                 this.set('columns.' + columnIndex + '.visible', e.currentTarget.checked);
                 this.columnsChanged();
             },
             /* LISTENERS */
-            handleScroll: function (e) {
+            handleScroll: function(e) {
                 if (this.enablePaging == true) {
                     e.preventDefault();
                     if (e.deltaY > 0) {
@@ -678,7 +678,7 @@
                     }
                 }
             },
-            handleColumnsMenu: function (e) {
+            handleColumnsMenu: function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -687,7 +687,7 @@
                 this.$.columnsMenu.style.top = (e.clientY + 10) + "px";
                 this.$.columnsMenu.style.left = (e.clientX) + "px";
             },
-            handleColumnsMenuButton: function (e) {
+            handleColumnsMenuButton: function(e) {
                 e.preventDefault();
                 e.stopPropagation();
 
@@ -698,21 +698,21 @@
                 this.$.columnsMenu.style.top = (bcrCurrent.top - bcrColumnsMenu.height) + "px";
                 this.$.columnsMenu.style.left = (bcrCurrent.left - bcrColumnsMenu.width + bcrCurrent.width) + "px";
             },
-            handleColumnsMenuLeave: function (e) {
+            handleColumnsMenuLeave: function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 this.$.columnsMenu.style.opacity = "";
                 this.$.columnsMenu.style.visibility = "";
             },
-            handleMenuScroll: function (e) {
+            handleMenuScroll: function(e) {
                 e.stopPropagation();
             },
 
-            selectedChanged: function (changeRecord) {
+            selectedChanged: function(changeRecord) {
                 this._updateSelected();
                 this.fire('selected', this.selected);
             },
-            _updateSelected: function () {
+            _updateSelected: function() {
                 var els = Polymer.dom(this.$.list).querySelectorAll('.table-row');
                 for (var i = 0; i < els.length; i++) {
                     var el = els[i];
@@ -725,18 +725,18 @@
                 }
             },
             /* OBSERVERS */
-            dataChanged: function (neo, old) {
+            dataChanged: function(neo, old) {
                 for (var i = 0; i < this.data.length; i++) {
                     var row = this.data[i];
                     delete row._filtered;
                 }
                 this.refreshPagination();
             },
-            refreshPagination: function () {
+            refreshPagination: function() {
                 this.currentPage = 1;
                 var count = 0;
                 if (this.data) {
-                    this.data.forEach(function (row) {
+                    this.data.forEach(function(row) {
                         if (row._filtered || row._filtered == null) {
                             count++;
                         }
@@ -746,8 +746,8 @@
                 this.pageCount = Math.ceil(count / this.pageSize);
                 this.filterPage();
             },
-            filterPage: function () {
-                var filteredRows = this.enableFilter ? this.data.filter(function (r) {
+            filterPage: function() {
+                var filteredRows = this.enableFilter ? this.data.filter(function(r) {
                     if (r._filtered == undefined) {
                         return true;
                     }
@@ -771,7 +771,7 @@
                     this.set('viewData', viewData);
                 }
             },
-            viewDataChanged: function (neo, old) {
+            viewDataChanged: function(neo, old) {
                 while (this.$.list.firstChild) {
                     this.$.list.removeChild(this.$.list.firstChild);
                 }
@@ -782,82 +782,82 @@
 
             },
             // pagination
-            handleFirstClick: function () {
+            handleFirstClick: function() {
                 this.currentPage = 1;
             },
-            handlePreviousClick: function () {
+            handlePreviousClick: function() {
                 if (this.currentPage > 1) {
                     this.currentPage--;
                 }
             },
-            handleNextClick: function () {
+            handleNextClick: function() {
                 // console.log(this.currentPage);
                 // console.log(this.pageCount);
                 if (this.currentPage < this.pageCount) {
                     this.currentPage++;
                 }
             },
-            handleLastClick: function () {
+            handleLastClick: function() {
                 this.currentPage = this.pageCount;
             },
-            currentPageChanged: function (neo, old) {
+            currentPageChanged: function(neo, old) {
                 this.currentPage = this.currentPage ? parseInt(this.currentPage) : 0;
                 this.currentPage = this.currentPage < 1 ? 1 : this.currentPage;
                 this.currentPage = this.pageCount > 0 && this.currentPage > this.pageCount ? this.pageCount : this.currentPage;
                 this.filterPage();
             },
-            pageSizeChanged: function () {
+            pageSizeChanged: function() {
                 this.pagesize = parseInt(this.pagesize);
                 this.refreshPagination();
             },
-            computePageFirstItem: function (currentPage, pageSize, itemCount) {
+            computePageFirstItem: function(currentPage, pageSize, itemCount) {
                 return ((currentPage - 1) * pageSize) + 1;
             },
-            computePageLastItem: function (currentPage, pageSize, itemCount) {
+            computePageLastItem: function(currentPage, pageSize, itemCount) {
                 var end = currentPage * pageSize;
                 if (itemCount < end) {
                     return itemCount;
                 }
                 return end;
             },
-            computePageTotal: function (pageSize, itemCount) {
+            computePageTotal: function(pageSize, itemCount) {
                 return Math.ceil(itemCount / pageSize);
             },
-            enablePagingChanged: function (neo, old) {
+            enablePagingChanged: function(neo, old) {
                 this.refreshPagination();
             },
-            enableRemoteChanged: function (neo, old) {
+            enableRemoteChanged: function(neo, old) {
                 if (this.request) {
                     this.checkRemote();
                 }
             },
-            requestChanged: function (neo, old) {
+            requestChanged: function(neo, old) {
                 if (this.currentPage != 1) {
                     this.currentPage = 1;
                 } else if (this.request && this.request.url != null && this.request.url != "") {
                     this.checkRemote();
                 }
             },
-            columnsChanged: function (neo, old) {
+            columnsChanged: function(neo, old) {
                 this.updateColumns();
                 this.viewDataChanged();
             },
-            clear: function () {
+            clear: function() {
                 this.data = [];
                 this.viewData = [];
                 this.currentPage = 1;
                 this.columns = [];
             },
-            refresh: function () {
+            refresh: function() {
                 this.dataChanged();
             },
-            checkRemote: function () {
+            checkRemote: function() {
                 var me = this;
                 if (this.enableLoading && this.currentPage == 1) {
                     this.setLoading(true);
                 }
                 if (this.enableRemote) {
-                    this._callRemote(function (resp) {
+                    this._callRemote(function(resp) {
                         me.itemCount = me.request.parseTotal(resp);
                         me.pageCount = Math.ceil(me.itemCount / me.pageSize);
                         me.viewData = me.request.parse(resp);
@@ -869,13 +869,13 @@
                     //                ...
                 }
             },
-            _callRemote: function (callback) {
+            _callRemote: function(callback) {
                 var method = 'GET';
                 if (typeof this.request.method !== 'undefined' && this.request.method != null) {
                     method = this.request.method;
                 }
                 var request = new XMLHttpRequest();
-                request.onload = function () {
+                request.onload = function() {
                     var contentType = this.getResponseHeader('Content-Type');
                     var resp;
                     if (contentType === 'application/json') {
@@ -885,7 +885,7 @@
                     }
                     callback(resp)
                 };
-                request.onerror = function () {
+                request.onerror = function() {
                     //                args.request.error(this);
                 };
                 if (this.request.url && this.request.url != "") {
@@ -899,7 +899,7 @@
                     console.log(url)
                 }
             },
-            updateColumns: function () {
+            updateColumns: function() {
                 var els = this.$.headerRow.querySelectorAll('.table-header-row');
                 for (var i = 0; i < els.length; i++) {
                     this.$.headerRow.removeChild(els[i]);
@@ -939,7 +939,7 @@
                 }
 
             },
-            _createFilterRow: function () {
+            _createFilterRow: function() {
                 var el = document.createElement('div');
                 el.classList.add('horizontal', 'layout', 'style-scope', 'stv-table');
                 for (var i = 0; i < this.columns.length; i++) {
@@ -950,7 +950,7 @@
                 }
                 this.$.filterRow.appendChild(el);
             },
-            _createFilterField: function (rowEl, column, rowData) {
+            _createFilterField: function(rowEl, column, rowData) {
                 var me = this;
                 var el = document.createElement('div');
                 el.classList.add('table-filter-field', 'horizontal', 'layout', 'style-scope', 'stv-table');
@@ -993,7 +993,7 @@
                                 input.style.width = column.width + "px";
                             }
                             input._col = column.name;
-                            input.addEventListener('input', function (e) {
+                            input.addEventListener('input', function(e) {
                                 var query = this.value;
                                 var filter = {}
                                 if (input._col in me.filters) {
@@ -1037,7 +1037,7 @@
                                 option.text = optVal;
                                 input.appendChild(option);
                             }
-                            input.addEventListener('click', function (e) {
+                            input.addEventListener('click', function(e) {
                                 var query = this.value;
                                 var filter = {}
                                 if (input._col in me.filters) {
@@ -1064,7 +1064,7 @@
                 }
                 rowEl.appendChild(el);
             },
-            _applyFilters: function () {
+            _applyFilters: function() {
                 for (var i = 0; i < this.data.length; i++) {
                     var row = this.data[i];
                     var filtered = true;
@@ -1087,7 +1087,7 @@
                 }
                 this.refreshPagination();
             },
-            _processColumn: function (column, x) {
+            _processColumn: function(column, x) {
                 if (column.columns && column.columns.length > 0) {
                     for (var i = 0; i < column.columns.length; i++) {
                         var col = column.columns[i];
@@ -1105,7 +1105,7 @@
                     }
                 }
             },
-            _createHeaderRow: function () {
+            _createHeaderRow: function() {
                 var el = document.createElement('div');
                 el.classList.add('table-header-row', 'horizontal', 'layout', 'style-scope', 'stv-table');
                 for (var i = 0; i < this.columns.length; i++) {
@@ -1116,7 +1116,7 @@
                 }
                 this.$.headerRow.appendChild(el);
             },
-            _setResizable: function (elem) {
+            _setResizable: function(elem) {
                 var me = this;
 
                 var columnName = ".column-" + elem._column.name;
@@ -1177,7 +1177,7 @@
                 resizer.addEventListener('mousedown', initDrag, false);
             },
 
-            _createHeaderField: function (rowEl, column) {
+            _createHeaderField: function(rowEl, column) {
                 var me = this;
                 var el = document.createElement('div');
                 el.classList.add('table-header-field', 'vertical', 'layout', 'center-justified', 'style-scope', 'stv-table', ('column-' + column.name.replace(/\s/g, '_')));
@@ -1213,7 +1213,7 @@
                 }
                 rowEl.appendChild(el);
             },
-            handleHeaderFieldClick: function (e) {
+            handleHeaderFieldClick: function(e) {
                 var me = this;
                 var column = e.currentTarget._column;
                 var sortedData = this.data.slice(0);
@@ -1225,19 +1225,19 @@
                     el.classList.remove('sort-up');
                 }
                 if (isSortDown) {
-                    sortedData.sort(function (a, b) {
+                    sortedData.sort(function(a, b) {
                         return me._columnSort(column, b, a);
                     });
                     e.currentTarget.classList.add('sort-up');
                 } else {
-                    sortedData.sort(function (a, b) {
+                    sortedData.sort(function(a, b) {
                         return me._columnSort(column, a, b);
                     });
                     e.currentTarget.classList.add('sort-down');
                 }
                 this.data = sortedData;
             },
-            _columnSort: function (column, a, b) {
+            _columnSort: function(column, a, b) {
                 //checking formula or TODO save calculated value in the item;
                 var aVal, bVal;
                 if (column.formula != null) {
@@ -1253,7 +1253,7 @@
                     return (aVal > bVal) - (aVal < bVal);
                 }
             },
-            _getPos: function (row) {
+            _getPos: function(row) {
                 for (var i = 0; i < this.viewData.length; i++) {
                     var elem = this.viewData[i];
                     if (elem === row) {
@@ -1262,7 +1262,7 @@
                 }
                 return -1;
             },
-            _createRow: function (rowData) {
+            _createRow: function(rowData) {
                 var me = this;
                 var el = document.createElement('div');
                 el.classList.add('table-row', 'horizontal', 'layout', 'style-scope', 'stv-table');
@@ -1273,7 +1273,7 @@
                     el.setAttribute("draggable", "true");
                     el.addEventListener('dragstart', this.drag);
                 }
-                el.addEventListener('click', function (e) {
+                el.addEventListener('click', function(e) {
                     me.fire('rowclick', {
                         row: rowData
                     });
@@ -1309,7 +1309,7 @@
                 }
                 this.$.list.appendChild(el);
             },
-            _toggleSelected: function (domElem, rowData) {
+            _toggleSelected: function(domElem, rowData) {
                 if (domElem.classList.contains("selected")) {
                     var index = this.selected.indexOf(rowData);
                     if (index >= 0) {
@@ -1324,7 +1324,7 @@
                 }
                 this.lastSelectedRow = domElem;
             },
-            _selectRowsBetweenIndexes: function (first, last) {
+            _selectRowsBetweenIndexes: function(first, last) {
                 var rows = this.$.list.getElementsByClassName("table-row");
                 for (var i = 0; i < rows.length; i++) {
                     var obj = rows[i];
@@ -1342,7 +1342,7 @@
                     }
                 }
             },
-            _clearSelection: function () {
+            _clearSelection: function() {
                 var rows = this.$.list.getElementsByClassName("table-row");
                 for (var i = 0; i < rows.length; i++) {
                     var obj = rows[i];
@@ -1350,7 +1350,7 @@
                 }
                 this.splice('selected', 0, this.selected.length);
             },
-            _createField: function (rowEl, column, rowData) {
+            _createField: function(rowEl, column, rowData) {
                 var me = this;
                 var el = document.createElement('div');
                 el.classList.add('table-field', 'horizontal', 'layout', 'center', 'style-scope', 'stv-table');
@@ -1363,7 +1363,7 @@
                 if (column.type === "action") {
                     var remove = document.createElement("i");
                     remove.classList.add("fa", "fa-remove");
-                    remove.addEventListener('click', function (e) {
+                    remove.addEventListener('click', function(e) {
                         me.fire('removerow', {
                             row: rowData
                         });
@@ -1386,7 +1386,7 @@
                 }
                 rowEl.appendChild(el);
             },
-            _createTypeField: function (el, column, rowData, isSubCol) {
+            _createTypeField: function(el, column, rowData, isSubCol) {
                 var me = this;
                 var value;
                 var defValue = column.defaultValue;
@@ -1417,10 +1417,10 @@
                             input.setAttribute("readonly", "");
                             input.classList.add('style-scope', 'stv-table');
                             input._col = column.name;
-                            input.addEventListener('dblclick', function (e) {
+                            input.addEventListener('dblclick', function(e) {
                                 this.removeAttribute('readonly');
                             });
-                            input.addEventListener('blur', function (e) {
+                            input.addEventListener('blur', function(e) {
                                 if (!this.hasAttribute('readonly')) {
                                     this.setAttribute('readonly', '');
                                     var val = this.value;
@@ -1461,7 +1461,7 @@
                                 input.appendChild(option);
                             }
                             //TODO check
-                            input.addEventListener('click', function (e) {
+                            input.addEventListener('click', function(e) {
                                 var val = this.value;
                                 rowData.attributes[column.name] = val;
                             });
@@ -1487,7 +1487,7 @@
                     el.appendChild(cEl);
                 }
             },
-            _deepValue: function (obj, path) {
+            _deepValue: function(obj, path) {
                 for (var i = 0, path = path.split('.'), len = path.length; i < len; i++) {
                     var auxPath = path[i];
                     if (auxPath === "undefined") {
@@ -1497,8 +1497,8 @@
                 }
                 return obj;
             },
-            contains: function (searchElem, compareFunction) {
-                var cmp = function (a, b) {
+            contains: function(searchElem, compareFunction) {
+                var cmp = function(a, b) {
                     return a === b;
                 }
                 if (compareFunction && typeof(compareFunction) === "function") {
@@ -1512,25 +1512,24 @@
                 }
                 return false;
             },
-            setLoading: function (loading) {
+            setLoading: function(loading) {
                 this.loading = loading;
             },
-            allowDrop: function (e) {
+            allowDrop: function(e) {
                 console.log("drag!!!")
                 e.preventDefault();
             },
-            drop: function (e) {
+            drop: function(e) {
                 e.preventDefault();
                 var data = JSON.parse(e.dataTransfer.getData("rowData"));
                 this.push('data', data);
             },
-            drag: function (e) {
+            drag: function(e) {
                 e.dataTransfer.setData("rowData", JSON.stringify(e.currentTarget._rowData));
             },
-            handleLoading: function (neo, old) {
-            },
+            handleLoading: function(neo, old) {},
 
-            selectElem: function (elem, compareFunction) {
+            selectElem: function(elem, compareFunction) {
 
                 var selected = null;
 
@@ -1548,13 +1547,13 @@
                 }
 
             },
-            _callRemoteExport: function (url, callback) {
+            _callRemoteExport: function(url, callback) {
                 var method = 'GET';
                 if (typeof this.request.method !== 'undefined' && this.request.method != null) {
                     method = this.request.method;
                 }
                 var request = new XMLHttpRequest();
-                request.onload = function () {
+                request.onload = function() {
                     var contentType = this.getResponseHeader('Content-Type');
                     var resp;
                     if (contentType === 'application/json') {
@@ -1564,7 +1563,7 @@
                     }
                     callback(resp)
                 };
-                request.onerror = function () {
+                request.onerror = function() {
                     //                args.request.error(this);
                 };
 
@@ -1572,7 +1571,7 @@
                 request.send();
                 console.log(url)
             },
-            handleExportCSVMenuButton: function (e) {
+            handleExportCSVMenuButton: function(e) {
 
                 e.stopPropagation();
                 var me = this;
@@ -1610,7 +1609,7 @@
                         limit: limit
                     }, this.request.url);
 
-                    this._callRemoteExport(url, function (response) {
+                    this._callRemoteExport(url, function(response) {
                         var data = me.request.parse(response);
 
                         for (var i = 0; i < data.length; i++) {
@@ -1665,7 +1664,7 @@
                 }
 
             },
-            exportToTable: function (start, end) {
+            exportToTable: function(start, end) {
                 start = start || 0;
                 end = end || this.data.length;
 
@@ -1682,7 +1681,7 @@
                 return table;
 
             },
-            _createTableHeader: function () {
+            _createTableHeader: function() {
                 var thead = document.createElement("thead");
                 thead.classList.add("stv-table");
                 var tr = document.createElement("tr");
@@ -1698,7 +1697,7 @@
                 thead.appendChild(tr);
                 return thead;
             },
-            _createTableHeaderField: function (rowEl, column) {
+            _createTableHeaderField: function(rowEl, column) {
 
                 var th = document.createElement("th");
                 th.classList.add("stv-table", ('column-' + column.name.replace(/\s/g, '_')));
@@ -1708,7 +1707,7 @@
 
             },
 
-            _createTableBody: function (start, end) {
+            _createTableBody: function(start, end) {
 
                 var tbody = document.createElement("tbody");
                 tbody.classList.add("stv-table");
@@ -1722,7 +1721,7 @@
                 return tbody;
 
             },
-            _createTableRow: function (rowData) {
+            _createTableRow: function(rowData) {
 
                 var tr = document.createElement("tr");
                 tr.classList.add("stv-table");
@@ -1735,7 +1734,7 @@
                 }
                 return tr;
             },
-            _createTableField: function (tr, column, rowData) {
+            _createTableField: function(tr, column, rowData) {
                 var td = document.createElement("td");
                 td.classList.add("stv-table");
 
@@ -1750,7 +1749,7 @@
 
                 tr.appendChild(td);
             },
-            _createTableTypeField: function (el, column, rowData, isSubCol) {
+            _createTableTypeField: function(el, column, rowData, isSubCol) {
                 var me = this;
                 var value;
                 var defValue = column.defaultValue;

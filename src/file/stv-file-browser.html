@@ -226,6 +226,11 @@
                 type: Object,
                 observer: 'userDataChanged'
             },
+            enableSelectOk: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
             folder: {
                 type: Object,
                 notify: true
@@ -279,11 +284,6 @@
                 type: String,
                 reflectToAttribute: true,
                 value: ""
-            },
-            enableSelectOk: {
-                type: Boolean,
-                value: false,
-                reflectToAttribute: true
             },
             loading: {
                 type: Boolean,
@@ -405,8 +405,12 @@
                 if (mode === 'file' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FILE') {
                     return true;
                 }
-                if (mode === 'folder' && selectedFile != null && selectedFile._id != null && selectedFile.type == 'FOLDER') {
-                    return true;
+                if (mode === 'folder') {
+                    if (selectedFile == null) {
+                        return true
+                    } else if (selectedFile._id != null && selectedFile.type == 'FOLDER' && selectedFile.job == null) {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -607,6 +611,8 @@
                 if (this.mode == 'folder') {
                     if (file.type != 'FOLDER') {
                         continue;
+                    } else if (file.job != null) {
+                        continue;
                     }
                 } else if (this.mode == 'file' && bfList.length > 0) {
                     if (file.type == 'FILE' && bfList.indexOf(file.bioformat) == -1) {
@@ -626,7 +632,7 @@
                 var exts = el.getAttribute('file-ext').split(',');
                 for (var j = 0; j < exts.length; j++) {
                     var ext = exts[j];
-                    if (Utils.endsWithIgnoreCase(this.selectedFile.name, ext)) {
+                    if (this.selectedFile != null && Utils.endsWithIgnoreCase(this.selectedFile.name, ext)) {
                         found = true;
                         break;
                     }
