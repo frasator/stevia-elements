@@ -160,7 +160,7 @@
         </template>
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
-                <template is="dom-repeat" items="{{files}}" filter="checkFilters" observe="type">
+                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" observe="type">
                     <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
@@ -238,6 +238,14 @@
                 isFile: {
                     type: Boolean,
                     value: false
+                },
+                searchBy: {
+                    type: String,
+                    value: ""
+                },
+                searchByType: {
+                    type: String,
+                    value: "all"
                 }
             },
             handleUploadFile: function(e) {
@@ -329,9 +337,44 @@
             checkSelectedFile: function(selected) {
                 return selected == null || selected.type != "FILE";
             },
-            checkFilters: function(item) {
-                return true;
-                //            return item.bioformat == "VARIANT";
+
+            checkFilters: function(searchBy, type) {
+                type = type.toUpperCase();
+                if (!searchBy) {
+                    // set filter to null to disable filtering
+                    return function(item) {
+                        var checkType = true;
+                        if (type === "ALL") {
+                            checkType = true;
+                        } else if (type === "JOB") {
+
+                            checkType = (item.job && item.job !== null);
+                        } else if (type === "FILE" || type === "FOLDER") {
+                            checkType = (item.type === type);
+                        } else {
+                            checkType = false;
+                        }
+                        return checkType;
+                    }
+                } else {
+                    // return a filter function for the current search string
+                    searchBy = searchBy.toLowerCase();
+                    return function(item) {
+                        var filename = item.name;
+                        var checkType = true;
+                        if (type === "ALL") {
+                            checkType = true;
+                        } else if (type === "JOB") {
+                            checkType = (item.job && item.job !== null);
+                        } else if (type === "FILE" || type === "FOLDER") {
+                            checkType = (item.type === type);
+                        } else {
+                            checkType = false;
+                        }
+                        return filename.indexOf(searchBy) != -1 && checkType;
+                    };
+
+                }
             },
             isFolderMode: function(mode) {
                 return mode === 'folder';
@@ -441,7 +484,7 @@
                         }
                     });
                 }
-            },
+            }
         });
     </script>
 </dom-module>

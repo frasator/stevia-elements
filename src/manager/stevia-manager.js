@@ -109,6 +109,9 @@ var SteviaManager = {
         content: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content');
         },
+        contentExample: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'content-example');
+        },
         contentGrep: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content-grep');
         },
@@ -118,9 +121,6 @@ var SteviaManager = {
         // setHeader: function (args) {
         //     return SteviaManager._doRequest(args, 'files', 'set-header');
         // },
-        contentExample: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'content-example');
-        },
         downloadExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'download-example');
         },
