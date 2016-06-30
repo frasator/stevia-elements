@@ -168,8 +168,8 @@ input.stv[type=email]:invalid,
 input.stv[type=number]:invalid,
 input.stv[type=color]:invalid,
 input.stv[type=password]:invalid {
-    border-color: rgb(232, 106, 52);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(232, 106, 52, .6);
+    border-color: rgb(232, 155, 52);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(232, 155, 52, .6);
 }
 
 input.stv[type=text]:invalid:focus,
