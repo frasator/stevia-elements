@@ -1,5 +1,4 @@
-[
-    {
+STV_LAUNCHER_APPS = [{
         "name": "VARIANT",
         "shortDescription": "Fast and accurate functional characterization of variants in VCF files",
         "link": "http://variant.bioinfo.cipf.es/",
@@ -46,47 +45,20 @@
         "shortDescription": "Inferring the functional effect of gene expression changes in signaling pathways",
         "link": "http://pathiways.babelomics.org/",
         "icon": ""
-    },
-    {
+    }, {
         "name": "PATHiVar",
         "shortDescription": "Assessing the impact of mutations found in next generation sequencing data over human signaling pathways",
         "link": "http://pathivar.babelomics.org/",
         "icon": "http://pathivar.babelomics.org/images/pathiways-logo.svg"
-    },
-    {
+    }, {
         "name": "Babelomics",
         "shortDescription": "A program suite for advanced functional genomic data analysis",
         "link": "http://www.babelomics.org/",
         "icon": "http://bioinfo.cipf.es/apps-beta/babelomics/produccion/images/logoBabelomics_negative.svg"
-    },
-    {
+    }, {
         "name": "Phylemon",
         "shortDescription": "Evolution, phylogenetics, phylogenomics",
         "link": "http://phylemon.bioinfo.cipf.es/",
         "icon": "http://phylemon.bioinfo.cipf.es/css/phylemon_title.png"
-    },
-    {
-        "name": "PTMCode",
-        "shortDescription": "The database of post-translational modifications within and between proteins",
-        "link": "http://ptmcode.embl.de/",
-        "icon": ""
-    },
-    {
-        "name": "SNPeffect",
-        "shortDescription": "on-line prediction of effects of protein-coding variants",
-        "link": "http://snpeffect.switchlab.org/",
-        "icon": "http://snpeffect.switchlab.org/sites/all/themes/rubik/cube/images/snpeffect.png"
-    },
-    {
-        "name": "DBAli",
-        "shortDescription": "Pairwise and multiple protein structure alignments",
-        "link": "http://salilab.org/DBAli/",
-        "icon": ""
-    },
-    {
-        "name": "SARA",
-        "shortDescription": "Functional annotation of RNA structures",
-        "link": "http://structure.biofold.org/sara/",
-        "icon": "http://structure.biofold.org/sara/images/logo.png"
     }
-]
+];

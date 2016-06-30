@@ -47,69 +47,116 @@ with a z-index above this value will not be blocked.
     <template>
         <style>
             #message {
-                font-size: 1.2em;
-                font-weight: bold;
+                /*font-weight: bold;*/
                 text-align: center;
+                font-size: 1.15em;
+            }
+
+            #title {
+                box-sizing: border-box;
+                font-size: 1.2em;
+                text-transform: capitalize;
+                padding: 7px 10px;
+                background-color: #444;
+                color: #fff;
+            }
+
+            #content {
+                box-sizing: border-box;
+                background-color: var(--modal-window-background, rgb(255, 255, 255));
+                padding: 10px 15px;
+                @apply(--layout-flex);
             }
 
             .blocking-div {
                 position: absolute;
                 top: 0;
                 bottom: 0;
-                left:0;
+                left: 0;
                 right: 0;
                 z-index: 1001;
-
+                background-color: rgba(0, 0, 0, 0.7);
             }
 
-            .modal-window{
-                background-color: var(--modal-window-background, rgb(230,230,230));
-                padding: 10px 100px 15px 100px;
-                box-shadow: 3px 3px 3px rgba(0,0,0, 0.5);
+            .modal-window {
+                box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
                 position: absolute;
-                top:30%;
+                top: 30%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 z-index: 1002;
                 @apply(--modal-window-style);
-
                 @apply(--layout-vertical);
+                min-height: 160px;
             }
 
-            .buttons{
-                margin-top: 5%;
+            .buttons {
                 @apply(--layout-horizontal);
                 @apply(--layout-around-justified);
-                align-items: flex-end;
+                padding: 5px;
+                background-color: #eee;
             }
 
-            .buttons > button {
-                padding: 5px 5px 5px 5px;
+            .buttons > div,
+            input {
+                font-size: 1.1em;
+                display: block;
+                position: relative;
+                outline: transparent solid 0px;
+                box-sizing: border-box;
+                border: 1px solid rgba(0, 0, 0, 0.3);
+                padding: 4px 7px;
+                background-color: #ffffff;
+                font-family: inherit;
+                color: inherit;
+                cursor: pointer;
+                box-shadow: 2px 2px 3px 0px rgba(0, 0, 0, 0.1);
+                transition: background-color 0.3s;
                 @apply(--buttons-style);
             }
 
-            input {
+            .buttons > div:hover {
+                background-color: #f8f8f8;
+                box-shadow: 2px 2px 3px 0px rgba(0, 0, 0, 0.3);
+            }
+
+            .buttons > div:active {
+                background-color: #eeeeee;
+            }
+
+            .input-wrapper {
+                display: block;
+                width: 100%;
                 position: relative;
-                left: 50%;
-                transform: translate(-50%, 0);
+                box-sizing: border-box;
+                padding: 10px 0;
+            }
+            
+            input {
+                width: 100%;
             }
         </style>
         <div class="blocking-div">
             <div class="modal-window">
-                <div id="message">
-                    {{message}}
+                <div id="title">{{_mode}}</div>
+                <div id="content">
+                    <div id="message">
+                        {{message}}
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" id="text" hidden value$="{{inputValue}}">
+                    </div>
                 </div>
-                <input type="text" id="text" hidden value$="{{inputValue}}">
                 <div id="buttonsHolder" class="buttons">
-                    <button id="ok" on-click="_handleOk"></button>
-                    <button id="cancel" on-click="_handleCancel" hidden>Cancel</button>
+                    <div id="ok" on-click="_handleOk"></div>
+                    <div id="cancel" on-click="_handleCancel" hidden>Cancel</div>
                 </div>
             </div>
         </div>
 
     </template>
     <script>
-        var stvDialog = Polymer({
+        StvDialog = Polymer({
             is: "stv-dialog",
 
             properties: {
@@ -122,37 +169,35 @@ with a z-index above this value will not be blocked.
                 /**
                  * The type of dialog box to be displayed: "confirm", "alert" or "prompt"
                  */
-                _mode:{
-                    type:String
-                }
+                _mode: {
+                    type: String
+                },
+
+                _hasParent: Boolean
             },
 
-            ready : function(){
+            ready: function() {
                 this.hidden = true;
             },
-
 
             /**
              * Holder for the passed **callback** when calling confirm, alert or prompt functions
              */
             _callback: undefined,
 
-
             /**
              * Calls to _executeCb passing true
              */
-            _handleOk:function(){
+            _handleOk: function() {
                 this._executeCb(true);
             },
-
 
             /**
              * Calls to _executeCb passing false
              */
-            _handleCancel:function(){
+            _handleCancel: function() {
                 this._executeCb(false);
             },
-
 
             /** Executes _callback passing to it the user response as a boolean.  If _mode === "prompt" it
              * passes the input text as well to _callback. Then it sets _callback to undefined and hides the dialog box.
@@ -160,8 +205,8 @@ with a z-index above this value will not be blocked.
              * @param userResponse {boolean}
              */
             _executeCb: function(userResponse) {
-                if(this._callback !== undefined){
-                    if(this._mode === "prompt"){
+                if (this._callback !== undefined) {
+                    if (this._mode === "prompt") {
                         this._callback(userResponse, this.$.text.value);
                     } else {
                         this._callback(userResponse);
@@ -172,7 +217,6 @@ with a z-index above this value will not be blocked.
                 this._closeDialog();
             },
 
-
             /**
              * Sets the message inside the confirm button and the elements needed according to **_mode**.
              *
@@ -180,39 +224,45 @@ with a z-index above this value will not be blocked.
              */
             _setElement: function(confirmBtnMessage) {
                 this.$.ok.textContent = confirmBtnMessage;
-                if(this._mode === "prompt") {
-                   this.$.text.removeAttribute("hidden");
+                if (this._mode === "prompt") {
+                    this.$.text.removeAttribute("hidden");
                     //TODO: Fix -> The user needs to press enter for the focus to work.
-                   this.$.text.focus();
-                   this.$.cancel.removeAttribute("hidden");
-                }else {
+                    this.$.text.focus();
+                    this.$.cancel.removeAttribute("hidden");
+                } else {
                     this.$.ok.focus();
-                    if(this._mode === "confirm"){
+                    if (this._mode === "confirm") {
                         this.$.cancel.removeAttribute("hidden");
                     }
                 }
 
             },
 
-
             /**
              * Resets all the element light DOM to default values
              */
-            _closeDialog: function(){
+            _closeDialog: function() {
                 this.$.text.setAttribute("hidden", true);
                 this.$.cancel.setAttribute("hidden", true);
                 this.$.text.value = "";
                 this.hidden = true;
-            },
 
+                if (this._hasParent === false) {
+                    document.body.removeChild(this);
+                }
+            },
 
             /**
              * Shows an confirm-like dialog to the user.
              *
              * @param {string} msg Message to be displayed in the dialog box
              * @param {function} cb
-            */
+             */
             confirm: function(msg, cb) {
+                if (this.parentElement == null) {
+                    this._hasParent = false;
+                    document.body.appendChild(this)
+                }
                 this._mode = "confirm";
                 this._setElement("Confirm");
                 this.message = msg;
@@ -227,6 +277,10 @@ with a z-index above this value will not be blocked.
              * @param {function} cb
              */
             alert: function(msg, cb) {
+                if (this.parentElement == null) {
+                    this._hasParent = false;
+                    document.body.appendChild(this)
+                }
                 this._mode = "alert";
                 this._setElement("Accept");
                 this.message = msg;
@@ -241,7 +295,11 @@ with a z-index above this value will not be blocked.
              * @param {string} msg Message to be displayed in the dialog box
              * @param {function} cb
              */
-            prompt: function(msg, cb){
+            prompt: function(msg, cb) {
+                if (this.parentElement == null) {
+                    this._hasParent = false;
+                    document.body.appendChild(this)
+                }
                 this._mode = "prompt";
                 this._setElement("Accept");
                 this.message = msg;

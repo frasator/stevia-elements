@@ -55,6 +55,12 @@
             text-align: center;
         }
 
+        .size {
+            color: #444;
+            width: 80px;
+            text-align: center;
+        }
+
         .status {
             color: #444;
             width: 95px;
@@ -91,7 +97,7 @@
             color: var(--default-primary-color);
         }
 
-        .bar > div {
+        .bar> div {
             margin-right: 5px;
         }
 
@@ -118,32 +124,35 @@
     <template>
         <div id="bar" class="horizontal layout">
             <div class="bar horizontal layout flex">
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkBack(folder)}}" on-click="handleBack">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkBack(folder)}}" on-click="handleBack" title="Go back">
                     <i class="fa fa-arrow-left"></i>
                 </div>
 
-                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isFolderMode(mode)}}" on-click="handleUploadFile">
+                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isFolderMode(mode)}}" on-click="handleUploadFile" title="Upload a new file">
                     <i class="fa fa-cloud-upload"></i> Upload
                 </div>
 
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkFolder(folder)}}" on-click="handleCreateFolder">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkFolder(folder)}}" on-click="handleCreateFolder" title="Create new folder">
                     <i class="fa fa-folder"></i> +
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelected(selected)}}" on-click="handleDeleteFile">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{computeDelete(selected)}}" on-click="handleDeleteFile" title="Remove file/folder/job">
                     <i class="fa fa-trash"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile" title="View file">
                     <i class="fa fa-eye"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile" title="Download file">
                     <i class="fa fa-download"></i>
+                </div>
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedJob(selected)}}" on-click="handleViewJob" title="View job results">
+                    <i class="fa fa-gears"></i>
                 </div>
             </div>
             <div class="horizontal layout">
-                <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}">
+                <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}" title="Show info ">
                     <i class="fa fa-info"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}">
+                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}" title="Change icon/list view">
                     <i class$="{{computeViewModeIconClass(viewMode)}}"></i>
                 </div>
                 <!--<div class="stv-btn stv-btn-shdw" on-click="handleIcon">-->
@@ -155,12 +164,13 @@
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
             <div id="header" class="horizontal layout">
                 <div class="name flex">Name</div>
+                <div class="size">Size</div>
                 <div class="creationDate">Date</div>
             </div>
         </template>
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
-                <template is="dom-repeat" items="{{files}}" filter="checkFilters" observe="type">
+                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" observe="type">
                     <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
@@ -176,6 +186,8 @@
             <div class="horizontal layout">
                 <span class="data">Type: &nbsp;</span>
                 <span class="value lowercase">{{fileType}}</span>
+                <!-- <span class="data">Format: &nbsp;</span>
+                <span class="value lowercase">{{fileFormat}}</span> -->
                 <span class="data">Bioformat: &nbsp;</span>
                 <span class="value lowercase">{{fileBioformat}}</span>
             </div>
@@ -236,7 +248,22 @@
                 isFile: {
                     type: Boolean,
                     value: false
-                }
+                },
+                searchBy: {
+                    type: String,
+                    value: ""
+                },
+                searchByType: {
+                    type: String,
+                    value: "all"
+                },
+                userData: {
+                    type: Object,
+                    observer: 'userDataChanged'
+                },
+            },
+            created: function() {
+                this.fileBelongsToJob = {};
             },
             handleUploadFile: function(e) {
                 this.set('selected', null);
@@ -261,6 +288,7 @@
                 this.fileName = "";
                 this.fileType = "";
                 this.fileBioformat = "";
+                this.fileFormat = "";
                 this.fileDate = "";
 
                 var sel = this.querySelector("stv-folder-list-item[selected]");
@@ -282,6 +310,7 @@
                 } else {
                     this.isFile = false;
                 }
+                this.fileFormat = this.selected.format;
                 this.fileBioformat = this.selected.bioformat;
 
                 var date = new Date(Date.parse(this.selected.createdAt));
@@ -322,12 +351,61 @@
             checkSelected: function(selected) {
                 return selected == null;
             },
+            computeDelete: function(selected) {
+                if (selected == null) {
+                    return true;
+                } else if (selected.job != undefined) {
+                    return false;
+                } else {
+
+                    return this.fileBelongsToJob[selected.parent];
+                }
+                // return selected == null;
+            },
             checkSelectedFile: function(selected) {
                 return selected == null || selected.type != "FILE";
             },
-            checkFilters: function(item) {
-                return true;
-                //            return item.bioformat == "VARIANT";
+            checkSelectedJob: function(selected) {
+                return selected == null || selected.job == undefined;
+            },
+
+            checkFilters: function(searchBy, type) {
+                type = type.toUpperCase();
+                if (!searchBy) {
+                    // set filter to null to disable filtering
+                    return function(item) {
+                        var checkType = true;
+                        if (type === "ALL") {
+                            checkType = true;
+                        } else if (type === "JOB") {
+
+                            checkType = (item.job && item.job !== null);
+                        } else if (type === "FILE" || type === "FOLDER") {
+                            checkType = (item.type === type);
+                        } else {
+                            checkType = false;
+                        }
+                        return checkType;
+                    }
+                } else {
+                    // return a filter function for the current search string
+                    searchBy = searchBy.toLowerCase();
+                    return function(item) {
+                        var filename = item.name;
+                        var checkType = true;
+                        if (type === "ALL") {
+                            checkType = true;
+                        } else if (type === "JOB") {
+                            checkType = (item.job && item.job !== null);
+                        } else if (type === "FILE" || type === "FOLDER") {
+                            checkType = (item.type === type);
+                        } else {
+                            checkType = false;
+                        }
+                        return filename.indexOf(searchBy) != -1 && checkType;
+                    };
+
+                }
             },
             isFolderMode: function(mode) {
                 return mode === 'folder';
@@ -438,6 +516,47 @@
                     });
                 }
             },
+            _processChildFile: function(file, isMyFatherAJob) {
+                var isJob = isMyFatherAJob || file.j;
+                this.fileBelongsToJob[file._id] = isJob;
+
+                for (var i = 0; i < file.f.length; i++) {
+                    this._processChildFile(file.f[i], isJob);
+                }
+            },
+            userDataChanged: function(neo, old) {
+                if (neo) {
+                    try {
+                        var home = neo.tree[0];
+                        var homeFiles = home.f;
+                        this.fileBelongsToJob[home._id] = false;
+
+                        for (var i = 0; i < homeFiles.length; i++) {
+                            var file = homeFiles[i];
+                            this._processChildFile(file, false);
+
+                        }
+
+                    } catch (e) {
+
+                    }
+
+                }
+
+            },
+            handleViewJob: function(e) {
+                if (this.selected) {
+                    var jobId = this.selected.job._id;
+                    for (var i = 0; i < this.userData.jobs.length; i++) {
+                        var job = this.userData.jobs[i];
+                        if (job._id === jobId) {
+                            this.fire("jobselect", job);
+                            break;
+                        }
+                    }
+                }
+
+            }
         });
     </script>
 </dom-module>

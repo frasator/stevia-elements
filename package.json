@@ -5,13 +5,5 @@
     "repository": {
         "type": "git",
         "url": ""
-    },
-    "scripts": {
-        "build": "./build.sh"
-    },
-    "devDependencies": {
-        "vulcanize": "1.14.0",
-        "crisper": "2.0.0",
-        "uglifyjs": "^2.4.10"
     }
 }
