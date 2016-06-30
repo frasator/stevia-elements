@@ -58,7 +58,7 @@
             border-right: 1px solid rgba(130, 130, 130, 0.4);
         }
 
-        #mainmenu > .resizer {
+        #mainmenu> .resizer {
             width: 2px;
             height: 100%;
             position: absolute;
@@ -68,7 +68,7 @@
             display: none;
         }
 
-        #mainmenu:hover > .resizer {
+        #mainmenu:hover> .resizer {
             display: inherit;
             background-color: #E1E3E5;
             border-left: 1px solid #DDD;
@@ -117,7 +117,7 @@
             white-space: nowrap;
         }
 
-        #breadcrums > span.clickable:hover {
+        #breadcrums> span.clickable:hover {
             cursor: pointer;
             text-decoration: underline;
         }
@@ -131,7 +131,7 @@
             background-color: #fafafa;
         }
 
-        .bar > div {
+        .bar> div {
             margin-right: 5px;
         }
 
@@ -168,13 +168,14 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
+                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
                 </stv-folder-list>
             </div>
         </div>
 
 
         <div id="botbar" class="horizontal layout center">
+            <div class="quota">{{computeSize(userData, userData.diskUsage)}} of {{computeSize(userData, userData.diskQuota)}}</div>
             <div class="flex"></div>
 
             <content id="customButtons" select=".custom-button"></content>
@@ -343,6 +344,7 @@
         },
         ready: function() {
             var me = this;
+
             if (this._parentPanel != null) {
                 this._parentPanel.addEventListener('hidden', function(e) {
                     if (e.detail == false) {
@@ -651,6 +653,9 @@
         computeSearchByType: function(type, value) {
             // debugger
             return type === value;
+        },
+        computeSize: function(userData, size) {
+            return Utils.humanFileSize(size);
         }
     });
 </script>
