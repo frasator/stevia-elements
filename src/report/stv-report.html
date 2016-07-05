@@ -1,0 +1,562 @@
+<link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+
+<script src="../../../network-viewer/conf/config.js"></script>
+<link rel="import" href="../../../network-viewer/network-viewer.html">
+
+<dom-module id="stv-report">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            box-sizing: border-box;
+            background-color: #FFFFFF;
+            padding: 20px 40px;
+            @apply(--layout-horizontal);
+        }
+
+        .section:first-child {
+            margin: 0px 0 5px 0;
+        }
+
+        .section {
+            font-size: 30px;
+            font-weight: lighter;
+            margin: 30px 0 5px 0;
+            color: var(--secondary-text-color);
+            border-bottom: 1px solid var(--divider-color);
+        }
+
+        .download,
+        .param,
+        .image,
+        .table,
+        .message {
+            font-size: 18px;
+            display: block;
+        }
+
+        .download> a:hover,
+        .image> a:hover,
+        .table> a:hover {
+            text-decoration: underline;
+        }
+
+        .download> a,
+        .image> a,
+        .table> a {
+            color: var(--secondary-text-color);
+            text-decoration: none;
+        }
+
+        .download> i,
+        .image> i,
+        .table> i,
+        .message> i {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        .param> .key {
+            color: var(--secondary-text-color);
+            margin-right: 5px;
+        }
+
+        .param> .val {
+            color: var(--accent-color);
+        }
+
+        .image> img {
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .table> stv-table {
+            width: 1000px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border: 1px solid var(--divider-color);
+            height: 380px;
+        }
+
+        .html {
+            color: var(--secondary-text-color);
+        }
+
+        #outline {
+            position: fixed;
+            box-sizing: border-box;
+            margin-top: 20px;
+            right: 40px;
+            min-width: 300px;
+            max-width: 300px;
+            background-color: white;
+            border: 1px solid var(--divider-color);
+            box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
+        .section> .name {
+            color: var(--accent-color);
+            margin-right: 10px;
+        }
+
+        .input-param {
+            margin-left: 40px;
+        }
+
+        .job-name,
+        .job-desc,
+        .job-tool {
+            margin-left: 40px;
+        }
+
+        .outline-line {
+            padding: 2px;
+        }
+
+        .outline-line> i {
+            color: var(--accent-color);
+            margin-right: 5px;
+        }
+
+        .download-icon {
+            font-size: 10pt;
+            margin-left: 5px;
+            color: var(--accent-color);
+        }
+
+        .download-icon:hover {
+            font-weight: bold;
+        }
+    </style>
+    <template>
+        <div id="outline" class="vertical layout"></div>
+        <div>
+            <div id="jobInfo" class="section">Job Information</div>
+            <div>
+                <div class="job-name"><span>Name:</span><span>{{job.name}}</span></div>
+                <div class="job-desc"><span>Description:</span><span>{{job.description}}</span></div>
+                <div class="job-tool"><span>Tool:</span><span>{{job.tool}}</span></div>
+                <!-- <div class="output">{{job}}</div> -->
+            </div>
+        </div>
+
+        <div>
+            <div id="inputParamsHeader" class="section">Input Params</div>
+            <div id="inputParams"></div>
+        </div>
+        <div class="flex vertical layout" id="main"></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'stv-report',
+            properties: {
+                job: {
+                    type: Object,
+                    observer: 'jobChanged'
+                },
+                fileNameMap: {
+                    type: Object
+                }
+            },
+            ready: function() {
+                this.count = 0;
+                this.iconMap = {
+                    download: 'fa-download',
+                    message: 'fa-comment-o',
+                    image: 'fa-image',
+                    table: 'fa-th'
+
+                }
+            },
+            jobChanged: function(neo, old) {
+                var me = this;
+                if (neo) {
+                    while (this.$.main.firstChild) {
+                        this.$.main.removeChild(this.$.main.firstChild);
+                    }
+
+                    while (this.$.outline.firstChild) {
+                        this.$.outline.removeChild(this.$.outline.firstChild);
+                    }
+
+                    while (this.$.inputParams.firstChild) {
+                        this.$.inputParams.removeChild(this.$.inputParams.firstChild);
+                    }
+
+                    var jobInfoElem = document.createElement('a');
+                    jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
+                    jobInfoElem.style.fontWeight = "bold";
+                    jobInfoElem.href = "#jobInfo";
+                    jobInfoElem.classList.add('outline-line');
+                    Polymer.dom(this.$.outline).appendChild(jobInfoElem);
+
+                    var inputParamsElem = document.createElement('a');
+                    inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Input Params</span>';
+                    inputParamsElem.style.fontWeight = "bold";
+                    inputParamsElem.href = "#inputParamsHeader";
+                    inputParamsElem.classList.add('outline-line');
+                    Polymer.dom(this.$.outline).appendChild(inputParamsElem);
+
+                    var files = [];
+                    SteviaManager.getPlainFolderFiles(me.job.folder._id, function(files) {
+                        me.processResultFiles(files);
+                    });
+                }
+            },
+            processResultFiles: function(files) {
+
+                var me = this;
+                this.fileNameMap = {};
+                for (var i = 0; i < files.length; i++) {
+                    var f = files[i];
+                    this.fileNameMap[f.name] = f;
+                }
+                SteviaManager.getFileContent(this.fileNameMap['report.xml']._id, function(content) {
+                    me.processReportFile(content);
+                });
+            },
+            processReportFile: function(fileContent) {
+                var parser = new DOMParser();
+                var reportXML = parser.parseFromString(fileContent, "text/xml");
+                var inputParamsEl = reportXML.querySelector('input-params');
+                var outputParamsEl = reportXML.querySelector('output-params');
+                var outputParams = outputParamsEl.childNodes;
+
+                for (var key in this.job.options) {
+                    var option = this.job.options[key];
+                    var elem = document.createElement("div");
+
+                    elem.classList.add("input-param");
+                    var keySpan = document.createElement("span");
+                    var valueSpan = document.createElement("span");
+
+                    keySpan.innerHTML = key + ": ";
+                    valueSpan.innerHTML = option.value ? option.value : "";
+
+                    elem.appendChild(keySpan);
+                    elem.appendChild(valueSpan);
+                    Polymer.dom(this.$.inputParams).appendChild(elem);
+
+                }
+
+                for (var i = 0; i < outputParams.length; i++) {
+                    var outEl = outputParams[i];
+                    if (outEl.tagName != null) {
+                        var functionPath = '_' + outEl.tagName + 'Tag';
+                        if (this[functionPath] != null) {
+                            var name = outEl.getAttribute('file');
+                            if (name != null && this.fileNameMap[name] == null) {
+                                console.log('####### File : ' + name + ' not found !');
+                                //transform to param;
+                                var newOutEl = reportXML.createElement('param');
+                                newOutEl.setAttribute('key', outEl.getAttribute('title'));
+                                newOutEl.setAttribute('value', outEl.getAttribute('file'));
+                                functionPath = '_' + newOutEl.tagName + 'Tag';
+                                outEl = newOutEl;
+                            }
+                            this[functionPath](outEl);
+                        } else {
+                            console.log('* ' + outEl.tagName + ' * tag function renderer is not defined');
+                        }
+                    }
+                }
+            },
+            _addTag: function(el, outEl) {
+
+                el.setAttribute("id", "stvReportId_" + this.count);
+                el.classList.add(outEl.tagName);
+
+                var level = parseInt(outEl.getAttribute("level"));
+                el.style.marginLeft = level * 40 + "px";
+                Polymer.dom(this.$.main).appendChild(el);
+                this._addOutlineEntry(outEl, "stvReportId_" + this.count);
+                this.count++;
+            },
+            _addOutlineEntry: function(outEl, id) {
+
+                var title = outEl.getAttribute('title');
+                var el = document.createElement('a');
+                var level = parseInt(outEl.getAttribute("level"));
+                var i = document.createElement('i');
+                switch (outEl.tagName) {
+                    case 'image':
+                        i.classList.add("fa", this.iconMap['image']);
+                        break;
+                    case 'table':
+                        i.classList.add("fa", this.iconMap['table']);
+                        break;
+                    case 'download':
+                        i.classList.add("fa", this.iconMap['download']);
+                        break;
+                    case 'message':
+                        i.classList.add("fa", this.iconMap['message']);
+                        break;
+                    case 'section':
+                        el.style.fontWeight = "bold";
+                        i.classList.add("fa", 'fa-caret-right');
+                        break;
+                    default:
+                }
+                var text = document.createElement('span');
+                text.innerHTML = title;
+
+                el.appendChild(i);
+                el.appendChild(text);
+                // el.innerHTML = title;
+                el.href = "#" + id;
+                el.style.marginLeft = level * 10 + "px";
+
+                el.classList.add('outline-line');
+                Polymer.dom(this.$.outline).appendChild(el);
+            },
+            _sectionTag: function(outEl) {
+                var el = document.createElement('div');
+                el.innerHTML = outEl.getAttribute('title');
+                this._addTag(el, outEl);
+
+            },
+            _downloadTag: function(outEl) {
+                var name = outEl.getAttribute('file');
+                var el = document.createElement('div');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['download']);
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                a.appendChild(this._createDownloadIcon());
+                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+
+                el.appendChild(i);
+                el.appendChild(a);
+                this._addTag(el, outEl);
+            },
+            _paramTag: function(outEl) {
+                // <param key='Decomposed paths' value='FALSE'></param>
+                var el = document.createElement('div');
+
+                var keyEl = document.createElement('span');
+                keyEl.classList.add('key');
+                keyEl.innerHTML = outEl.getAttribute('key') + ':';
+
+                var valEl = document.createElement('span');
+                valEl.classList.add('val');
+                valEl.innerHTML = outEl.getAttribute('value');
+
+                el.appendChild(keyEl);
+                el.appendChild(valEl);
+                this._addTag(el, outEl);
+            },
+            _messageTag: function(outEl) {
+                // <message text='...'></message>
+                var el = document.createElement('div');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['message']);
+
+                var span = document.createElement('span');
+                span.innerHTML = outEl.getAttribute('text');
+
+                el.appendChild(i);
+                el.appendChild(span);
+
+                this._addTag(el, outEl);
+            },
+            _imageTag: function(outEl) {
+                // <image title='Heatmap' file='paths_heatmap.png'></image>
+                var name = outEl.getAttribute('file');
+                var el = document.createElement('div');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['image']);
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                a.appendChild(this._createDownloadIcon());
+
+                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+
+                var img = document.createElement('img');
+                img.setAttribute('src', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+
+                el.appendChild(i);
+                el.appendChild(a);
+                el.appendChild(img);
+                this._addTag(el, outEl);
+            },
+            _tableTag: function(outEl) {
+                var me = this;
+                // <table title='Path significance' file='paths_comparison.txt'  page-size='10'></table>
+                var name = outEl.getAttribute('file');
+
+                var el = document.createElement('div');
+                var i = document.createElement('i');
+                i.classList.add('fa', 'fa-th');
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                a.appendChild(this._createDownloadIcon());
+                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+
+                var table = document.createElement('stv-table');
+                table.setAttribute('enable-paging', '');
+                table.setAttribute('page-size', outEl.getAttribute('page-size'));
+
+                SteviaManager.getFileContent(this.fileNameMap[name]._id, function(content) {
+                    var parsedContent = me._parseTabularFile(content);
+                    table.set('data', parsedContent.data);
+                    table.set('columns', parsedContent.columns);
+                });
+
+                el.appendChild(i);
+                el.appendChild(a);
+                el.appendChild(table);
+                this._addTag(el, outEl);
+            },
+
+            _htmlTag: function(outEl) {
+                var me = this;
+                var name = outEl.getAttribute('file');
+                var el = document.createElement('div');
+                SteviaManager.getFileContent(this.fileNameMap[name]._id, function(content) {
+                    var parser = new DOMParser();
+                    var doc = parser.parseFromString(content, "text/html");
+                    me._processHTML(doc, el);
+                });
+                this._addTag(el, outEl);
+            },
+
+            _processHTML: function(doc, outEl) {
+                var indexStyle = doc.querySelector('style');
+                var indexScript = doc.querySelector('script[data-var]');
+                var contextVar = indexScript.dataset.var;
+                var content = doc.querySelector('#content');
+
+                /*fix index-body*/
+                var els = content.querySelectorAll('.pathway_selector_item');
+                for (var i = 0; i < els.length; i++) {
+                    var el = els[i];
+                    el.removeAttribute('onclick');
+                    el.setAttribute('on-click', 'handlePathwayClick');
+                }
+                var els = content.querySelectorAll('img');
+                for (var i = 0; i < els.length; i++) {
+                    var el = els[i];
+                    var split = el.getAttribute('src').split('/');
+                    var name = split[split.length - 1];
+                    el.setAttribute('src', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                }
+
+                var scriptTextContent = indexScript.textContent;
+                scriptTextContent = scriptTextContent.replace('pathSelector.appendChild(div)', 'Polymer.dom(pathSelector).appendChild(div)');
+                eval(scriptTextContent);
+                var obj = eval(contextVar);
+
+                /* Create custom element */
+                var domModule = document.createElement('dom-module');
+                var style = document.createElement('style');
+                style.textContent = indexStyle.textContent;
+                var template = document.createElement('template');
+                template.innerHTML = content.innerHTML;
+                domModule.appendChild(style);
+                domModule.appendChild(template);
+
+                var rndstr = Math.floor(Math.random() * (1000 - 9999 + 1)) + 1000;
+                var elname = 'stv-hipathia-result-gen' + rndstr;
+                domModule.register(elname);
+
+                var moduleConfig = {
+                    is: elname,
+                    ready: function() {
+                        var me = this;
+                        this.init(Polymer.dom(this.root));
+                    },
+                    handlePathwayClick: function(e) {
+                        this.loadPathway(e.currentTarget.dataset.pathway, e.currentTarget.dataset.pathwayname, Polymer.dom(this.root));
+                    }
+                }
+                for (var prop in obj) {
+                    if (hasOwnProperty.call(obj, prop)) {
+                        moduleConfig[prop] = obj[prop];
+                    }
+                }
+
+                Polymer(moduleConfig);
+                var res = document.createElement(elname);
+                outEl.appendChild(res);
+            },
+            _createDownloadIcon: function() {
+                var icon = document.createElement('i');
+                icon.classList.add('fa', 'download-icon', this.iconMap['download']);
+
+                return icon;
+            },
+            _createReportHTMLElement: function() {
+
+            },
+            _parseTabularFile: function(textContent) {
+                var lines = textContent.split('\n');
+                if (lines.length > 0) {
+                    var line, fields, field, data = [],
+                        columns = [],
+                        obj;
+
+                    if (lines[0].charAt(0) == '#') {
+                        var firstLine = lines[0].replace('#', '');
+                        fields = firstLine.split('\t');
+                        for (var i = 0; i < fields.length; i++) {
+                            field = fields[i];
+                            field = field.trim();
+                            var name = field.replace(/ /gi, '_');
+                            var width = 150;
+                            if (i === 0) {
+                                width = 400;
+                            }
+                            columns.push({
+                                name: name,
+                                title: name.replace('path', 'circuit'),
+                                width: width
+                            });
+                        }
+                    } else {
+                        var colCount = lines[0].split('\t').length;
+                        for (var i = 0; i < colCount; i++) {
+                            var width = 150;
+                            if (i === 0) {
+                                width = 400;
+                            }
+                            columns.push({
+                                name: i.toString(),
+                                title: "Column " + i.toString(),
+                                width: width
+                            });
+                        }
+                    }
+
+                    if (columns.length) {
+                        for (var i = 0; i < lines.length; i++) {
+                            line = lines[i];
+                            if (line != '' && line.charAt(0) != '#') {
+                                fields = line.split('\t');
+                                obj = {};
+                                for (var j = 0; j < fields.length; j++) {
+                                    field = fields[j].trim();
+                                    column = columns[j];
+                                    obj[column.name] = field;
+                                }
+                                data.push(obj);
+                            }
+                        }
+                    }
+                    return {
+                        columns: columns,
+                        data: data
+                    };
+                }
+            }
+        });
+    </script>
+</dom-module>
