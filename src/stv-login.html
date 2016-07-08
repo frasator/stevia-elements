@@ -28,21 +28,35 @@
         }
 
         .message {
-            margin-top: 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.3);
         }
 
         .shortcut {
             cursor: pointer;
             color: var(--dark-primary-color);
-            float: right;
         }
 
         .right {
-            float: right;
+            text-align: right;
         }
 
         .shortcut:hover {
             text-decoration: underline;
+        }
+
+        #button {
+            font-weight: normal;
+            height: auto;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 3px;
+            color: var(--text-primary-color);
+            background-color: var(--dark-button-color);
+        }
+
+        #button:hover {
+            background-color: var(--light-button-color);
         }
     </style>
     <template>
@@ -55,34 +69,38 @@
             </div>
         </div>
         <form id="form" on-keypress="handleFormKey">
-            <label class="stv">E-mail:</label>
-            <input class="stv" type="email" value="{{email::input}}" required>
+            <label class="stv">User name:</label>
+            <input class="stv" type="text" value="{{name::input}}" required pattern="[a-zA-Z0-9]+">
 
-            <span hidden$={{hideSignup}} class="shortcut" on-click="handleSignup">Create new user...</span>
+            <div class="right">
+                <span hidden$={{hideSignup}} class="shortcut" on-click="handleSignup">Create new user...</span>
+            </div>
             <br>
             <label class="stv">Password:</label>
-            <input class="stv" type="password" value="{{password::input}}" required pattern="[a-zA-Z0-9]+">
+            <input class="stv" type="password" value="{{password::input}}" required>
 
-            <span hidden$={{hideSignup}} class="shortcut" on-click="handleRemember">Remember password...</span>
+            <div class="right">
+                <span hidden$={{hideSignup}} class="shortcut" on-click="handleRemember">Remember password...</span>
+            </div>
             <br>
             <br>
 
-            <div class="stv-btn stv-btn-shdw" on-click="handleForm">Login</div>
+            <div id="button" class="stv-btn stv-btn-shdw" on-click="handleForm">Login</div>
             <br>
-            <div hidden$="{{hideAnonymous}}">
+            <div hidden$="{{hideAnonymous}}" class="right">
                 <span class="shortcut" on-click="handleAnonymous">Login as anonymous</span>
                 <br>
-                <span class="right" style="color:#888">All data will be deleted on logout</span>
+                <span style="color:#888">All data will be deleted on logout</span>
             </div>
         </form>
-        <div class="message">{{message}}</div>
+        <div hidden$="{{!message}}" class="message stv-note stv-note-warn">&nbsp;{{message}}</div>
     </template>
 
     <script>
         Polymer({
             is: "stv-login",
             properties: {
-                email: {
+                name: {
                     type: String,
                     value: ''
                 },
@@ -105,6 +123,11 @@
                     reflectToAttribute: true
                 },
             },
+            clean: function() {
+                this.set('name', '');
+                this.set('message', '');
+                this.set('password', '');
+            },
             handleFormKey: function(e) {
                 if (e.which == 13) {
                     this.handleForm();
@@ -117,21 +140,23 @@
                 this.fire("signup", {});
             },
             handleForm: function(e) {
-                this.message = '';
-                this.email = (this.email === "demo") ? "demo@demo.com" : this.email;
+                this.set('message', '');
                 if (this.$.form.checkValidity()) {
                     this._login();
+                }else{
+                    this.set('message', 'Please, you should fill all the fields.');
                 }
             },
             handleAnonymous: function() {
+                this.clean();
                 this.fire('anonymous');
             },
             _login: function() {
                 var me = this;
-                // console.log(this.email)
+                // console.log(this.name)
                 // console.log(this.password)
                 SteviaManager.users.login({
-                    id: this.email,
+                    id: this.name,
                     sid: CryptoJS.SHA1(this.password).toString(),
                     request: {
                         success: function(response) {
@@ -139,13 +164,13 @@
                                 Cookies.set('bioinfo_sid', response.response[0].results[0].id, {
                                     path: window.location.pathname
                                 });
-                                Cookies.set('bioinfo_user', me.email, {
+                                Cookies.set('bioinfo_user', me.name, {
                                     path: window.location.pathname
                                 });
                                 me.fire('login', {
                                     status: true
                                 });
-                                me.email = null;
+                                me.clean();
                             } else {
                                 console.log(response.response[0].error);
                                 me.message = response.response[0].error;

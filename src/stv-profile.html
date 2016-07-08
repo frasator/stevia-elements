@@ -27,12 +27,26 @@
         }
 
         .message {
-            margin-top: 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        #button {
+            font-weight: normal;
+            height: auto;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 3px;
+            color: var(--text-primary-color);
+            background-color: var(--dark-button-color);
+        }
+
+        #button:hover {
+            background-color: var(--light-button-color);
         }
 
         #formEmail {
             margin-top: 40px;
-            ;
         }
     </style>
     <template>
@@ -53,8 +67,9 @@
             <label class="stv">Check password:</label>
             <input class="stv" type="password" value="{{passwordCheck::input}}" required pattern="[a-zA-Z0-9]+">
             <br>
+            <br>
 
-            <div class="stv-btn stv-btn-shdw" on-click="handleChangePasswordForm">Change password</div>
+            <div id="button" class="stv-btn stv-btn-shdw" on-click="handleChangePasswordForm">Change password</div>
         </form>
 
         <!-- <form id="formEmail">
@@ -65,7 +80,7 @@
             <div class="stv-btn stv-btn-shdw" on-click="handleChangeEmailForm">Change e-mail</div>
         </form> -->
 
-        <div class="message">{{message}}</div>
+        <div hidden$="{{!message}}" class="message stv-note stv-note-warn">&nbsp;{{message}}</div>
     </template>
     <script>
         Polymer({
@@ -92,30 +107,42 @@
                     value: ''
                 }
             },
+            clean: function() {
+                this.set('oldpassword', '');
+                this.set('password', '');
+                this.set('passwordCheck', '');
+                this.set('message', '');
+            },
             handleChangePasswordForm: function(e) {
                 var me = this;
                 this.message = '';
 
-                if (this.$.formPassword.checkValidity() && (this.password === this.passwordCheck)) {
-                    SteviaManager.users.updatePassword({
-                        id: Cookies('bioinfo_user'),
-                        request: {
-                            headers: {
-                                'x-stv-1': CryptoJS.SHA1(this.oldpassword).toString(),
-                                'x-stv-2': CryptoJS.SHA1(this.password).toString()
-                            },
-                            success: function(response) {
-                                if (response.response[0].error == null) {
-                                    me.message = 'Password updated';
-                                } else {
-                                    me.message = response.response[0].error;
+                if (this.$.formPassword.checkValidity()) {
+                    if (this.password === this.passwordCheck) {
+                        SteviaManager.users.updatePassword({
+                            id: Cookies('bioinfo_user'),
+                            request: {
+                                headers: {
+                                    'x-stv-1': CryptoJS.SHA1(this.oldpassword).toString(),
+                                    'x-stv-2': CryptoJS.SHA1(this.password).toString()
+                                },
+                                success: function(response) {
+                                    if (response.response[0].error == null) {
+                                        me.message = 'Password updated';
+                                    } else {
+                                        me.message = response.response[0].error;
+                                    }
+                                },
+                                error: function() {
+                                    me.message = 'Server error, try again later.';
                                 }
-                            },
-                            error: function() {
-                                me.message = 'Server error, try again later.';
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        this.set('message', 'Sorry, your new password does not match.');
+                    }
+                } else {
+                    this.set('message', 'Please, you should fill all the fields.');
                 }
             },
             handleChangeEmailForm: function(e) {
