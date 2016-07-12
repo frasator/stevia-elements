@@ -60,8 +60,8 @@
         <stv-tooltip icon="signal" type="{{type}}" class$="{{_computeStatusClass(_serverStatusObject)}}">
             <h1>Cluster Status</h1>
             <ul>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i> CPU: <span class="cluster_data">{{_computeNumber(_serverStatusObject.cpuUsage, 2)}} %</span></li>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_computeNumber(_serverStatusObject.memUsage, 2)}} %</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i> CPU: <span class="cluster_data">{{_computeNumber(_serverStatusObject.cpuUsage, 0)}} %</span></li>
+                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_computeNumber(_serverStatusObject.memUsage, 0)}} %</span></li>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i>Cluster Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
                 <li><i class="fa fa-globe"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
                 <hr>
@@ -123,16 +123,16 @@
             },
 
             retrieveServerStatus: function(url) {
+                var me = this;
                 var startRequestTime = new Date();
                 url = url + "?rand=" + startRequestTime.getTime();
                 var oReq = new XMLHttpRequest();
-                var that = this;
 
                 function reqListener() {
                     var jsonObject = JSON.parse(this.responseText);
-                    that._serverStatusObject = jsonObject;
-                    that._connexionLatency = new Date() - startRequestTime;
-                    console.log(that._serverStatusObject);
+                    me.set('_serverStatusObject', jsonObject);
+                    me.set('_connexionLatency', new Date() - startRequestTime);
+                    console.log(me._serverStatusObject);
                 }
 
                 oReq.open("GET", url);
@@ -141,7 +141,7 @@
                 oReq.addEventListener("load", reqListener);
                 oReq.addEventListener("error", function() {
                     console.error("Server currently unavailable at " + url);
-                    that._serverStatusObject = null;
+                    me.set('_serverStatusObject', null);
                 }.bind(this));
             },
 
@@ -172,7 +172,7 @@
             },
 
             _computeNumber: function(number, digits) {
-                return number.toFixed(digits) * 100;
+                return (number * 100).toFixed(digits);
             },
 
             _computeSingleElementStatusClass(value, thresholds) {

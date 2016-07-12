@@ -26,7 +26,22 @@
         }
 
         .message {
-            margin-top: 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        #button {
+            font-weight: normal;
+            height: auto;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 3px;
+            color: var(--text-primary-color);
+            background-color: var(--dark-button-color);
+        }
+
+        #button:hover {
+            background-color: var(--light-button-color);
         }
     </style>
     <template>
@@ -39,6 +54,9 @@
             </div>
         </div>
         <form id="form" on-keypress="handleFormKey">
+            <label class="stv">User name:</label>
+            <input class="stv" type="text" value="{{name::input}}" required pattern="[a-zA-Z0-9]+">
+            <br>
             <label class="stv">E-mail:</label>
             <input class="stv" type="email" value="{{email::input}}" required>
             <br>
@@ -50,15 +68,19 @@
             <br>
             <br>
 
-            <div class="stv-btn stv-btn-shdw" on-click="handleForm">Sign up</div>
+            <div id="button" class="stv-btn stv-btn-shdw" on-click="handleForm">Sign up</div>
         </form>
-        <div class="message">{{message}}</div>
+        <div hidden$="{{!message}}" class="message stv-note stv-note-warn">&nbsp;{{message}}</div>
     </template>
 
     <script>
         Polymer({
             is: "stv-signup",
             properties: {
+                name: {
+                    type: String,
+                    value: ''
+                },
                 email: {
                     type: String,
                     value: ''
@@ -88,14 +110,15 @@
                     if (this.password === this.passwordCheck) {
                         this._signup();
                     } else {
-                        alert("Sorry, your password does not match");
+                        this.set('message', 'Sorry, your password does not match.');
                     }
                 } else {
                     // alert("Please, you should fill all the fields. If error persist, contact crew at " + CONTACT_MAIL + ".");
-                    alert("Please, you should fill all the fields.");
+                    this.set('message', 'Please, you should fill all the fields.');
                 }
             },
             clean: function() {
+                this.name = "";
                 this.email = "";
                 this.password = "";
                 this.passwordCheck = "";
@@ -104,6 +127,7 @@
                 var me = this;
                 SteviaManager.users.create({
                     query: {
+                        name: this.name,
                         email: this.email,
                     },
                     sid: CryptoJS.SHA1(this.password).toString(),
@@ -111,12 +135,12 @@
                         async: true,
                         success: function(response) {
                             if (response.response[0].error == null) {
-                                var email = response.response[0].results[0].email;
+                                var name = response.response[0].results[0].name;
                                 // me.message = email + ' created';
                                 Cookies.set('bioinfo_sid', response.response[0].results[0].sessions[0].id, {
                                     path: window.location.pathname
                                 });
-                                Cookies.set('bioinfo_user', email, {
+                                Cookies.set('bioinfo_user', name, {
                                     path: window.location.pathname
                                 });
 

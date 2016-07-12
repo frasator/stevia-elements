@@ -404,6 +404,7 @@
                 this.$.stvLogin._login();
             },
             anonymousSign: function() {
+                this.$.stvSignup.name = "anonymous";
                 this.$.stvSignup.email = "anonymous@anonymous.anonymous";
                 this.$.stvSignup.password = "anonymous";
                 this.$.stvSignup._signup();
@@ -427,6 +428,7 @@
                 this.userData = null;
                 this.selectedOption = 'home';
                 this.isLogged = false;
+                this.userText = '';
                 Cookies.expire('bioinfo_sid', {
                     path: window.location.pathname
                 });
@@ -495,10 +497,10 @@
                 }
             },
             _checkUserName: function(userData) {
-                if (userData.email.indexOf('anonymous___') != -1) {
+                if (userData.name.indexOf('anonymous___') != -1) {
                     return 'anonymous';
                 } else {
-                    return userData.email;
+                    return userData.name;
                 }
             }
         });

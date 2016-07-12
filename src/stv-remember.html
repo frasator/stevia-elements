@@ -28,7 +28,22 @@
         }
 
         .message {
-            margin-top: 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        #button {
+            font-weight: normal;
+            height: auto;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 3px;
+            color: var(--text-primary-color);
+            background-color: var(--dark-button-color);
+        }
+
+        #button:hover {
+            background-color: var(--light-button-color);
         }
     </style>
     <template>
@@ -44,15 +59,15 @@
             <!-- <label class="stv">User ID</label>
             <input class="stv" type="text" value="{{user::input}}" required pattern="[a-zA-Z0-9]+">
             <br> -->
-            <label class="stv">E-mail:</label>
-            <input class="stv" type="email" value="{{email::input}}" required>
+            <label class="stv">User name:</label>
+            <input class="stv" type="text" value="{{name::input}}" required>
             <br>
             <br>
 
-            <div class="stv-btn stv-btn-shdw" on-click="handleForm">Send an email</div>
+            <div id="button" class="stv-btn stv-btn-shdw" on-click="handleForm">Send reset request</div>
         </form>
 
-        <div class="horizontal layout center message">
+        <div hidden$="{{!message}}" class="horizontal layout center message stv-note stv-note-warn">
             <template is="dom-if" if="{{loading}}">
                 <i class="fa fa-spinner fa-spin" style="margin-right: 5px;"></i>
             </template>
@@ -63,11 +78,11 @@
         Polymer({
             is: "stv-remember",
             properties: {
-                email: {
-                    type: String,
-                    value: ''
-                },
-                user: {
+                // email: {
+                //     type: String,
+                //     value: ''
+                // },
+                name: {
                     type: String,
                     value: ''
                 },
@@ -99,7 +114,7 @@
                     this.loading = true;
                     SteviaManager.users.resetPassword({
                         query: {
-                            email: this.email
+                            name: this.name
                         },
                         request: {
                             success: function(response) {
@@ -116,6 +131,8 @@
                             }
                         }
                     });
+                }else{
+                    this.set('message', "Please, fill the field");
                 }
             }
         });
