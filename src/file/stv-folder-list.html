@@ -120,6 +120,23 @@
         .lowercase {
             text-transform: lowercase;
         }
+        /*.menu-option:before {
+            font-family: 'FontAwesome';
+            content: '\f0da';
+            margin-right: 5px;
+        }*/
+
+        .sort-ASC:after {
+            font-family: 'FontAwesome';
+            content: '\f107';
+            padding-left: 5px;
+        }
+
+        .sort-DESC:after {
+            font-family: 'FontAwesome';
+            content: '\f106';
+            padding-left: 5px;
+        }
     </style>
     <template>
         <div id="bar" class="horizontal layout">
@@ -163,14 +180,14 @@
 
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
             <div id="header" class="horizontal layout">
-                <div class="name flex">Name</div>
-                <div class="size">Size</div>
-                <div class="creationDate">Date</div>
+                <div class$="{{computeSortClass(sort, sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
+                <div class$="{{computeSortClass(sort, sortASC,'size')}}" data-sort="size" on-click="changeSort">Size</div>
+                <div class$="{{computeSortClass(sort, sortASC, 'date')}}" data-sort="date" on-click="changeSort">Date</div>
             </div>
         </template>
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
-                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" observe="type">
+                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}" observe="type">
                     <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
@@ -261,6 +278,14 @@
                     type: Object,
                     observer: 'userDataChanged'
                 },
+                sort: {
+                    type: String,
+                    value: "name"
+                },
+                sortASC: {
+                    type: Boolean,
+                    value: true
+                }
             },
             created: function() {
                 this.fileBelongsToJob = {};
@@ -556,6 +581,86 @@
                     }
                 }
 
+            },
+            changeSort: function(e) {
+                var elem = e.currentTarget;
+                var newSortValue = elem.dataset.sort;
+
+                if (this.sort == newSortValue) {
+                    this.sortASC = !this.sortASC;
+                } else {
+                    this.sort = newSortValue;
+                    this.sortASC = true;
+                }
+            },
+            checkSort: function(sort, sortASC) {
+                switch (sort) {
+                    case "name":
+                        if (sortASC) {
+                            return function(a, b) {
+                                if (a.name === b.name) return 0;
+                                return a.name < b.name ? -1 : 1;
+                            };
+                        } else {
+                            return function(a, b) {
+                                if (a.name === b.name) return 0;
+                                return a.name < b.name ? 1 : -1;
+                            };
+                        }
+
+                        break;
+                    case "size":
+                        if (sortASC) {
+                            return function(a, b) {
+                                if (a.size === b.size) return 0;
+                                return a.size < b.size ? -1 : 1;
+                            };
+                        } else {
+                            return function(a, b) {
+                                if (a.size === b.size) return 0;
+                                return a.size < b.size ? 1 : -1;
+                            };
+                        }
+                        break;
+                    case "date":
+                        if (sortASC) {
+                            return function(a, b) {
+                                return new Date(b.createdAt) - new Date(a.createdAt);
+                            }
+                        } else {
+                            return function(a, b) {
+                                return new Date(a.createdAt) - new Date(b.createdAt);
+                            }
+                        }
+
+                    default:
+
+                }
+            },
+            computeSortClass: function(sort, sortASC, elem) {
+                var newClass = "";
+
+                switch (elem) {
+                    case 'name':
+                        newClass = "name flex";
+                        break;
+                    case 'size':
+                        newClass = "size";
+                        break;
+                    case 'date':
+                        newClass = "date";
+                        break;
+                    default:
+                }
+
+                if (elem === sort) {
+                    if (sortASC) {
+                        newClass += ' sort-ASC';
+                    } else {
+                        newClass += " sort-DESC";
+                    }
+                }
+                return newClass;
             }
         });
     </script>

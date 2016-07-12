@@ -135,8 +135,6 @@
             } else if (file.format == "application/xml" || file.format == "application/x-sh") {
                 icon = 'fa fa-file-code-o';
             }
-            console.log(file.name + " - " + file.format);
-
             if (window.BIOFORMATS != null && window.BIOFORMATS[file.bioformat] != null && window.BIOFORMATS[file.bioformat].icon != null) {
                 icon = "fa fa-" + window.BIOFORMATS[file.bioformat].icon
             }

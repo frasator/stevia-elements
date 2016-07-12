@@ -138,6 +138,18 @@
         .wrapped-text {
             white-space: pre-wrap;
         }
+
+        .quota-.75 {
+            color: #FF3419
+        }
+
+        .quota-0.9 {
+            color: #DD1A00
+        }
+
+        .quota-1 {
+            color: #B31D09;
+        }
     </style>
     <template>
         <div id="topbar" class="horizontal layout center">
@@ -175,7 +187,7 @@
 
 
         <div id="botbar" class="horizontal layout center">
-            <div class="quota">{{computeSize(userData, userData.diskUsage)}} of {{computeSize(userData, userData.diskQuota)}}</div>
+            <div><span class$="{{computeSizeClass(userData)}}">{{computeSize(userData, userData.diskUsage)}}</span> of <span>{{computeSize(userData, userData.diskQuota)}}</span></div>
             <div class="flex"></div>
 
             <content id="customButtons" select=".custom-button"></content>
@@ -656,6 +668,23 @@
         },
         computeSize: function(userData, size) {
             return Utils.humanFileSize(size);
+        },
+        computeSizeClass: function(userData) {
+            if (!userData) {
+                return;
+            }
+            var ratio = userData.diskUsage / userData.diskQuota;
+
+            if (ratio >= 0.5 && ratio < 0.75) {
+                return "quota-0.75";
+            } else if (ratio >= 0.5 && ratio < 0.9) {
+                return "quota-0.9";
+            } else if (ratio >= 0.9) {
+                return "quota-1";
+            } else {
+                return "";
+            }
+
         }
     });
 </script>

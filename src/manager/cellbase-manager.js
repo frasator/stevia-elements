@@ -22,7 +22,7 @@
 var CellBaseManager = {
     host: (typeof window.CELLBASE_HOST === 'undefined') ? 'http://bioinfo.hpc.cam.ac.uk/cellbase' : window.CELLBASE_HOST,
     version: (typeof window.CELLBASE_VERSION === 'undefined') ? 'v3' : window.CELLBASE_VERSION,
-    get: function(args) {
+    get: function (args) {
         var success = args.success;
         var error = args.error;
         var async = (args.async == false) ? false: true;
@@ -47,7 +47,7 @@ var CellBaseManager = {
 
         var d;
         var request = new XMLHttpRequest();
-        request.onload = function() {
+        request.onload = function () {
             var contentType = this.getResponseHeader('Content-Type');
             if (contentType === 'application/json') {
                 var parsedResponse = JSON.parse(this.response);
@@ -59,16 +59,22 @@ var CellBaseManager = {
                 console.log(this.response)
             }
         };
-        request.onerror = function() {
+        request.onerror = function () {
             console.log("CellBaseManager: Ajax call returned " + this.statusText);
             if (typeof error === "function") error(this);
         };
         request.open("GET", url, async);
-        request.send();
+        try {
+            request.send();
+        } catch (e) {
+            console.log("CellBaseManager: Ajax call returned " + this.statusText);
+            if (typeof error === "function") error(this);
+        }
+
         return d;
 
     },
-    url: function(args) {
+    url: function (args) {
         if (args == null) {
             args = {};
         }
@@ -123,7 +129,6 @@ var CellBaseManager = {
         } else {
             url = config.host + '/webservices/rest/' + config.version + '/' + config.species + '/' + config.category + '/' + config.subCategory + query + '/' + config.resource;
         }
-
 
         url = Utils.addQueryParamtersToUrl(config.params, url);
         return url;

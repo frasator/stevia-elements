@@ -76,17 +76,17 @@
             position: relative;
         }
 
-        .table-header-field.sort-down > .name:after {
+        .table-header-field.sort-down> .name:after {
             font-family: 'FontAwesome';
             content: ' \f107';
         }
 
-        .table-header-field.sort-up > .name:after {
+        .table-header-field.sort-up> .name:after {
             font-family: 'FontAwesome';
             content: ' \f106';
         }
 
-        .table-header-field > .name {
+        .table-header-field> .name {
             box-sizing: border-box;
             /*cursor: pointer;*/
             text-align: center;
@@ -96,7 +96,7 @@
             text-overflow: ellipsis;
         }
 
-        .table-header-field > .sub {
+        .table-header-field> .sub {
             box-sizing: border-box;
             /*cursor: pointer;*/
             text-align: center;
@@ -132,7 +132,7 @@
             overflow-x: hidden;
         }
 
-        .table-pager > * {
+        .table-pager> * {
             margin: 0 2px;
         }
 
@@ -153,15 +153,15 @@
             background-color: #fafafa;
         }
 
-        :host > .table-body {
+        :host> .table-body {
             overflow-y: scroll;
         }
 
-        :host[enable-paging] > .table-body {
+        :host[enable-paging]> .table-body {
             overflow-y: hidden;
         }
 
-        :host[enable-filter] > .table-body {
+        :host[enable-filter]> .table-body {
             height: calc(100% - 88px);
         }
 
@@ -207,7 +207,7 @@
             height: 100%;
         }
 
-        .table-field > div {
+        .table-field> div {
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
@@ -291,13 +291,13 @@
             margin: 1px;
         }
 
-        .table-filter-field:last-child > .select,
-        .table-filter-field:last-child > input[type=text] {
+        .table-filter-field:last-child> .select,
+        .table-filter-field:last-child> input[type=text] {
             margin-right: 15px;
         }
 
-        :host[enable-paging] .table-filter-field:last-child > .select,
-        :host[enable-paging] .table-filter-field:last-child > input[type=text] {
+        :host[enable-paging] .table-filter-field:last-child> .select,
+        :host[enable-paging] .table-filter-field:last-child> input[type=text] {
             margin-right: 1px;
         }
 
@@ -314,8 +314,8 @@
             box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
         }
 
-        .table-field > .select,
-        .table-field > input[type=text] {
+        .table-field> .select,
+        .table-field> input[type=text] {
             box-sizing: border-box;
             background-color: transparent;
             border-color: transparent;
@@ -324,23 +324,23 @@
             margin: 0;
         }
 
-        .table-field > input[type=text]:hover {
+        .table-field> input[type=text]:hover {
             border-color: #ccc;
         }
 
-        .table-field > input[type=text][readonly]:focus {
+        .table-field> input[type=text][readonly]:focus {
             border-color: #ccc;
             box-shadow: inset 0 0 3px 1px rgba(0, 0, 0, .01);
             background-color: #fff;
         }
 
-        .table-field > input[type=text]:focus {
+        .table-field> input[type=text]:focus {
             border-color: #66afe9;
             box-shadow: inset 0 0 3px 1px rgba(102, 175, 233, .5);
             background-color: #fff;
         }
 
-        .table-header-field > .resizer {
+        .table-header-field> .resizer {
             width: 2px;
             height: 100%;
             position: absolute;
@@ -350,7 +350,7 @@
             display: none;
         }
 
-        .table-header-field:hover > .resizer {
+        .table-header-field:hover> .resizer {
             display: inherit;
             background-color: #E1E3E5;
             border-left: 1px solid #DDD;
@@ -390,7 +390,6 @@
         #list[loading] {
             visibility: hidden;
         }
-
     </style>
     <template>
         <div id="loading" hidden$="{{!loading}}">
@@ -805,6 +804,7 @@
                 this.currentPage = this.currentPage < 1 ? 1 : this.currentPage;
                 this.currentPage = this.pageCount > 0 && this.currentPage > this.pageCount ? this.pageCount : this.currentPage;
                 this.filterPage();
+
             },
             pageSizeChanged: function() {
                 this.pagesize = parseInt(this.pagesize);
@@ -853,7 +853,7 @@
             },
             checkRemote: function() {
                 var me = this;
-                if (this.enableLoading && this.currentPage == 1) {
+                if (this.enableLoading) {
                     this.setLoading(true);
                 }
                 if (this.enableRemote) {
@@ -861,7 +861,7 @@
                         me.itemCount = me.request.parseTotal(resp);
                         me.pageCount = Math.ceil(me.itemCount / me.pageSize);
                         me.viewData = me.request.parse(resp);
-                        if (me.enableLoading && me.currentPage == 1) {
+                        if (me.enableLoading) {
                             me.setLoading(false);
                         }
                     });
