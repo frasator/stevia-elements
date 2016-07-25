@@ -120,7 +120,7 @@ var CellBaseManager = {
             if (config.subCategory === 'chromosome') {
                 delete config.params["assembly"]
             }
-            config.species = Utils.getSpeciesCode(config.species.scientificName);
+            config.species = stv.utils.getSpeciesCode(config.species.scientificName);
         }
 
         var url;
@@ -130,7 +130,7 @@ var CellBaseManager = {
             url = config.host + '/webservices/rest/' + config.version + '/' + config.species + '/' + config.category + '/' + config.subCategory + query + '/' + config.resource;
         }
 
-        url = Utils.addQueryParamtersToUrl(config.params, url);
+        url = stv.utils.addQueryParamtersToUrl(config.params, url);
         return url;
     }
 };

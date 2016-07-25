@@ -39,11 +39,8 @@
             display: block;
             width: 100%;
             height: calc(100% - 60px);
-            /*height: 100%;*/
             overflow-x: hidden !important;
         }
-        /*.item {*/
-        /*}*/
 
         stv-job-item {
             margin: 2px 2px 0 2px;
@@ -91,16 +88,6 @@
                 <stv-job-item class="jobItem" job="{{item}}" on-click="handleSelect" disable-relaunch="{{disableRelaunch}}">
                 </stv-job-item>
             </template>
-
-            <!-- <iron-list id="content" items="{{filteredJobs}}" as="item">
-            <template>
-                <div class="item">
-                    <stv-job-item class="jobItem" job="{{item}}" on-click="handleSelect" disable-relaunch="{{disableRelaunch}}">
-                    </stv-job-item>
-                </div>
-            </template>
-        </iron-list> -->
-
         </div>
         <div id="footer" class="horizontal layout center">
             <div>
@@ -167,12 +154,6 @@
                 }
             },
             ready: function() {
-                // var me = this;
-                // if (this._parentPanel != null) {
-                //     this._parentPanel.addEventListener('hidden', function(e) {
-                //         me.updateFilteredJobs();
-                //     });
-                // }
             },
             handleSelect: function(e) {
                 e.stopPropagation();
@@ -196,9 +177,9 @@
             },
             userDataChanged: function(neo, old) {
                 if (neo) {
-                    if(neo.jobs.length > 0 ){
+                    if (neo.jobs.length > 0) {
                         this.set('jobs', neo.jobs);
-                    }else{
+                    } else {
                         this.clean();
                     }
                 } else {

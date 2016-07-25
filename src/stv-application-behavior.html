@@ -180,7 +180,7 @@
                     }
 
                     if (currentDate < startDate) {
-                        var diffMessage = Utils.timeDiff(split[0], split[1]);
+                        var diffMessage = stv.utils.timeDiff(split[0], split[1]);
                         var msg = ['There will be a <b>', diffMessage,
                             '</b> downtime on this site for maintenance from: <br><br> <b>',
                             new Date(startDate).toString(), '</b> to <br> <b>' + new Date(endDate).toString(), '</b><br><br>',
@@ -194,7 +194,7 @@
                     }
 
                     if (currentDate >= startDate && currentDate <= endDate) {
-                        var diffMessage = Utils.timeDiff(currentDate, split[1]);
+                        var diffMessage = stv.utils.timeDiff(currentDate, split[1]);
                         var msg = ['This site is under maintenance we will be back in: <b><br><br>',
                             diffMessage, '</b> <br><br>',
                             'We apologize for any inconvenience.',

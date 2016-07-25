@@ -143,12 +143,10 @@
                     var elem = me.$.table.data[i];
                     var maf = parseFloat(Math.min(elem.refAlleleFreq, elem.altAlleleFreq).toFixed(3));
                     data.push(maf);
-                    cat.push(elem.study + "/" + elem.pop);
+                    cat.push(elem.study + "/" + elem.population);
 
                 }
-                console.log(data);
-                console.log(cat);
-
+                
                 var polarChart = new Highcharts.Chart({
                     chart: {
                         polar: true,

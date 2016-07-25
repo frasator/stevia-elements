@@ -48,7 +48,7 @@ var SteviaManager = {
         info: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'info');
         },
-        reportError(args) {
+        reportError: function(args) {
             return SteviaManager._doRequest(args, 'jobs', 'report-error');
         }
     },

@@ -28,7 +28,7 @@
     </style>
     <template>
         <stv-table id="table" hidden$="{{isEmpty}}"
-                   on-rowclick="handleRowClick"></stv-table>
+                   on-rowclick="handleRowClick" enable-export></stv-table>
         <div hidden$="{{!isEmpty}}" style="padding:20px 50px;">
             No effect found.
         </div>
@@ -213,7 +213,7 @@
 
                 for (var j = 0; j < elem.sequenceOntologyTerms.length; j++) {
                     var soTerm = elem.sequenceOntologyTerms[j];
-                    var aux = Utils.clone(elem);
+                    var aux = stv.utils.clone(elem);
                     aux.soName = soTerm.name;
                     aux.soAccession = soTerm.accession;
 

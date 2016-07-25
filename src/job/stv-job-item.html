@@ -44,12 +44,12 @@
             font-size: 0.9em;
         }
 
-        .bar > * {
+        .bar> * {
             margin: 1px;
             color: #666;
         }
 
-        .bar > *:hover {
+        .bar> *:hover {
             color: #000;
             cursor: pointer;
         }
@@ -74,6 +74,10 @@
             color: #0068cc !important;
         }
 
+        /*.bug-job:hover {
+            color: #0068cc !important;
+        }*/
+
         .download {
             color: #000 !important;
         }
@@ -88,6 +92,10 @@
             padding: 10px;
             overflow-y: auto;
             overflow-x: auto;
+        }
+
+        .fa-spin-elem {
+            color: red !important;
         }
     </style>
     <template>
@@ -111,7 +119,7 @@
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
                             <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
                             <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
-                            <i class="fa fa-bug" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
+                            <i class="fa fa-bug bug-job" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
                         </template>
                     </div>
                 </div>
@@ -227,6 +235,8 @@
             handleRelaunchJob: function(e) {
                 e.stopPropagation();
                 var me = this;
+                me.fire('job-relaunched', this.job);
+                return;
                 if (confirm("You are going to relaunch this Job. Are you sure?")) {
                     var query = {
                         name: this.job.name,
@@ -277,17 +287,24 @@
             handleReportError: function(e) {
                 e.stopPropagation();
                 var jobId = this.job._id;
+                var jobItem = e.currentTarget;
+                jobItem.classList.add("fa-spin", "fa-spin-elem");
                 SteviaManager.jobs.reportError({
                     id: jobId,
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {
                                 alert(response.response[0].results[0]);
+                                jobItem.disabled = true;
                             } else {
                                 alert('Sorry! There was a problem, try again later');
                             }
+                            jobItem.classList.remove("fa-spin");
+                            jobItem.classList.remove("fa-spin-elem");
                         },
                         error: function() {
+                            jobItem.classList.remove("fa-spin");
+                            jobItem.classList.remove("fa-spin-elem");
                             console.log('Server error, try again later');
                         }
                     }

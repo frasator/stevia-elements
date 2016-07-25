@@ -150,6 +150,11 @@
         .quota-1 {
             color: #B31D09;
         }
+
+        #filePreview{
+          height: 600px;
+          width: 800px;
+        }
     </style>
     <template>
         <div id="topbar" class="horizontal layout center">
@@ -646,7 +651,7 @@
                 var exts = el.getAttribute('file-ext').split(',');
                 for (var j = 0; j < exts.length; j++) {
                     var ext = exts[j];
-                    if (this.selectedFile != null && Utils.endsWithIgnoreCase(this.selectedFile.name, ext)) {
+                    if (this.selectedFile != null && stv.utils.endsWithIgnoreCase(this.selectedFile.name, ext)) {
                         found = true;
                         break;
                     }
@@ -667,7 +672,7 @@
             return type === value;
         },
         computeSize: function(userData, size) {
-            return Utils.humanFileSize(size);
+            return stv.utils.humanFileSize(size);
         },
         computeSizeClass: function(userData) {
             if (!userData) {

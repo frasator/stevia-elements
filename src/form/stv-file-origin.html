@@ -165,6 +165,14 @@
                 } else {
                     return '';
                 }
+            },
+            setFileFromId: function(id, cb) {
+                var me = this;
+
+                SteviaManager.getFile(id, function(file) {
+                    me.selectedFile = file;
+                    cb();
+                });
             }
         });
     </script>
