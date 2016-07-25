@@ -1,19 +1,60 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../iron-flex-layout/iron-flex-layout.html">
 
 <script src="../../../network-viewer/conf/config.js"></script>
 <link rel="import" href="../../../network-viewer/network-viewer.html">
+<link rel="import" href="../../../pathway-viewer/pathway-viewer.html">
 
 <dom-module id="stv-report">
-    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning"></style>
-    <style>
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
             background-color: #FFFFFF;
             padding: 20px 40px;
-            @apply(--layout-horizontal);
+            /*@apply(--layout-horizontal);*/
+        }
+
+        :host[toc-fixed]> #outline {
+            position: fixed;
+        }
+
+        #outline {
+            /*position: fixed;*/
+            position: absolute;
+            box-sizing: border-box;
+            margin-top: 25px;
+            right: 40px;
+            min-width: 300px;
+            max-width: 300px;
+            background-color: white;
+            border: 1px solid var(--divider-color);
+            box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+        }
+
+        #up {
+            position: fixed;
+            box-sizing: border-box;
+            margin-top: -10px;
+            right: 20px;
+        }
+
+        .job-name,
+        .job-desc,
+        .job-tool {
+            margin-left: 40px;
+        }
+
+        .outline-line {
+            padding: 2px;
+        }
+
+        .outline-line> i {
+            color: var(--accent-color);
+            margin-right: 5px;
         }
 
         .section:first-child {
@@ -84,19 +125,6 @@
             color: var(--secondary-text-color);
         }
 
-        #outline {
-            position: fixed;
-            box-sizing: border-box;
-            margin-top: 20px;
-            right: 40px;
-            min-width: 300px;
-            max-width: 300px;
-            background-color: white;
-            border: 1px solid var(--divider-color);
-            box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-        }
-
         .section> .name {
             color: var(--accent-color);
             margin-right: 10px;
@@ -104,21 +132,6 @@
 
         .input-param {
             margin-left: 40px;
-        }
-
-        .job-name,
-        .job-desc,
-        .job-tool {
-            margin-left: 40px;
-        }
-
-        .outline-line {
-            padding: 2px;
-        }
-
-        .outline-line> i {
-            color: var(--accent-color);
-            margin-right: 5px;
         }
 
         .download-icon {
@@ -130,10 +143,20 @@
         .download-icon:hover {
             font-weight: bold;
         }
+
+        .button {
+            background-color: var(--dark-button-color) !important;
+            color: var(--text-primary-color) !important;
+        }
+
+        .button:hover {
+            background-color: var(--light-button-color) !important;
+        }
     </style>
     <template>
         <div id="outline" class="vertical layout"></div>
-        <div>
+        <div id="up" on-click="handleUp" class="button stv-btn stv-btn-shdw" title="Go top"><i class="fa fa-arrow-up"></i></div>
+        <div hidden$="{{hideJobInformation}}">
             <div id="jobInfo" class="section">Job Information</div>
             <div>
                 <div class="job-name"><span>Name:</span><span>{{job.name}}</span></div>
@@ -141,13 +164,12 @@
                 <div class="job-tool"><span>Tool:</span><span>{{job.tool}}</span></div>
                 <!-- <div class="output">{{job}}</div> -->
             </div>
-        </div>
 
-        <div>
-            <div id="inputParamsHeader" class="section">Input Params</div>
+            <div id="inputParamsHeader" class="section">Job Arguments</div>
             <div id="inputParams"></div>
+            <br>
         </div>
-        <div class="flex vertical layout" id="main"></div>
+        <div id="main"></div>
     </template>
     <script>
         Polymer({
@@ -159,6 +181,16 @@
                 },
                 fileNameMap: {
                     type: Object
+                },
+                hideJobInformation: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
+                tocFixed: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
             ready: function() {
@@ -168,12 +200,15 @@
                     message: 'fa-comment-o',
                     image: 'fa-image',
                     table: 'fa-th'
-
                 }
+            },
+            handleUp: function() {
+                this.scrollTop = 0;
             },
             jobChanged: function(neo, old) {
                 var me = this;
                 if (neo) {
+                    this.fileNameMap = {};
                     while (this.$.main.firstChild) {
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
@@ -186,35 +221,75 @@
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
 
-                    var jobInfoElem = document.createElement('a');
-                    jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
-                    jobInfoElem.style.fontWeight = "bold";
-                    jobInfoElem.href = "#jobInfo";
-                    jobInfoElem.classList.add('outline-line');
-                    Polymer.dom(this.$.outline).appendChild(jobInfoElem);
+                    if (this.hideJobInformation != true) {
 
-                    var inputParamsElem = document.createElement('a');
-                    inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Input Params</span>';
-                    inputParamsElem.style.fontWeight = "bold";
-                    inputParamsElem.href = "#inputParamsHeader";
-                    inputParamsElem.classList.add('outline-line');
-                    Polymer.dom(this.$.outline).appendChild(inputParamsElem);
+                        var jobInfoElem = document.createElement('a');
+                        jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
+                        jobInfoElem.style.fontWeight = "bold";
+                        jobInfoElem.href = "#jobInfo";
+                        jobInfoElem.classList.add('outline-line');
+                        Polymer.dom(this.$.outline).appendChild(jobInfoElem);
+
+                        var inputParamsElem = document.createElement('a');
+                        inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Input Parameters</span>';
+                        inputParamsElem.style.fontWeight = "bold";
+                        inputParamsElem.href = "#inputParamsHeader";
+                        inputParamsElem.classList.add('outline-line');
+                        Polymer.dom(this.$.outline).appendChild(inputParamsElem);
+
+                        for (var key in this.job.options) {
+                            var option = this.job.options[key];
+                            var elem = document.createElement("div");
+
+                            elem.classList.add("input-param");
+                            var keySpan = document.createElement("span");
+                            var valueSpan = document.createElement("span");
+
+                            keySpan.innerHTML = key + ": ";
+                            valueSpan.innerHTML = option.value ? option.value : "";
+
+                            elem.appendChild(keySpan);
+                            elem.appendChild(valueSpan);
+                            Polymer.dom(this.$.inputParams).appendChild(elem);
+
+                        }
+                    }
 
                     var files = [];
                     SteviaManager.getPlainFolderFiles(me.job.folder._id, function(files) {
-                        me.processResultFiles(files);
+                        me._createFilePathMap(files);
+                        me.processResultFiles();
                     });
                 }
             },
-            processResultFiles: function(files) {
-
-                var me = this;
+            _createFilePathMap: function(files) {
                 this.fileNameMap = {};
+                var jobRelativePath;
                 for (var i = 0; i < files.length; i++) {
                     var f = files[i];
-                    this.fileNameMap[f.name] = f;
+                    if (this.job.folder._id != f._id) {
+                        jobRelativePath = f.path.replace(this.job.folder.path + '/', '');
+                        this.fileNameMap[jobRelativePath] = f;
+                    }
                 }
-                SteviaManager.getFileContent(this.fileNameMap['report.xml']._id, function(content) {
+            },
+            getFileFromName: function(name) {
+                var file = this.fileNameMap[name];
+                if (file != null) {
+                    return file;
+                } else {
+                    /* Old versions compatibility */
+                    for (var key in this.fileNameMap) {
+                        if (key == 'report/' + name) {
+                            return this.fileNameMap[key];
+                        }
+                    }
+                }
+            },
+            processResultFiles: function() {
+                var me = this;
+                SteviaManager.getFileContent(this.getFileFromName('report.xml')._id, function(content) {
+                    console.log(content);
                     me.processReportFile(content);
                 });
             },
@@ -225,30 +300,13 @@
                 var outputParamsEl = reportXML.querySelector('output-params');
                 var outputParams = outputParamsEl.childNodes;
 
-                for (var key in this.job.options) {
-                    var option = this.job.options[key];
-                    var elem = document.createElement("div");
-
-                    elem.classList.add("input-param");
-                    var keySpan = document.createElement("span");
-                    var valueSpan = document.createElement("span");
-
-                    keySpan.innerHTML = key + ": ";
-                    valueSpan.innerHTML = option.value ? option.value : "";
-
-                    elem.appendChild(keySpan);
-                    elem.appendChild(valueSpan);
-                    Polymer.dom(this.$.inputParams).appendChild(elem);
-
-                }
-
                 for (var i = 0; i < outputParams.length; i++) {
                     var outEl = outputParams[i];
                     if (outEl.tagName != null) {
                         var functionPath = '_' + outEl.tagName + 'Tag';
                         if (this[functionPath] != null) {
                             var name = outEl.getAttribute('file');
-                            if (name != null && this.fileNameMap[name] == null) {
+                            if (name != null && this.getFileFromName(name) == null) {
                                 console.log('####### File : ' + name + ' not found !');
                                 //transform to param;
                                 var newOutEl = reportXML.createElement('param');
@@ -265,58 +323,63 @@
                 }
             },
             _addTag: function(el, outEl) {
-
                 el.setAttribute("id", "stvReportId_" + this.count);
                 el.classList.add(outEl.tagName);
 
                 var level = parseInt(outEl.getAttribute("level"));
+                level = (isNaN(level)) ? 0 : level;
                 el.style.marginLeft = level * 40 + "px";
                 Polymer.dom(this.$.main).appendChild(el);
                 this._addOutlineEntry(outEl, "stvReportId_" + this.count);
                 this.count++;
             },
             _addOutlineEntry: function(outEl, id) {
-
                 var title = outEl.getAttribute('title');
-                var el = document.createElement('a');
-                var level = parseInt(outEl.getAttribute("level"));
-                var i = document.createElement('i');
-                switch (outEl.tagName) {
-                    case 'image':
-                        i.classList.add("fa", this.iconMap['image']);
-                        break;
-                    case 'table':
-                        i.classList.add("fa", this.iconMap['table']);
-                        break;
-                    case 'download':
-                        i.classList.add("fa", this.iconMap['download']);
-                        break;
-                    case 'message':
-                        i.classList.add("fa", this.iconMap['message']);
-                        break;
-                    case 'section':
-                        el.style.fontWeight = "bold";
-                        i.classList.add("fa", 'fa-caret-right');
-                        break;
-                    default:
+                if (title != null) {
+                    var el = document.createElement('a');
+                    var level = parseInt(outEl.getAttribute("level"));
+                    level = (isNaN(level)) ? 0 : level;
+                    var i = document.createElement('i');
+                    switch (outEl.tagName) {
+                        case 'image':
+                            i.classList.add("fa", this.iconMap['image']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'table':
+                            i.classList.add("fa", this.iconMap['table']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'download':
+                            i.classList.add("fa", this.iconMap['download']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'message':
+                            i.classList.add("fa", this.iconMap['message']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'section':
+                            el.style.fontWeight = "bold";
+                            el.style.marginLeft = level * 10 + "px";
+                            i.classList.add("fa", 'fa-caret-right');
+                            break;
+                        default:
+                    }
+                    var text = document.createElement('span');
+                    text.innerHTML = title;
+
+                    el.appendChild(i);
+                    el.appendChild(text);
+                    // el.innerHTML = title;
+                    el.href = "#" + id;
+
+                    el.classList.add('outline-line');
+                    Polymer.dom(this.$.outline).appendChild(el);
                 }
-                var text = document.createElement('span');
-                text.innerHTML = title;
-
-                el.appendChild(i);
-                el.appendChild(text);
-                // el.innerHTML = title;
-                el.href = "#" + id;
-                el.style.marginLeft = level * 10 + "px";
-
-                el.classList.add('outline-line');
-                Polymer.dom(this.$.outline).appendChild(el);
             },
             _sectionTag: function(outEl) {
                 var el = document.createElement('div');
                 el.innerHTML = outEl.getAttribute('title');
                 this._addTag(el, outEl);
-
             },
             _downloadTag: function(outEl) {
                 var name = outEl.getAttribute('file');
@@ -328,7 +391,7 @@
                 var a = document.createElement('a');
                 a.innerHTML = outEl.getAttribute('title');
                 a.appendChild(this._createDownloadIcon());
-                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
 
                 el.appendChild(i);
                 el.appendChild(a);
@@ -377,10 +440,10 @@
                 a.innerHTML = outEl.getAttribute('title');
                 a.appendChild(this._createDownloadIcon());
 
-                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
 
                 var img = document.createElement('img');
-                img.setAttribute('src', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                img.setAttribute('src', SteviaManager.getFileURL(this.getFileFromName(name)._id));
 
                 el.appendChild(i);
                 el.appendChild(a);
@@ -399,13 +462,13 @@
                 var a = document.createElement('a');
                 a.innerHTML = outEl.getAttribute('title');
                 a.appendChild(this._createDownloadIcon());
-                a.setAttribute('href', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
 
                 var table = document.createElement('stv-table');
                 table.setAttribute('enable-paging', '');
                 table.setAttribute('page-size', outEl.getAttribute('page-size'));
 
-                SteviaManager.getFileContent(this.fileNameMap[name]._id, function(content) {
+                SteviaManager.getFileContent(this.getFileFromName(name)._id, function(content) {
                     var parsedContent = me._parseTabularFile(content);
                     table.set('data', parsedContent.data);
                     table.set('columns', parsedContent.columns);
@@ -416,19 +479,35 @@
                 el.appendChild(table);
                 this._addTag(el, outEl);
             },
+            _pathwayViewerTag: function(outEl) {
+                var el = document.createElement('div');
+
+                var pw = document.createElement('pathway-viewer');
+                pw.style.height = '800px';
+
+                pw.set('hideAltered', true);
+                pw.set('sessionFileNameMap', this.fileNameMap);
+                pw.set('path', outEl.getAttribute('path'));
+                pw.set('pathType', outEl.getAttribute('path-type'));
+
+                // pw.style.border = "1px solid #d3d3d3";
+                // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
+
+                el.appendChild(pw);
+                this._addTag(el, outEl);
+            },
 
             _htmlTag: function(outEl) {
                 var me = this;
                 var name = outEl.getAttribute('file');
                 var el = document.createElement('div');
-                SteviaManager.getFileContent(this.fileNameMap[name]._id, function(content) {
+                SteviaManager.getFileContent(this.getFileFromName(name)._id, function(content) {
                     var parser = new DOMParser();
                     var doc = parser.parseFromString(content, "text/html");
                     me._processHTML(doc, el);
                 });
                 this._addTag(el, outEl);
             },
-
             _processHTML: function(doc, outEl) {
                 var indexStyle = doc.querySelector('style');
                 var indexScript = doc.querySelector('script[data-var]');
@@ -447,7 +526,7 @@
                     var el = els[i];
                     var split = el.getAttribute('src').split('/');
                     var name = split[split.length - 1];
-                    el.setAttribute('src', SteviaManager.getFileURL(this.fileNameMap[name]._id));
+                    el.setAttribute('src', SteviaManager.getFileURL(this.getFileFromName(name)._id));
                 }
 
                 var scriptTextContent = indexScript.textContent;
@@ -504,40 +583,40 @@
                         columns = [],
                         obj;
 
-                    if (lines[0].charAt(0) == '#') {
-                        var firstLine = lines[0].replace('#', '');
-                        fields = firstLine.split('\t');
-                        for (var i = 0; i < fields.length; i++) {
-                            field = fields[i];
-                            field = field.trim();
-                            var name = field.replace(/ /gi, '_');
-                            var width = 150;
-                            if (i === 0) {
-                                width = 400;
-                            }
-                            columns.push({
-                                name: name,
-                                title: name.replace('path', 'circuit'),
-                                width: width
-                            });
+                    // if (lines[0].charAt(0) == '#') {
+                    var firstLine = lines[0].replace('#', '');
+                    fields = firstLine.split('\t');
+                    for (var i = 0; i < fields.length; i++) {
+                        field = fields[i];
+                        field = field.trim();
+                        var name = field.replace(/ /gi, '_');
+                        var width = 150;
+                        if (i === 0) {
+                            width = 400;
                         }
-                    } else {
-                        var colCount = lines[0].split('\t').length;
-                        for (var i = 0; i < colCount; i++) {
-                            var width = 150;
-                            if (i === 0) {
-                                width = 400;
-                            }
-                            columns.push({
-                                name: i.toString(),
-                                title: "Column " + i.toString(),
-                                width: width
-                            });
-                        }
+                        columns.push({
+                            name: name,
+                            title: name.replace('path', 'circuit'),
+                            width: width
+                        });
                     }
+                    // } else {
+                    //     var colCount = lines[0].split('\t').length;
+                    //     for (var i = 0; i < colCount; i++) {
+                    //         var width = 150;
+                    //         if (i === 0) {
+                    //             width = 400;
+                    //         }
+                    //         columns.push({
+                    //             name: i.toString(),
+                    //             title: "Column " + i.toString(),
+                    //             width: width
+                    //         });
+                    //     }
+                    // }
 
                     if (columns.length) {
-                        for (var i = 0; i < lines.length; i++) {
+                        for (var i = 1; i < lines.length; i++) {
                             line = lines[i];
                             if (line != '' && line.charAt(0) != '#') {
                                 fields = line.split('\t');

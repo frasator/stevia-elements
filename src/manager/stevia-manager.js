@@ -94,6 +94,9 @@ var SteviaManager = {
         info: function (args) {
             return SteviaManager._doRequest(args, 'files', 'info');
         },
+        path: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'path');
+        },
         delete: function (args) {
             return SteviaManager._doRequest(args, 'files', 'delete');
         },
@@ -416,6 +419,22 @@ var SteviaManager = {
     getFile: function (fileId, cb) {
         SteviaManager.files.info({
             id: fileId,
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response.response[0].results[0]);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    getFileByPath: function (path, cb) {
+        SteviaManager.files.path({
+            query: {
+                path: path
+            },
             request: {
                 async: true,
                 success: function (response) {
