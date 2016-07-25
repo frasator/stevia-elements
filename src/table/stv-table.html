@@ -890,7 +890,7 @@
                 };
                 if (this.request.url && this.request.url != "") {
 
-                    var url = Utils.addQueryParamtersToUrl({
+                    var url = stv.utils.addQueryParamtersToUrl({
                         skip: ((this.currentPage - 1) * this.pageSize),
                         limit: this.pageSize
                     }, this.request.url);
@@ -1604,7 +1604,7 @@
                     // var limit = 500;
                     // var numTotalResults = this.itemCount;
 
-                    var url = Utils.addQueryParamtersToUrl({
+                    var url = stv.utils.addQueryParamtersToUrl({
                         skip: skip,
                         limit: limit
                     }, this.request.url);
@@ -1631,7 +1631,7 @@
 
                     // while (skip < numTotalResults) {
                     //
-                    //     var url = Utils.addQueryParamtersToUrl({
+                    //     var url = stv.utils.addQueryParamtersToUrl({
                     //         skip: skip,
                     //         limit: limit
                     //

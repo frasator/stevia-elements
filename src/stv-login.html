@@ -141,6 +141,7 @@
             },
             handleForm: function(e) {
                 this.set('message', '');
+                
                 if (this.$.form.checkValidity()) {
                     this._login();
                 }else{

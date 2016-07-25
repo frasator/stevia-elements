@@ -34,7 +34,7 @@
         width: 50
     }];
     for (var i = 0; i < 5; i++) {
-        var name = Utils.randomString(Utils.getRandomInt(10, 30));
+        var name = stv.utils.randomString(stv.utils.getRandomInt(10, 30));
         columns.push({
             name: "col_" + i,
             title: "col_" + i,
@@ -43,7 +43,7 @@
         });
     }
     for (var i = 0; i < 5; i++) {
-        var name = Utils.randomString(Utils.getRandomInt(10, 30));
+        var name = stv.utils.randomString(stv.utils.getRandomInt(10, 30));
         columns.push({
             name: "col_" + i,
             title: "col_" + i,
@@ -59,7 +59,7 @@
         obj['i'] = i + 1;
         for (var j = 1; j < columns.length; j++) {
             column = columns[j];
-            obj[column.name] = Utils.randomString(Utils.getRandomInt(1, 10));
+            obj[column.name] = stv.utils.randomString(stv.utils.getRandomInt(1, 10));
         }
         data.push(obj)
     }

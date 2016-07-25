@@ -112,7 +112,7 @@
         },
         computeSize: function(file) {
             if (file.type == "FILE") {
-                return Utils.humanFileSize(file.size);
+                return stv.utils.humanFileSize(file.size);
             } else {
                 return ".";
             }

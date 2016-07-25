@@ -9,8 +9,8 @@
             box-sizing: border-box;
             overflow-y: auto;
             overflow-x: auto;
-            width: 800px;
-            height: 600px;
+            min-width: 800px;
+            min-height: 600px;
             padding: 10px;
         }
 
@@ -29,7 +29,7 @@
         }
     </style>
     <template>
-        <div class="horizontal layout center-justified topbar">
+        <div class="horizontal layout center-justified topbar" hidden$="{{hideDownload}}">
             <div class="download stv-btn stv-btn-shdw" on-click="handleDownloadFile">Download <i class="fa fa-download"></i></div>
         </div>
         <code class="wrapped-text">{{contentData}}</code>
@@ -62,6 +62,11 @@
             _end: {
                 type: Boolean,
                 value: false
+            },
+            hideDownload: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
             }
         },
         listeners: {
@@ -95,7 +100,7 @@
             });
 
             if (data) {
-                this.contentData = this.contentData = this.contentData + data;
+                this.contentData = this.contentData + data;
             } else {
                 this._end = true;
             }
