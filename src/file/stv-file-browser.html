@@ -131,6 +131,15 @@
             background-color: #fafafa;
         }
 
+        #searchBar {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        #searchBar>div {
+            margin: 0 1px 0 1px;
+        }
+
         .bar> div {
             margin-right: 5px;
         }
@@ -151,9 +160,9 @@
             color: #B31D09;
         }
 
-        #filePreview{
-          height: 600px;
-          width: 800px;
+        #filePreview {
+            height: 600px;
+            width: 800px;
         }
     </style>
     <template>
@@ -196,7 +205,7 @@
             <div class="flex"></div>
 
             <content id="customButtons" select=".custom-button"></content>
-            <div class="horizontal layout">
+            <div id="searchBar" class="horizontal layout">
                 <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'all')}}" data-value="all">All</div>
                 <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'job')}}" data-value="job"><i class="fa fa-flask"></i></div>
                 <div class="stv-btn stv-btn-shdw file" on-click="handleSearchByType" data-checked$="{{computeSearchByType(searchByType, 'folder')}}" data-value="folder"><i class="fa fa-folder"></i></div>
@@ -205,7 +214,7 @@
                     <input id="searchInput" class="stv" type="text" style="width:100%;" placeholder="Search by name..." value="{{searchBy::input}}">
                 </div>
             </div>
-            <div hidden$="{{!checkFileModeOk(mode,selectedFile)}}" class="stv-btn stv-btn-shdw" style="width:100px;margin-left:5px;" on-click="handleFileModeOk">
+            <div hidden$="{{!checkFileModeOk(mode,selectedFile)}}" class="stv-btn stv-btn-shdw" style="width:100px;" on-click="handleFileModeOk">
                 OK
             </div>
         </div>
@@ -361,6 +370,7 @@
         },
         ready: function() {
             var me = this;
+            this._parentPanel = stv.utils.closest(this, 'stv-panel');
 
             if (this._parentPanel != null) {
                 this._parentPanel.addEventListener('hidden', function(e) {

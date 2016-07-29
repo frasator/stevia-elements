@@ -3,7 +3,7 @@ stv.utils = {
     stevia: true,
     //properties
     characters: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-
+    months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     number: {
         sign: function (x) {
             return x ? x < 0 ? -1 : 1 : 0;

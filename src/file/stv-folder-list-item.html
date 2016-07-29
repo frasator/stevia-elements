@@ -106,9 +106,7 @@
         },
         computeDate: function(file) {
             var date = new Date(Date.parse(file.createdAt));
-            return date.toLocaleString("en-us", {
-                month: "short"
-            }) + " " + date.getDate() + ", " + date.getFullYear();
+            return stv.utils.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
         },
         computeSize: function(file) {
             if (file.type == "FILE") {
