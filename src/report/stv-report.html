@@ -73,6 +73,7 @@
         .param,
         .image,
         .table,
+        .boxplot,
         .message {
             font-size: 18px;
             display: block;
@@ -80,12 +81,14 @@
 
         .download> a:hover,
         .image> a:hover,
+        .boxplot> a:hover,
         .table> a:hover {
             text-decoration: underline;
         }
 
         .download> a,
         .image> a,
+        .boxplot> a,
         .table> a {
             color: var(--secondary-text-color);
             text-decoration: none;
@@ -94,6 +97,7 @@
         .download> i,
         .image> i,
         .table> i,
+        .boxplot> i,
         .message> i {
             color: var(--accent-color);
             margin-right: 10px;
@@ -152,9 +156,37 @@
         .button:hover {
             background-color: var(--light-button-color) !important;
         }
+
+        #outlineBottomBar {
+            margin-top: 10px;
+        }
+
+        #outlineBottomBar>i {
+            padding-left: 7px;
+        }
+
+        .delete-job:hover {
+            color: #b30000 !important;
+        }
+
+        .relaunch-job:hover {
+            color: #298c63 !important;
+        }
+
+        .download-job:hover {
+            color: #0068cc !important;
+        }
     </style>
     <template>
-        <div id="outline" class="vertical layout"></div>
+        <div id="outline" class="vertical layout">
+            <div id="outlineContent" class="vertical layout"></div>
+            <div id="outlineRedirections" class="vertical layout"></div>
+            <div id="outlineBottomBar" class="horizontal layout end-justified">
+                <i class="fa fa-download download-job" title="Download Job"></i>
+                <i class="fa fa-trash-o delete-job" title="Delete Job"></i>
+                <i class="fa fa-refresh relaunch-job" title="Relaunch Job"></i>
+            </div>
+        </div>
         <div id="up" on-click="handleUp" class="button stv-btn stv-btn-shdw" title="Go top"><i class="fa fa-arrow-up"></i></div>
         <div hidden$="{{hideJobInformation}}">
             <div id="jobInfo" class="section">Job Information</div>
@@ -199,7 +231,8 @@
                     download: 'fa-download',
                     message: 'fa-comment-o',
                     image: 'fa-image',
-                    table: 'fa-th'
+                    table: 'fa-th',
+                    boxplot: 'fa-bar-chart'
                 }
             },
             handleUp: function() {
@@ -213,8 +246,8 @@
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
 
-                    while (this.$.outline.firstChild) {
-                        this.$.outline.removeChild(this.$.outline.firstChild);
+                    while (this.$.outlineContent.firstChild) {
+                        this.$.outlineContent.removeChild(this.$.outlineContent.firstChild);
                     }
 
                     while (this.$.inputParams.firstChild) {
@@ -228,14 +261,14 @@
                         jobInfoElem.style.fontWeight = "bold";
                         jobInfoElem.href = "#jobInfo";
                         jobInfoElem.classList.add('outline-line');
-                        Polymer.dom(this.$.outline).appendChild(jobInfoElem);
+                        Polymer.dom(this.$.outlineContent).appendChild(jobInfoElem);
 
                         var inputParamsElem = document.createElement('a');
-                        inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Input Parameters</span>';
+                        inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job Arguments</span>';
                         inputParamsElem.style.fontWeight = "bold";
                         inputParamsElem.href = "#inputParamsHeader";
                         inputParamsElem.classList.add('outline-line');
-                        Polymer.dom(this.$.outline).appendChild(inputParamsElem);
+                        Polymer.dom(this.$.outlineContent).appendChild(inputParamsElem);
 
                         for (var key in this.job.options) {
                             var option = this.job.options[key];
@@ -349,6 +382,10 @@
                             i.classList.add("fa", this.iconMap['table']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
                             break;
+                        case 'boxplot':
+                            i.classList.add("fa", this.iconMap['boxplot']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
                         case 'download':
                             i.classList.add("fa", this.iconMap['download']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
@@ -373,7 +410,7 @@
                     el.href = "#" + id;
 
                     el.classList.add('outline-line');
-                    Polymer.dom(this.$.outline).appendChild(el);
+                    Polymer.dom(this.$.outlineContent).appendChild(el);
                 }
             },
             _sectionTag: function(outEl) {
@@ -449,6 +486,168 @@
                 el.appendChild(a);
                 el.appendChild(img);
                 this._addTag(el, outEl);
+            },
+            _boxplotTag: function(outEl) {
+                var me = this;
+
+                var name = outEl.getAttribute('file');
+                var el = document.createElement('div');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['boxplot']);
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                a.appendChild(this._createDownloadIcon());
+
+                a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
+
+                // var img = document.createElement('img');
+                // img.setAttribute('src', SteviaManager.getFileURL(this.getFileFromName(name)._id));
+
+                var chartDiv = document.createElement("div");
+
+                SteviaManager.getFileContent(this.getFileFromName(name)._id, function(content) {
+
+                    var data = me._parseBoxPlotData(content);
+                    var chart = new Highcharts.Chart({
+                        chart: {
+                            type: 'boxplot',
+                            renderTo: chartDiv,
+                            width: 700,
+                            height: 500
+                        },
+                        title: {
+                            text: 'Box Plot'
+                        },
+                        legend: {
+                            enabled: false
+                        },
+                        xAxis: {
+                            categories: data.keys,
+                            title: {
+                                text: outEl.getAttribute('title')
+                            }
+                        },
+                        yAxis: {},
+                        series: [{
+                                name: 'Observations',
+                                data: data.data
+                                    // tooltip: {
+                                    // headerFormat: '<em>Experiment No {point.key}</em><br/>'
+                                    // }
+                            }, {
+                                name: 'Outlier',
+                                color: Highcharts.getOptions().colors[0],
+                                type: 'scatter',
+
+                                data: data.outliers,
+                                marker: {
+                                    fillColor: 'white',
+                                    lineWidth: 1,
+                                    radius: 1,
+                                    lineColor: Highcharts.getOptions().colors[0]
+                                },
+                                tooltip: {
+                                    pointFormat: 'Observation: {point.y}'
+                                }
+                            }
+
+                        ]
+
+                    });
+
+                });
+
+                el.appendChild(i);
+                el.appendChild(a);
+                el.appendChild(chartDiv);
+                // el.appendChild(img);
+                this._addTag(el, outEl);
+            },
+            _getPercentile: function(data, percentile) {
+                data.sort(function(a, b) {
+                    return a - b;
+                });
+                var index = (percentile / 100) * data.length;
+                var result;
+                if (Math.floor(index) == index) {
+                    result = (data[(index - 1)] + data[index]) / 2;
+                } else {
+                    result = data[Math.floor(index)];
+                }
+                return result;
+            },
+            _getBoxPlotValues: function(data) {
+                var boxValues = {};
+                boxValues.q1 = this._getPercentile(data, 25);
+                boxValues.median = this._getPercentile(data, 50);
+                boxValues.q3 = this._getPercentile(data, 75);
+                var iqr = boxValues.q3 - boxValues.q1;
+                boxValues.low = boxValues.q1 - (1.5 * iqr);
+                boxValues.high = boxValues.q3 + (1.5 * iqr);
+                // boxValues.low = Math.min.apply(Math, data);
+                // boxValues.high = Math.max.apply(Math, data);
+                return boxValues;
+            },
+            _calcultateOutliers: function(quartiles, data, category, outliers) {
+
+                for (var i = 0; i < data.length; i++) {
+                    var value = data[i];
+                    if (value < quartiles.low || value > quartiles.high) {
+                        outliers.push([category, value]);
+                    }
+                }
+            },
+            _parseBoxPlotData: function(content) {
+
+                var lines = content.split('\n');
+                if (lines.length > 0) {
+                    var line, data = [],
+                        obj, keys = [],
+                        row = [];
+
+                    var firstLine = lines[0].replace('#', '');
+                    fields = firstLine.split('\t');
+                    for (var i = 1; i < fields.length; i++) {
+                        field = fields[i].trim();
+                        keys.push(field);
+
+                    }
+                    for (var i = 1; i < lines.length; i++) {
+                        if (lines[i] == undefined || lines[i] == "") {
+                            continue;
+                        }
+                        line = lines[i].split("\t");
+
+                        row = [];
+                        for (var j = 1; j < line.length; j++) {
+                            row.push(parseFloat(line[j]));
+                        }
+                        data.push(row);
+                    }
+
+                    var transposedData = Object.keys(data[0]).map(function(c) {
+                        return data.map(function(r) {
+                            return r[c];
+                        });
+                    });
+                    var boxPlotData = [];
+                    var outliers = [];
+
+                    for (var i = 0; i < transposedData.length; i++) {
+                        var bpdArray = this._getBoxPlotValues(transposedData[i]);
+                        boxPlotData.push(bpdArray)
+                        this._calcultateOutliers(bpdArray, transposedData[i], i, outliers);
+                    }
+
+                    return {
+                        data: boxPlotData,
+                        keys: keys,
+                        outliers: outliers
+                    };
+                }
+
             },
             _tableTag: function(outEl) {
                 var me = this;

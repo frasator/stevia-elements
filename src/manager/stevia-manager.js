@@ -45,10 +45,13 @@ var SteviaManager = {
         delete: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'delete');
         },
+        download: function (args) {
+            return SteviaManager._doRequest(args, 'jobs', 'download');
+        },
         info: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'info');
         },
-        reportError: function(args) {
+        reportError: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'report-error');
         }
     },
@@ -213,6 +216,15 @@ var SteviaManager = {
                     request.setRequestHeader(header, args.request.headers[header]);
                 }
             }
+
+            var stv_app = (window.STV_APP != undefined) ? window.STV_APP : "-";
+            request.setRequestHeader("x-stv-app", stv_app);
+
+            var stv_user = (Cookies("bioinfo_user") != undefined) ? Cookies("bioinfo_user") : "-";
+            request.setRequestHeader("x-stv-user", stv_user);
+
+            request.setRequestHeader("x-stv-api", api);
+            request.setRequestHeader("x-stv-action", action);
 
             if (args.sid == null) {
                 args.sid = Cookies("bioinfo_sid");
