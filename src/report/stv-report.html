@@ -491,6 +491,7 @@
                 var me = this;
 
                 var name = outEl.getAttribute('file');
+                var outliers = outEl.getAttribute('outliers');
                 var el = document.createElement('div');
 
                 var i = document.createElement('i');
@@ -507,55 +508,23 @@
 
                 var chartDiv = document.createElement("div");
 
-                SteviaManager.getFileContent(this.getFileFromName(name)._id, function(content) {
+                SteviaManager.getFileContent(me.getFileFromName(name)._id, function(content) {
 
                     var data = me._parseBoxPlotData(content);
-                    var chart = new Highcharts.Chart({
-                        chart: {
-                            type: 'boxplot',
-                            renderTo: chartDiv,
-                            width: 700,
-                            height: 500
-                        },
-                        title: {
-                            text: 'Box Plot'
-                        },
-                        legend: {
-                            enabled: false
-                        },
-                        xAxis: {
-                            categories: data.keys,
-                            title: {
-                                text: outEl.getAttribute('title')
+
+                    if (outliers) {
+                        SteviaManager.getFileContent(me.getFileFromName(outliers)._id, function(content) {
+
+                            var outliersData = me._parseOutliers(content);
+                            if (outliers.length > 0) {
+                                data.outliers = outliersData;
                             }
-                        },
-                        yAxis: {},
-                        series: [{
-                                name: 'Observations',
-                                data: data.data
-                                    // tooltip: {
-                                    // headerFormat: '<em>Experiment No {point.key}</em><br/>'
-                                    // }
-                            }, {
-                                name: 'Outlier',
-                                color: Highcharts.getOptions().colors[0],
-                                type: 'scatter',
-
-                                data: data.outliers,
-                                marker: {
-                                    fillColor: 'white',
-                                    lineWidth: 1,
-                                    radius: 1,
-                                    lineColor: Highcharts.getOptions().colors[0]
-                                },
-                                tooltip: {
-                                    pointFormat: 'Observation: {point.y}'
-                                }
-                            }
-
-                        ]
-
-                    });
+                            me._createBoxPlotChart(chartDiv, outEl.getAttribute('title'), data);
+                        });
+                    } else {
+                        data.outliers = [];
+                        me._createBoxPlotChart(chartDiv,outEl.getAttribute('title'), data);
+                    }
 
                 });
 
@@ -565,39 +534,54 @@
                 // el.appendChild(img);
                 this._addTag(el, outEl);
             },
-            _getPercentile: function(data, percentile) {
-                data.sort(function(a, b) {
-                    return a - b;
-                });
-                var index = (percentile / 100) * data.length;
-                var result;
-                if (Math.floor(index) == index) {
-                    result = (data[(index - 1)] + data[index]) / 2;
-                } else {
-                    result = data[Math.floor(index)];
-                }
-                return result;
-            },
-            _getBoxPlotValues: function(data) {
-                var boxValues = {};
-                boxValues.q1 = this._getPercentile(data, 25);
-                boxValues.median = this._getPercentile(data, 50);
-                boxValues.q3 = this._getPercentile(data, 75);
-                var iqr = boxValues.q3 - boxValues.q1;
-                boxValues.low = boxValues.q1 - (1.5 * iqr);
-                boxValues.high = boxValues.q3 + (1.5 * iqr);
-                // boxValues.low = Math.min.apply(Math, data);
-                // boxValues.high = Math.max.apply(Math, data);
-                return boxValues;
-            },
-            _calcultateOutliers: function(quartiles, data, category, outliers) {
+            _createBoxPlotChart: function(chartDiv,title, data) {
+                var me = this;
+                var chart = new Highcharts.Chart({
+                    chart: {
+                        type: 'boxplot',
+                        renderTo: chartDiv,
+                        width: 700,
+                        height: 500
+                    },
+                    title: {
+                        text: 'Box Plot'
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        categories: data.keys,
+                        title: {
+                            text: title
+                        }
+                    },
+                    yAxis: {},
+                    series: [{
+                            name: 'Observations',
+                            data: data.data
+                                // tooltip: {
+                                // headerFormat: '<em>Experiment No {point.key}</em><br/>'
+                                // }
+                        }, {
+                            name: 'Outlier',
+                            color: Highcharts.getOptions().colors[0],
+                            type: 'scatter',
 
-                for (var i = 0; i < data.length; i++) {
-                    var value = data[i];
-                    if (value < quartiles.low || value > quartiles.high) {
-                        outliers.push([category, value]);
-                    }
-                }
+                            data: data.outliers,
+                            marker: {
+                                fillColor: 'white',
+                                lineWidth: 1,
+                                radius: 1,
+                                lineColor: Highcharts.getOptions().colors[0]
+                            },
+                            tooltip: {
+                                pointFormat: 'Observation: {point.y}'
+                            }
+                        }
+
+                    ]
+
+                });
             },
             _parseBoxPlotData: function(content) {
 
@@ -605,7 +589,8 @@
                 if (lines.length > 0) {
                     var line, data = [],
                         obj, keys = [],
-                        row = [];
+                        row = [],
+                        outliers = [];
 
                     var firstLine = lines[0].replace('#', '');
                     fields = firstLine.split('\t');
@@ -632,22 +617,30 @@
                             return r[c];
                         });
                     });
-                    var boxPlotData = [];
-                    var outliers = [];
-
-                    for (var i = 0; i < transposedData.length; i++) {
-                        var bpdArray = this._getBoxPlotValues(transposedData[i]);
-                        boxPlotData.push(bpdArray)
-                        this._calcultateOutliers(bpdArray, transposedData[i], i, outliers);
-                    }
 
                     return {
-                        data: boxPlotData,
+                        data: transposedData,
                         keys: keys,
-                        outliers: outliers
+                        outliers: []
                     };
                 }
 
+            },
+
+            _parseOutliers: function(content) {
+                var lines = content.split('\n');
+                var outliers = [];
+                if (lines.length > 0) {
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line != undefined && line != "") {
+                            var splits = line.split("\t");
+                            outliers.push([parseFloat(splits[0]) - 1, parseFloat(splits[1])]);
+                        }
+
+                    }
+                }
+                return outliers;
             },
             _tableTag: function(outEl) {
                 var me = this;
