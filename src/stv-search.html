@@ -208,7 +208,7 @@
                     this.lastQuery = query;
                     this.searchFunction(query, function(results) {
                         me.set('count', results.length);
-                        if (results.length > 0) {
+                        if (results.length >= minQueryLength) {
                             me.showList();
                             me.$.input.classList.remove("error");
                             me.hideEmptyMessage();
