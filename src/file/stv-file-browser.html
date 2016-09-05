@@ -487,7 +487,7 @@
             this.fire('ok-click');
         },
         _setInitialSelection: function() {
-            if (this._parentPanel != null && this._parentPanel.hidden === false) {
+            if (this._parentPanel != null && this._parentPanel.hidden === false && this.userData != null) {
                 var folderId = (this.folder) ? this.folder._id : this.userData.home._id
                 this.refreshFolderFiles(folderId);
             }
