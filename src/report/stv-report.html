@@ -723,6 +723,20 @@
                 el.appendChild(pw);
                 this._addTag(el, outEl);
             },
+            _goViewerTag: function(outEl) {
+                var el = document.createElement('div');
+
+                var gw = document.createElement('babelomics-go-viewer');
+                gw.style.height = '800px';
+
+                gw.set('subNetwork', outEl.getAttribute('sub-network'));
+                gw.set('subAttributes', outEl.getAttribute('sub-attributes'));
+                gw.set('attributes', outEl.getAttribute('attributes'));
+                gw.set('sessionFileNameMap', this.fileNameMap);
+
+                el.appendChild(gw);
+                this._addTag(el, outEl);
+            },
 
             _htmlTag: function(outEl) {
                 var me = this;
