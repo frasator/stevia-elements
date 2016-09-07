@@ -8,7 +8,7 @@
 
 <dom-module id="stv-report">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+     :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -17,7 +17,7 @@
             /*@apply(--layout-horizontal);*/
         }
 
-        :host[toc-fixed]> #outline {
+         :host[toc-fixed]>#outline {
             position: fixed;
         }
 
@@ -50,9 +50,10 @@
 
         .outline-line {
             padding: 2px;
+            text-transform: capitalize;
         }
 
-        .outline-line> i {
+        .outline-line>i {
             color: var(--accent-color);
             margin-right: 5px;
         }
@@ -79,45 +80,46 @@
             display: block;
         }
 
-        .download> a:hover,
-        .image> a:hover,
-        .boxplot> a:hover,
-        .table> a:hover {
+        .download>a:hover,
+        .image>a:hover,
+        .boxplot>a:hover,
+        .table>a:hover {
             text-decoration: underline;
         }
 
-        .download> a,
-        .image> a,
-        .boxplot> a,
-        .table> a {
+        .download>a,
+        .image>a,
+        .boxplot>a,
+        .table>a {
             color: var(--secondary-text-color);
             text-decoration: none;
         }
 
-        .download> i,
-        .image> i,
-        .table> i,
-        .boxplot> i,
-        .message> i {
+        .download>i,
+        .image>i,
+        .table>i,
+        .boxplot>i,
+        .message>i,
+        .redirection-btn>i {
             color: var(--accent-color);
             margin-right: 10px;
         }
 
-        .param> .key {
+        .param>.key {
             color: var(--secondary-text-color);
             margin-right: 5px;
         }
 
-        .param> .val {
+        .param>.val {
             color: var(--accent-color);
         }
 
-        .image> img {
+        .image>img {
             display: block;
             margin-bottom: 30px;
         }
 
-        .table> stv-table {
+        .table>stv-table {
             width: 1000px;
             margin-top: 10px;
             margin-bottom: 20px;
@@ -129,7 +131,7 @@
             color: var(--secondary-text-color);
         }
 
-        .section> .name {
+        .section>.name {
             color: var(--accent-color);
             margin-right: 10px;
         }
@@ -176,11 +178,20 @@
         .download-job:hover {
             color: #0068cc !important;
         }
+
+        .redirection-btn {
+            max-width: 400px;
+            margin: 10px;
+        }
+    }
     </style>
     <template>
         <div id="outline" class="vertical layout">
             <div id="outlineContent" class="vertical layout"></div>
-            <div id="outlineRedirections" class="vertical layout"></div>
+            <div class="vertical layout">
+                <a class="outline-line" style="font-weight:bold;"><i class="fa fa-caret-right"></i><span>Redirections</span></a>
+                <div class="vertical layout" id="outlineRedirections"></div>
+            </div>
             <div id="outlineBottomBar" class="horizontal layout end-justified">
                 <i class="fa fa-download download-job" title="Download Job"></i>
                 <i class="fa fa-trash-o delete-job" title="Delete Job"></i>
@@ -202,6 +213,8 @@
             <br>
         </div>
         <div id="main"></div>
+        <div id="redirectionsHeader" class="section">Redirections</div>
+        <div id="redirections" class="vertical layout"></div>
     </template>
     <script>
         Polymer({
@@ -246,8 +259,16 @@
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
 
+                    while (this.$.redirections.firstChild) {
+                        this.$.redirections.removeChild(this.$.redirections.firstChild);
+                    }
+
                     while (this.$.outlineContent.firstChild) {
                         this.$.outlineContent.removeChild(this.$.outlineContent.firstChild);
+                    }
+
+                    while (this.$.outlineRedirections.firstChild) {
+                        this.$.outlineRedirections.removeChild(this.$.outlineRedirections.firstChild);
                     }
 
                     while (this.$.inputParams.firstChild) {
@@ -331,7 +352,9 @@
                 var reportXML = parser.parseFromString(fileContent, "text/xml");
                 var inputParamsEl = reportXML.querySelector('input-params');
                 var outputParamsEl = reportXML.querySelector('output-params');
+                var redirectionsEl = reportXML.querySelector('redirections');
                 var outputParams = outputParamsEl.childNodes;
+                var redirections = redirectionsEl.childNodes;
 
                 for (var i = 0; i < outputParams.length; i++) {
                     var outEl = outputParams[i];
@@ -354,6 +377,49 @@
                         }
                     }
                 }
+
+                var level = 1;
+
+                for (var i = 0; i < redirections.length; i++) {
+                    var redEl = redirections[i];
+                    if (redEl.tagName != null) {
+
+                        var a = document.createElement('a');
+                        a.style.marginLeft = (10 + (level * 10)) + "px";
+
+                        var text = document.createElement('span');
+                        text.innerHTML = redEl.getAttribute("tool");
+
+                        var iEl = document.createElement('i');
+                        iEl.classList.add('fa', 'fa-forward');
+
+                        a.appendChild(iEl);
+                        a.appendChild(text)
+
+                        a.classList.add('outline-line');
+                        Polymer.dom(this.$.outlineRedirections).appendChild(a);
+
+                        this._createRedirectionButton(redEl);
+                    }
+
+                }
+            },
+            _createRedirectionButton: function(redirection) {
+
+                var button = document.createElement('div');
+                button.classList.add("stv-btn", "stv-btn-shdw", "redirection-btn");
+
+                var text = document.createElement("span");
+                text.innerHTML = "Send  " + redirection.getAttribute("file") + " to " + redirection.getAttribute("tool");
+
+                var iEl = document.createElement('i');
+                iEl.classList.add('fa', 'fa-forward');
+
+                button.appendChild(iEl);
+                button.appendChild(text);
+
+                Polymer.dom(this.$.redirections).appendChild(button);
+
             },
             _addTag: function(el, outEl) {
                 el.setAttribute("id", "stvReportId_" + this.count);
@@ -523,7 +589,7 @@
                         });
                     } else {
                         data.outliers = [];
-                        me._createBoxPlotChart(chartDiv,outEl.getAttribute('title'), data);
+                        me._createBoxPlotChart(chartDiv, outEl.getAttribute('title'), data);
                     }
 
                 });
@@ -534,7 +600,7 @@
                 // el.appendChild(img);
                 this._addTag(el, outEl);
             },
-            _createBoxPlotChart: function(chartDiv,title, data) {
+            _createBoxPlotChart: function(chartDiv, title, data) {
                 var me = this;
                 var chart = new Highcharts.Chart({
                     chart: {
