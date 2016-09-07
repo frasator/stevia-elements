@@ -75,7 +75,8 @@
         .image,
         .table,
         .boxplot,
-        .message {
+        .message,
+        .redirection {
             font-size: 18px;
             display: block;
         }
@@ -83,14 +84,16 @@
         .download>a:hover,
         .image>a:hover,
         .boxplot>a:hover,
-        .table>a:hover {
+        .table>a:hover,
+        .redirection>a:hover {
             text-decoration: underline;
         }
 
         .download>a,
         .image>a,
         .boxplot>a,
-        .table>a {
+        .table>a,
+        .redirection>a {
             color: var(--secondary-text-color);
             text-decoration: none;
         }
@@ -100,7 +103,7 @@
         .table>i,
         .boxplot>i,
         .message>i,
-        .redirection-btn>i {
+        .redirection>i {
             color: var(--accent-color);
             margin-right: 10px;
         }
@@ -179,19 +182,15 @@
             color: #0068cc !important;
         }
 
-        .redirection-btn {
-            max-width: 400px;
-            margin: 10px;
+        .redirection-btn{
+          margin:10px;
+          max-width: 300px;
         }
     }
     </style>
     <template>
         <div id="outline" class="vertical layout">
             <div id="outlineContent" class="vertical layout"></div>
-            <div class="vertical layout">
-                <a class="outline-line" style="font-weight:bold;"><i class="fa fa-caret-right"></i><span>Redirections</span></a>
-                <div class="vertical layout" id="outlineRedirections"></div>
-            </div>
             <div id="outlineBottomBar" class="horizontal layout end-justified">
                 <i class="fa fa-download download-job" title="Download Job"></i>
                 <i class="fa fa-trash-o delete-job" title="Delete Job"></i>
@@ -213,8 +212,6 @@
             <br>
         </div>
         <div id="main"></div>
-        <div id="redirectionsHeader" class="section">Redirections</div>
-        <div id="redirections" class="vertical layout"></div>
     </template>
     <script>
         Polymer({
@@ -245,7 +242,8 @@
                     message: 'fa-comment-o',
                     image: 'fa-image',
                     table: 'fa-th',
-                    boxplot: 'fa-bar-chart'
+                    boxplot: 'fa-bar-chart',
+                    redirection:'fa-forward'
                 }
             },
             handleUp: function() {
@@ -259,16 +257,8 @@
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
 
-                    while (this.$.redirections.firstChild) {
-                        this.$.redirections.removeChild(this.$.redirections.firstChild);
-                    }
-
                     while (this.$.outlineContent.firstChild) {
                         this.$.outlineContent.removeChild(this.$.outlineContent.firstChild);
-                    }
-
-                    while (this.$.outlineRedirections.firstChild) {
-                        this.$.outlineRedirections.removeChild(this.$.outlineRedirections.firstChild);
                     }
 
                     while (this.$.inputParams.firstChild) {
@@ -352,9 +342,7 @@
                 var reportXML = parser.parseFromString(fileContent, "text/xml");
                 var inputParamsEl = reportXML.querySelector('input-params');
                 var outputParamsEl = reportXML.querySelector('output-params');
-                var redirectionsEl = reportXML.querySelector('redirections');
                 var outputParams = outputParamsEl.childNodes;
-                var redirections = redirectionsEl.childNodes;
 
                 for (var i = 0; i < outputParams.length; i++) {
                     var outEl = outputParams[i];
@@ -377,48 +365,6 @@
                         }
                     }
                 }
-
-                var level = 1;
-
-                for (var i = 0; i < redirections.length; i++) {
-                    var redEl = redirections[i];
-                    if (redEl.tagName != null) {
-
-                        var a = document.createElement('a');
-                        a.style.marginLeft = (10 + (level * 10)) + "px";
-
-                        var text = document.createElement('span');
-                        text.innerHTML = redEl.getAttribute("tool");
-
-                        var iEl = document.createElement('i');
-                        iEl.classList.add('fa', 'fa-forward');
-
-                        a.appendChild(iEl);
-                        a.appendChild(text)
-
-                        a.classList.add('outline-line');
-                        Polymer.dom(this.$.outlineRedirections).appendChild(a);
-
-                        this._createRedirectionButton(redEl);
-                    }
-
-                }
-            },
-            _createRedirectionButton: function(redirection) {
-
-                var button = document.createElement('div');
-                button.classList.add("stv-btn", "stv-btn-shdw", "redirection-btn");
-
-                var text = document.createElement("span");
-                text.innerHTML = "Send  " + redirection.getAttribute("file") + " to " + redirection.getAttribute("tool");
-
-                var iEl = document.createElement('i');
-                iEl.classList.add('fa', 'fa-forward');
-
-                button.appendChild(iEl);
-                button.appendChild(text);
-
-                Polymer.dom(this.$.redirections).appendChild(button);
 
             },
             _addTag: function(el, outEl) {
@@ -460,11 +406,16 @@
                             i.classList.add("fa", this.iconMap['message']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
                             break;
+                        case 'redirection':
+                            i.classList.add("fa", this.iconMap['redirection']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
                         case 'section':
                             el.style.fontWeight = "bold";
                             el.style.marginLeft = level * 10 + "px";
                             i.classList.add("fa", 'fa-caret-right');
                             break;
+
                         default:
                     }
                     var text = document.createElement('span');
@@ -484,6 +435,7 @@
                 el.innerHTML = outEl.getAttribute('title');
                 this._addTag(el, outEl);
             },
+
             _downloadTag: function(outEl) {
                 var name = outEl.getAttribute('file');
                 var el = document.createElement('div');
@@ -498,6 +450,23 @@
 
                 el.appendChild(i);
                 el.appendChild(a);
+                this._addTag(el, outEl);
+            },
+            _redirectionTag: function(outEl) {
+                var tool = outEl.getAttribute('tool');
+                
+                outEl.setAttribute("title", stv.utils.titleCase(tool));
+                var el = document.createElement('div');
+                el.classList.add("stv-btn", "stv-btn-shdw", "redirection-btn")
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['redirection']);
+
+                var text = document.createElement('span');
+                text.innerHTML = "Send to " + tool;
+
+                el.appendChild(i);
+                el.appendChild(text);
                 this._addTag(el, outEl);
             },
             _paramTag: function(outEl) {

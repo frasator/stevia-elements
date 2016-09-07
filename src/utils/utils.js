@@ -19,7 +19,7 @@ stv.utils = {
         return text;
     },
     titleCase: function (str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);;
+        return str[0].toUpperCase() + str.slice(1);;
     },
     camelCase: function (str) {
         return str.toLowerCase().replace(/[.-_\s](.)/g, function (match, group1) {
