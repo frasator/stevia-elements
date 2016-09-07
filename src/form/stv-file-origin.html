@@ -1,8 +1,9 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="stv-network-list-select.html">
 <dom-module id="stv-file-origin">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             position: relative;
         }
 
@@ -32,6 +33,13 @@
                         <input type="radio" name="origin" value="textarea" on-change="handleOriginChange">
                         <span>Text area</span>
                     </label>
+
+                    <template is="dom-if" if="{{allowNetwork}}">
+                        <label class="stv-control">
+                            <input type="radio" name="origin" value="network" on-change="handleOriginChange">
+                            <span>Network</span>
+                        </label>
+                    </template>
                 </form>
             </template>
         </template>
@@ -70,7 +78,7 @@
         </div>
 
         <template is="dom-if" if="{{check(dataOrigin,'textarea')}}">
-            <template is="dom-if" if="{{allowTextArea}}">
+            <template is="dom-if" if="{{_allowTextArea}}">
                 <label class="stv">You can paste your ids here:</label>
 
                 <div class="horizontal layout">
@@ -79,6 +87,15 @@
                 </div>
             </template>
         </template>
+
+        <template is="dom-if" if="{{allowNetwork}}">
+            <template is="dom-if" if="{{check(dataOrigin,'network')}}">
+                <div class="horizontal layout">
+                    <stv-network-list-select id="networkSelect" columns="{{columns}}" items="{{items}}" selected="{{selected}}" text-area-value="{{textAreaValue}}"></stv-network-list-select>
+                </div>
+            </template>
+        </template>
+
 
     </template>
     <script>
@@ -117,7 +134,22 @@
 
                 bioformats: {
                     type: Array
-                }
+                },
+
+                // network Viewer
+                allowNetwork: {
+                    type: Boolean,
+                    value: false
+                },
+                columns: {
+                    type: Array
+                },
+                items: {
+                    type: Array
+                },
+                selected: {
+                    type: Array
+                },
             },
             check: function(s, v) {
                 return s === v;
