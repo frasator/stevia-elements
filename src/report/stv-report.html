@@ -204,6 +204,7 @@
                 <div class="param"><span class="key">Name:</span><span class="val">{{job.name}}</span></div>
                 <div class="param"><span class="key">Description:</span><span class="val">{{job.description}}</span></div>
                 <div class="param"><span class="key">Tool:</span><span class="val">{{job.tool}}</span></div>
+                <div class="param"><span class="key">Date:</span><span class="val">{{jobDate}}</span></div>
             </div>
             <div id="inputParamsHeader" class="section">Job Arguments</div>
             <div id="inputParams" style="margin-left: 30px;"></div>
@@ -247,6 +248,7 @@
             jobChanged: function(neo, old) {
                 var me = this;
                 if (neo) {
+                    this.jobDate = new Date(Date.parse(me.job.createdAt)).toLocaleString();
                     this.fileNameMap = {};
                     while (this.$.main.firstChild) {
                         this.$.main.removeChild(this.$.main.firstChild);
