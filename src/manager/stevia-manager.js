@@ -442,6 +442,21 @@ var SteviaManager = {
             }
         });
     },
+    getJob: function (jobId, cb) {
+        SteviaManager.jobs.info({
+            id: jobId,
+            request: {
+                async: false,
+                success: function (response) {
+
+                    cb(response.response[0].results[0]);
+                },
+                error: function (response) {
+                    
+                }
+            }
+        });
+    },
     getFileByPath: function (path, cb) {
         SteviaManager.files.path({
             query: {
