@@ -182,9 +182,9 @@
             color: #0068cc !important;
         }
 
-        .redirection-btn{
-          margin:10px;
-          max-width: 300px;
+        .redirection-btn {
+            margin: 10px;
+            max-width: 300px;
         }
     }
     </style>
@@ -233,7 +233,9 @@
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
-                }
+                },
+
+
             },
             ready: function() {
                 this.count = 0;
@@ -243,7 +245,7 @@
                     image: 'fa-image',
                     table: 'fa-th',
                     boxplot: 'fa-bar-chart',
-                    redirection:'fa-forward'
+                    redirection: 'fa-forward'
                 }
             },
             handleUp: function() {
@@ -454,7 +456,7 @@
             },
             _redirectionTag: function(outEl) {
                 var tool = outEl.getAttribute('tool');
-                
+
                 outEl.setAttribute("title", stv.utils.titleCase(tool));
                 var el = document.createElement('div');
                 el.classList.add("stv-btn", "stv-btn-shdw", "redirection-btn")
@@ -731,8 +733,9 @@
 
                 gw.set('subNetwork', outEl.getAttribute('sub-network'));
                 gw.set('subAttributes', outEl.getAttribute('sub-attributes'));
-                gw.set('attributes', outEl.getAttribute('attributes'));
+                gw.set('all-attributes', outEl.getAttribute('all-attributes'));
                 gw.set('sessionFileNameMap', this.fileNameMap);
+                gw.set('allowNetwork', this.allowNetwork);
 
                 el.appendChild(gw);
                 this._addTag(el, outEl);
