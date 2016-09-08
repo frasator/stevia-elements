@@ -258,32 +258,20 @@
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
 
-                    // if (this.hideJobInformation != true) {
 
-                    // var inputParamsElem = document.createElement('a');
-                    // inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job Arguments</span>';
-                    // inputParamsElem.style.fontWeight = "bold";
-                    // inputParamsElem.href = "#inputParamsHeader";
-                    // inputParamsElem.classList.add('outline-line');
-                    // Polymer.dom(this.$.outlineContent).appendChild(inputParamsElem);
+                    var jobInfoElem = document.createElement('a');
+                    jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
+                    jobInfoElem.style.fontWeight = "bold";
+                    jobInfoElem.href = "#jobInfo";
+                    jobInfoElem.classList.add('outline-line');
+                    Polymer.dom(this.$.outlineContent).appendChild(jobInfoElem);
 
-                    // for (var key in this.job.options) {
-                    //     var option = this.job.options[key];
-                    //     var elem = document.createElement("div");
-                    //
-                    //     elem.classList.add("input-param");
-                    //     var keySpan = document.createElement("span");
-                    //     var valueSpan = document.createElement("span");
-                    //
-                    //     keySpan.innerHTML = key + ": ";
-                    //     valueSpan.innerHTML = option.value ? option.value : "";
-                    //
-                    //     elem.appendChild(keySpan);
-                    //     elem.appendChild(valueSpan);
-                    //     Polymer.dom(this.$.inputParams).appendChild(elem);
-                    //
-                    // }
-                    // }
+                    var inputParamsElem = document.createElement('a');
+                    inputParamsElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job Arguments</span>';
+                    inputParamsElem.style.fontWeight = "bold";
+                    inputParamsElem.href = "#inputParamsHeader";
+                    inputParamsElem.classList.add('outline-line');
+                    Polymer.dom(this.$.outlineContent).appendChild(inputParamsElem);
 
                     var files = [];
                     SteviaManager.getPlainFolderFiles(me.job.folder._id, function(files) {
@@ -331,7 +319,7 @@
                 var outputParamsEl = reportXML.querySelector('output-params');
                 var outputParams = outputParamsEl.childNodes;
                 var inputParams = inputParamsEl.childNodes;
-                
+
                 if (inputParams.length == 0) {
                     this.$.inputParamsHeader.hidden = true;
                 } else {
