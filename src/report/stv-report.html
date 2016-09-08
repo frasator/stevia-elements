@@ -235,11 +235,13 @@
                 this.count = 0;
                 this.iconMap = {
                     download: 'fa-download',
+                    file: 'fa-file',
                     message: 'fa-comment-o',
                     image: 'fa-image',
                     table: 'fa-th',
                     boxplot: 'fa-bar-chart',
-                    redirection: 'fa-forward'
+                    redirection: 'fa-forward',
+                    redirection: 'fa-forward',
                 }
             },
             handleUp: function() {
@@ -319,21 +321,22 @@
 
                 var parser = new DOMParser();
                 var reportXML = parser.parseFromString(fileContent, "text/xml");
+
                 var inputParamsEl = reportXML.querySelector('input-params');
+                var inputParams = inputParamsEl.childNodes;
                 var outputParamsEl = reportXML.querySelector('output-params');
                 var outputParams = outputParamsEl.childNodes;
-                var inputParams = inputParamsEl.childNodes;
 
                 if (inputParams.length == 0) {
                     this.$.inputParamsHeader.hidden = true;
                 } else {
-                    this._processParams(inputParams, this.$.inputParams);
+                    this._processParams(reportXML, inputParams, this.$.inputParams);
                 }
 
-                this._processParams(outputParams, this.$.main);
+                this._processParams(reportXML, outputParams, this.$.main);
 
             },
-            _processParams: function(params, renderEl) {
+            _processParams: function(reportXML, params, renderEl) {
                 for (var i = 0; i < params.length; i++) {
                     var outEl = params[i];
                     if (outEl.tagName != null) {
@@ -432,7 +435,7 @@
                 var el = document.createElement('div');
 
                 var i = document.createElement('i');
-                i.classList.add('fa', this.iconMap['download']);
+                i.classList.add('fa', this.iconMap['file']);
 
                 var a = document.createElement('a');
                 a.innerHTML = outEl.getAttribute('title');
