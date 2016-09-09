@@ -150,6 +150,10 @@
         }
 
         .download-icon:hover {
+            cursor: pointer;
+        }
+
+        .download-icon:hover {
             font-weight: bold;
         }
 
@@ -210,6 +214,7 @@
             <div id="inputParams" style="margin-left: 30px;"></div>
             <br>
         </div>
+        <div class="section">Results</div>
         <div id="main"></div>
     </template>
     <script>
@@ -228,7 +233,6 @@
                     value: false,
                     reflectToAttribute: true
                 },
-
 
             },
             ready: function() {
@@ -263,7 +267,6 @@
                     while (this.$.inputParams.firstChild) {
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
-
 
                     var jobInfoElem = document.createElement('a');
                     jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
@@ -535,11 +538,6 @@
                 a.innerHTML = outEl.getAttribute('title');
                 a.appendChild(this._createDownloadIcon());
 
-                a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
-
-                // var img = document.createElement('img');
-                // img.setAttribute('src', SteviaManager.getFileURL(this.getFileFromName(name)._id));
-
                 var chartDiv = document.createElement("div");
 
                 SteviaManager.getFileContent(me.getFileFromName(name)._id, function(content) {
@@ -561,6 +559,12 @@
                     }
 
                 });
+
+                a.addEventListener('click', function(e) {
+                    var chartElem = chartDiv;
+                    var chart = Highcharts.charts[chartElem.dataset["highchartsChart"]];
+                    chart.exportChart();
+                })
 
                 el.appendChild(i);
                 el.appendChild(a);
