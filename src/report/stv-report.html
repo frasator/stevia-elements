@@ -227,9 +227,7 @@
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
-                },
-
-
+                }
             },
             ready: function() {
                 this.count = 0;
@@ -263,7 +261,6 @@
                     while (this.$.inputParams.firstChild) {
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
-
 
                     var jobInfoElem = document.createElement('a');
                     jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
@@ -735,10 +732,32 @@
                 gw.set('subAttributes', outEl.getAttribute('sub-attributes'));
                 gw.set('all-attributes', outEl.getAttribute('all-attributes'));
                 gw.set('sessionFileNameMap', this.fileNameMap);
-                gw.set('allowNetwork', this.allowNetwork);
 
                 el.appendChild(gw);
-                // this._addTag(el, outEl);
+                return el;
+            },
+            _interactomeViewerTag: function(outEl) {
+                var el = document.createElement('div');
+
+                var iw = document.createElement('babelomics-interactome-viewer');
+                iw.style.height = '800px';
+
+                iw.set('network', outEl.getAttribute('network'));
+                iw.set('intermediates', outEl.getAttribute('intermediates'));
+                iw.set('seeds', outEl.getAttribute('seeds'));
+                iw.set('sessionFileNameMap', this.fileNameMap);
+
+                el.appendChild(iw);
+                return el;
+            },
+            _networkMinerPlotTag: function(outEl) {
+                var el = document.createElement('div');
+
+                var plotEl = document.createElement('babelomics-network-miner-plot');
+                plotEl.set('file', outEl.getAttribute('file'));
+                plotEl.set('sessionFileNameMap', this.fileNameMap);
+
+                el.appendChild(plotEl);
                 return el;
             },
 

@@ -446,13 +446,12 @@ var SteviaManager = {
         SteviaManager.jobs.info({
             id: jobId,
             request: {
-                async: false,
+                async: true,
                 success: function (response) {
-
                     cb(response.response[0].results[0]);
                 },
                 error: function (response) {
-                    
+
                 }
             }
         });
