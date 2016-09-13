@@ -198,7 +198,7 @@
             <div id="outlineBottomBar" class="horizontal layout end-justified">
                 <i class="fa fa-download download-job" title="Download Job"></i>
                 <i class="fa fa-trash-o delete-job" title="Delete Job"></i>
-                <i class="fa fa-refresh relaunch-job" title="Relaunch Job"></i>
+                <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob"></i>
             </div>
         </div>
         <div id="up" on-click="handleUp" class="button stv-btn stv-btn-shdw" title="Go top"><i class="fa fa-arrow-up"></i></div>
@@ -906,6 +906,9 @@
                         data: data
                     };
                 }
+            },
+            handleRelaunchJob: function(e){
+                this.fire('job-relaunched', this.job);
             }
         });
     </script>

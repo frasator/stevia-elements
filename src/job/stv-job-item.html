@@ -236,49 +236,7 @@
                 e.stopPropagation();
                 var me = this;
                 me.fire('job-relaunched', this.job);
-                return;
-                if (confirm("You are going to relaunch this Job. Are you sure?")) {
-                    var query = {
-                        name: this.job.name,
-                        description: this.job.description,
-                        outdirId: this.job.folder.parent
-                    };
-                    var jobConfig = {};
-                    jobConfig.options = this.job.options;
-                    jobConfig.tool = this.job.tool;
-                    jobConfig.execution = this.job.execution;
-                    jobConfig.executable = this.job.executable;
-
-                    SteviaManager.jobs.create({
-                        query: query,
-                        request: {
-                            method: 'POST',
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify(jobConfig),
-                            success: function(response) {
-                                if (response.response[0].error == null) {
-                                    console.log(response);
-                                } else {
-                                    console.log(response.response[0].error);
-                                }
-                                me.fire('need-refresh');
-                                me.fire('job-launched');
-                            },
-                            error: function() {
-                                console.log('Server error, try again later.');
-                            }
-                        }
-                    });
-                }
             },
-
-            // handleJobInformation: function(e) {
-            //     e.stopPropagation();
-            //     this.showInfo = !this.showInfo;
-            // },
-
             handleViewLogFile: function(e) {
                 e.stopPropagation();
                 this.$.filePreview.fileId = this.job.olog;
