@@ -82,15 +82,9 @@ var SteviaManager = {
         list: function (args) {
             return SteviaManager._doRequest(args, 'files', 'list');
         },
-        // fetch: function (args) {
-        //     return SteviaManager._doRequest(args, 'files', 'fetch');
-        // },
-        // alignments: function (args) {
-        //     return SteviaManager._doRequest(args, 'files', 'alignments');
-        // },
-        // variants: function (args) {
-        //     return SteviaManager._doRequest(args, 'files', 'variants');
-        // },
+        saveAttrFile: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'save-attr-file');
+        },
         read: function (args) {
             return SteviaManager._doRequest(args, 'files', 'info');
         },
@@ -103,9 +97,6 @@ var SteviaManager = {
         delete: function (args) {
             return SteviaManager._doRequest(args, 'files', 'delete');
         },
-        // index: function (args) {
-        //     return SteviaManager._doRequest(args, 'files', 'index');
-        // },
         search: function (args) {
             return SteviaManager._doRequest(args, 'files', 'search');
         },
@@ -118,8 +109,8 @@ var SteviaManager = {
         contentExample: function (args) {
             return SteviaManager._doRequest(args, 'files', 'content-example');
         },
-        contentGrep: function (args) {
-            return SteviaManager._doRequest(args, 'files', 'content-grep');
+        grep: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'grep');
         },
         createFolder: function (args) {
             return SteviaManager._doRequest(args, 'files', 'create-folder');

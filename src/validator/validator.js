@@ -39,12 +39,12 @@ Validator.prototype = {
             var lastReadBytes = null;
 
             if (res) {
-                me._navigator = new FileNavigator(me.file, undefined, {
+                me._navigator = new LineNavigator(me.file, undefined, {
                     newLineCode: '\r'.charCodeAt(0),
                     splitPattern: /\r/
                 });
             } else {
-                me._navigator = new FileNavigator(me.file);
+                me._navigator = new LineNavigator(me.file);
             }
             me._totalBytes = me.file.size;
             var indexToStartWith = 0;
@@ -70,12 +70,19 @@ Validator.prototype = {
                 }
                 me._emit("progress", me.progress);
 
-                if (lastReadBytes == me._readBytes) {
+                if (eof) {
                     me._emit("progress", 100);
                     me._emit("end");
                     me._validateEnd();
                     return;
                 }
+
+                // if (lastReadBytes == me._readBytes) {
+                //     me._emit("progress", 100);
+                //     me._emit("end");
+                //     me._validateEnd();
+                //     return;
+                // }
 
                 lastReadBytes = me._readBytes;
 

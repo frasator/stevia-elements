@@ -1424,7 +1424,7 @@
                                 if (!this.hasAttribute('readonly')) {
                                     this.setAttribute('readonly', '');
                                     var val = this.value;
-                                    rowData.attributes[column.name] = val;
+                                    rowData[column.name] = val;
                                     me.fire('update-row', {
                                         row: rowData,
                                         column: column
@@ -1463,7 +1463,7 @@
                             //TODO check
                             input.addEventListener('click', function(e) {
                                 var val = this.value;
-                                rowData.attributes[column.name] = val;
+                                rowData[column.name] = val;
                             });
                             input.value = value;
                             el.appendChild(selwrap);

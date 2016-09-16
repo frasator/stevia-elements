@@ -214,7 +214,7 @@
             <div id="inputParams" style="margin-left: 30px;"></div>
             <br>
         </div>
-        <div class="section">Results</div>
+        <!-- <div class="section">Results</div> -->
         <div id="main"></div>
     </template>
     <script>
@@ -243,7 +243,6 @@
                     image: 'fa-image',
                     table: 'fa-table',
                     boxplot: 'fa-bar-chart',
-                    redirection: 'fa-forward',
                     redirection: 'fa-forward',
                 }
             },
@@ -450,6 +449,7 @@
                 return el;
             },
             _redirectionTag: function(outEl) {
+                var me = this;
                 var tool = outEl.getAttribute('tool');
 
                 outEl.setAttribute("title", stv.utils.titleCase(tool));
@@ -464,7 +464,30 @@
 
                 el.appendChild(i);
                 el.appendChild(text);
-                // this._addTag(el, outEl);
+
+                el.addEventListener('click', function(e) {
+                    var elem = outEl;
+                    var args = {};
+                    var tool = "";
+
+                    for (var i = 0; i < elem.attributes.length; i++) {
+                        var attr = elem.attributes[i];
+                        if (attr.name == "tool") {
+                            tool = attr.value
+                        } else if (attr.name == "level" || attr.name == "title") {
+                            continue;
+                        } else {
+                            args[attr.name] = attr.value;
+                        }
+                    }
+
+                    me.fire('redirection', {
+                        tool: tool,
+                        job: me.job,
+                        args: args
+                    });
+                })
+
                 return el;
             },
             _paramTag: function(outEl) {
@@ -559,7 +582,7 @@
 
                 });
 
-                a.addEventListener('click', function(e) {
+                el.addEventListener('click', function(e) {
                     var chartElem = chartDiv;
                     var chart = Highcharts.charts[chartElem.dataset["highchartsChart"]];
                     chart.exportChart();
@@ -907,7 +930,7 @@
                     };
                 }
             },
-            handleRelaunchJob: function(e){
+            handleRelaunchJob: function(e) {
                 this.fire('job-relaunched', this.job);
             }
         });
