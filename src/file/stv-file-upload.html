@@ -1,12 +1,14 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../stv-dialog/stv-dialog.html">
+
 <link rel="import" href="stv-file-bioformat.html">
 <link rel="import" href="../validator/stv-validator.html">
 
 <dom-module id="stv-file-upload">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -255,34 +257,31 @@
             }
         },
         handleUpload: function() {
+            var me = this;
             var file = this.$.fileInput.files[0];
             if (file == null) {
                 this.message = "No file selected."
-                return;
-            }
-            if (this.uploading == true) {
+            } else if (this.uploading == true) {
                 this.message = "Upload already in progress."
-                return;
-            }
-            if (this.validating == false) {
+            } else if (this.validating == false) {
                 if (this.$.validator.errorCount > 0) {
                     this.message = "The file contains errors."
-                    if (window.UPLOAD_FILES_WITH_ERRORS !== true) {
-                        return;
-                    } else {
-                        if (confirm("File contains error messages, if you use this file on a job the execution may fail, are you sure?")) {
-                            this.handleForm();
-                            return;
+                    if (window.UPLOAD_FILES_WITH_ERRORS == true) {
+                        new StvDialog().confirm("File contains error messages, if you use this file on a job the execution may fail, are you sure?", function(res) {
+                            if (res == true) {
+                                me.handleForm();
+                            }
+                        });
+                    }
+                } else if (this.$.validator.warningCount > 0) {
+                    new StvDialog().confirm("File contains warning messages, are you sure?",function(res){
+                        if(res ==true){
+                            me.handleForm();
                         }
-                    }
+                    });
+                }else{
+                    this.handleForm();
                 }
-                if (this.$.validator.warningCount > 0) {
-                    if (confirm("File contains warning messages, are you sure?")) {
-                        this.handleForm();
-                        return;
-                    }
-                }
-                this.handleForm();
             }
         },
         handleForm: function() {
