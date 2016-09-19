@@ -158,6 +158,7 @@
             handleSelect: function(e) {
                 e.stopPropagation();
                 var job = e.currentTarget.job;
+                console.log(job);
                 if (job.status === 'DONE') {
                     this.selected = job;
                     var sel = this.querySelector("stv-job-item[selected]");
@@ -165,7 +166,6 @@
                         sel.removeAttribute('selected');
                     }
                     e.currentTarget.setAttribute('selected', '');
-                    console.log(this.selected);
                     this.fire('jobselect', this.selected);
                 }
             },
