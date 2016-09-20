@@ -52,7 +52,7 @@
     <template>
         <div class="title">
             <div>
-                User profile
+                Password
             </div>
             <div class="icon">
                 <i class="fa fa-user"></i>
@@ -72,25 +72,7 @@
             <div id="button" class="stv-btn stv-btn-shdw" on-click="handleChangePasswordForm">Change password</div>
         </form>
         <br>
-        <br>
-        <br>
-        <div class="title">
-            <div>
-                Notifications
-            </div>
-            <div class="icon">
-                <i class="fa fa-envelope-o"></i>
-            </div>
-        </div>
-        <br>
-        <div style="font-size:1.2em;">
-            <label class="stv-control" style="cursor:pointer; text-align:center;">
-                <input id="jobNotificationCheckbox" type="checkbox" name="job" on-click="handleClickJobNotification">
-                <span>Send an E-mail on job finish.</span>
-            </label>
-        </div>
-        <br>
-        <br>
+        <div hidden$="{{!message}}" class="message stv-note stv-note-warn">&nbsp;{{message}}</div>
         <!-- <form id="formEmail">
             <label class="stv">New e-mail</label>
             <input class="stv" type="email" value="{{email::input}}" required>
@@ -99,7 +81,7 @@
             <div class="stv-btn stv-btn-shdw" on-click="handleChangeEmailForm">Change e-mail</div>
         </form> -->
 
-        <div hidden$="{{!message}}" class="message stv-note stv-note-warn">&nbsp;{{message}}</div>
+
     </template>
     <script>
         Polymer({
@@ -108,10 +90,6 @@
                 email: {
                     type: String,
                     value: ''
-                },
-                userData: {
-                    type: Object,
-                    observer: 'userDataChanged'
                 },
                 oldpassword: {
                     type: String,
@@ -135,33 +113,6 @@
                 this.set('password', '');
                 this.set('passwordCheck', '');
                 this.set('message', '');
-            },
-            userDataChanged: function(neo, old) {
-                if (this.userData != null) {
-                    if (this.userData.notifications != null && this.userData.notifications.job == true) {
-                        this.$.jobNotificationCheckbox.checked = true;
-                    } else {
-                        this.$.jobNotificationCheckbox.checked = false;
-                    }
-                }
-            },
-            handleClickJobNotification: function(e) {
-                var me = this;
-                e.preventDefault();
-                if (this.userData != null) {
-                    if (this.userData.notifications != null) {
-                        var obj = {
-                            job: !this.userData.notifications.job
-                        };
-                        SteviaManager.updateUserNotifications(this.userData.name, obj, function(notifications) {
-                            for (var key in notifications) {
-                                if (key == 'job') {
-                                    me.$.jobNotificationCheckbox.checked = notifications[key];
-                                }
-                            }
-                        });
-                    }
-                }
             },
             handleChangePasswordForm: function(e) {
                 var me = this;

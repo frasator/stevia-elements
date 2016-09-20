@@ -99,6 +99,7 @@
                 e.stopPropagation();
                 this.$.messageInfo.hidden = !this.$.messageInfo.hidden;
                 this._getPosition();
+                this.fire('tooltip-toggle', !this.$.messageInfo.hidden);
             },
             showInfoThis: function(e) {
                 if (e.target === this) {
@@ -149,6 +150,7 @@
             handleClose: function(e) {
                 e.stopPropagation();
                 this.$.messageInfo.hidden = !this.$.messageInfo.hidden;
+                this.fire('tooltip-toggle', !this.$.messageInfo.hidden);
             },
 
         })

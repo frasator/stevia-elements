@@ -3,7 +3,7 @@
 <dom-module id="stv-cluster-status">
     <template>
         <style>
-            :host {
+             :host {
                 position: relative;
                 display: block;
                 box-sizing: border-box;
@@ -57,7 +57,7 @@
                 float: right;
             }
         </style>
-        <stv-tooltip icon="signal" type="{{type}}" class$="{{_computeStatusClass(_serverStatusObject)}}">
+        <stv-tooltip icon="signal" type="{{type}}" class$="{{_computeStatusClass(_serverStatusObject)}}" on-tooltip-toggle="handleTooltipToogle">
             <h1>Cluster Status</h1>
             <ul>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i> CPU: <span class="cluster_data">{{_computeNumber(_serverStatusObject.cpuUsage, 0)}} %</span></li>
@@ -102,6 +102,7 @@
                 },
 
                 _connexionLatency: Number,
+                _interval: Number,
 
                 type: {
                     type: String,
@@ -112,15 +113,19 @@
             ready: function() {
 
             },
-
             attached: function() {
                 this.retrieveServerStatus(this.clusterApi);
-
-                this._timer = setInterval(function() {
+                this._interval = setInterval(function() {
                     this.retrieveServerStatus(this.clusterApi);
                 }.bind(this), 5000);
             },
-
+            handleTooltipToogle: function(e) {
+                // if (e.detail) {
+                //     this.retrieveServerStatus(this.clusterApi);
+                // } else {
+                //     clearInterval(this._interval);
+                // }
+            },
             retrieveServerStatus: function(url) {
                 var me = this;
                 var startRequestTime = new Date();

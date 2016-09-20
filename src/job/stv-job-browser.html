@@ -6,7 +6,7 @@
 
 <dom-module id="stv-job-browser">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             position: relative;
             display: block;
             box-sizing: border-box;
@@ -94,6 +94,12 @@
                 Total:
                 <span>{{computeTotalJobs(filteredJobs)}}</span>
             </div>
+            <div class="flex">
+            </div>
+            <label class="stv-control" style="cursor:pointer; text-align:center;" title="When enabled, an email will be sent every time a job ends.">
+                <input id="jobNotificationCheckbox" type="checkbox" name="job" on-click="handleClickJobNotification">
+                <span>Enable job notifications</span>
+            </label>
         </div>
 
     </template>
@@ -153,8 +159,7 @@
                     value: false
                 }
             },
-            ready: function() {
-            },
+            ready: function() {},
             handleSelect: function(e) {
                 e.stopPropagation();
                 var job = e.currentTarget.job;
@@ -181,6 +186,11 @@
                         this.set('jobs', neo.jobs);
                     } else {
                         this.clean();
+                    }
+                    if (this.userData.notifications.job == true) {
+                        this.$.jobNotificationCheckbox.checked = true;
+                    } else {
+                        this.$.jobNotificationCheckbox.checked = false;
                     }
                 } else {
                     this.clean();
@@ -253,6 +263,25 @@
             viewChanged: function(neo, old) {
                 if (neo != null) {
                     this.updateFilteredJobs();
+                }
+            },
+            handleClickJobNotification: function(e) {
+                var me = this;
+                e.preventDefault();
+                if (this.userData != null) {
+                    if (this.userData.notifications != null) {
+                        var obj = {
+                            job: !this.userData.notifications.job
+                        };
+                        SteviaManager.updateUserNotifications(this.userData.name, obj, function(notifications) {
+                            me.userData.notifications = notifications;
+                            for (var key in notifications) {
+                                if (key == 'job') {
+                                    me.$.jobNotificationCheckbox.checked = notifications[key];
+                                }
+                            }
+                        });
+                    }
                 }
             },
             _filterByStatus: function(filteredJobs) {
