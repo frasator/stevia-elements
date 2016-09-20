@@ -62,7 +62,6 @@
             <ul>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.cpuUsage, _statusThresholds.cpu_Mem)}} fa"></i> CPU: <span class="cluster_data">{{_computeNumber(_serverStatusObject.cpuUsage, 0)}} %</span></li>
                 <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.memUsage, _statusThresholds.cpu_Mem)}} fa"></i> Memory Usage: <span class="cluster_data">{{_computeNumber(_serverStatusObject.memUsage, 0)}} %</span></li>
-                <li><i class$="{{_computeSingleElementStatusClass(_serverStatusObject.latency, _statusThresholds.latency)}} fa"></i>Cluster Latency: <span class="cluster_data">{{_serverStatusObject.latency}} ms</span></li>
                 <li><i class="fa fa-globe"></i> Connexion Latency: <span class="cluster_data">{{_connexionLatency}} ms</span></li>
                 <hr>
                 <li>Jobs Running: <span class="cluster_data">{{_serverStatusObject.jobsRunning}}</span></li>

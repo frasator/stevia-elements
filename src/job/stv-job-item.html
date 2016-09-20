@@ -1,18 +1,21 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../stv-dialog/stv-dialog.html">
+
 <dom-module id="stv-job-item">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
         }
 
-        :host(:hover) {
+         :host(:hover) {
             background-color: var(--hover-color);
         }
 
-        :host[selected] {
+         :host[selected] {
             background-color: var(--selected-color);
         }
 
@@ -44,12 +47,12 @@
             font-size: 0.9em;
         }
 
-        .bar> * {
+        .bar>* {
             margin: 1px;
             color: #666;
         }
 
-        .bar> *:hover {
+        .bar>*:hover {
             color: #000;
             cursor: pointer;
         }
@@ -73,7 +76,6 @@
         .info-job:hover {
             color: #0068cc !important;
         }
-
         /*.bug-job:hover {
             color: #0068cc !important;
         }*/
@@ -211,26 +213,28 @@
             handleDeleteJob: function(e) {
                 var me = this;
                 e.stopPropagation();
-                if (confirm("Are you sure?")) {
-                    SteviaManager.jobs.delete({
-                        query: {
-                            jobId: this.job._id,
-                        },
-                        request: {
-                            success: function(response) {
-                                if (response.response[0].error == null) {
-                                    console.log('Job deleted');
-                                } else {
-                                    console.log(response.response[0].error);
-                                }
-                                me.fire('need-refresh');
+                new StvDialog().confirm("Are you sure?", function(answer) {
+                    if (answer == true) {
+                        SteviaManager.jobs.delete({
+                            query: {
+                                jobId: this.job._id,
                             },
-                            error: function() {
-                                console.log('Server error, try again later.');
+                            request: {
+                                success: function(response) {
+                                    if (response.response[0].error == null) {
+                                        console.log('Job deleted');
+                                    } else {
+                                        console.log(response.response[0].error);
+                                    }
+                                    me.fire('need-refresh');
+                                },
+                                error: function() {
+                                    console.log('Server error, try again later.');
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             },
             handleRelaunchJob: function(e) {
                 e.stopPropagation();

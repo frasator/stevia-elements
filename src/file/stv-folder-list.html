@@ -1,11 +1,13 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../stv-dialog/stv-dialog.html">
+
 <link rel="import" href="stv-folder-create.html">
 <link rel="import" href="stv-folder-list-item.html">
 <dom-module id="stv-folder-list">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             position: relative;
             display: block;
             box-sizing: border-box;
@@ -53,7 +55,7 @@
             color: #444;
             width: 80px;
             text-align: center;
-            margin-left:20;
+            margin-left: 20;
         }
 
         .size {
@@ -98,7 +100,7 @@
             color: var(--default-primary-color);
         }
 
-        .bar> div {
+        .bar>div {
             margin-right: 5px;
         }
 
@@ -309,9 +311,13 @@
                 this.$.createFolderModal.setAttribute('hidden', '');
             },
             handleDeleteFile: function(e) {
-                if (confirm("Are you sure?")) {
-                    this._deleteFile();
-                }
+                var me = this;
+                new StvDialog().confirm("Are you sure?", function(answer) {
+                    if (answer == true) {
+                        me._deleteFile();
+
+                    }
+                });
             },
             selectedChanged: function(neo, old) {
                 this.fileName = "";
