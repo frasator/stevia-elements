@@ -21,6 +21,9 @@ var SteviaManager = {
         updatePassword: function (args) {
             return SteviaManager._doRequest(args, 'users', 'change-password');
         },
+        updateNotifications: function (args) {
+            return SteviaManager._doRequest(args, 'users', 'change-notifications');
+        },
         resetPassword: function (args) {
             return SteviaManager._doRequest(args, 'users', 'reset-password');
         },
@@ -488,6 +491,24 @@ var SteviaManager = {
                 body: JSON.stringify(attributes),
                 success: function (response) {
                     cb(response.response[0].results);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    updateUserNotifications: function (user, notifications, cb) {
+        SteviaManager.users.updateNotifications({
+            id: user,
+            request: {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(notifications),
+                success: function (response) {
+                    cb(response.response[0].results[0]);
                 },
                 error: function (response) {
 
