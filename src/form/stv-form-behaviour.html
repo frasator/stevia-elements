@@ -1,4 +1,5 @@
 <link rel="import" href="../../../polymer/polymer.html">
+<link rel="import" href="../stv-dialog/stv-dialog.html">
 <script>
     StvFormBehaviour = {
         properties: {
@@ -47,7 +48,7 @@
                 validated = false;
             }
             if (!validated) {
-                alert(msg)
+                this.alert(msg)
             }
             return validated;
         },
@@ -127,8 +128,27 @@
                 callback(content);
             });
         },
+        getFileByName: function(fileName, folder, callback) {
+            var me = this;
+            var path = folder.path + "/" + fileName;
+            SteviaManager.getFileByPath(path, callback);
+
+        },
         loadJob: function(job) {
 
+        },
+        redirection: function(args, job) {
+
+        },
+        alert: function(msg, cb) {
+            new StvDialog().alert(msg, cb);
+        },
+        confirm: function(msg, cb) {
+            new StvDialog().confirm(msg, cb);
+        },
+        prompt: function(msg, cb) {
+            new StvDialog().prompt(msg, cb);
         }
+
     };
 </script>

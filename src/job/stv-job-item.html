@@ -217,7 +217,7 @@
                     if (answer == true) {
                         SteviaManager.jobs.delete({
                             query: {
-                                jobId: this.job._id,
+                                jobId: me.job._id,
                             },
                             request: {
                                 success: function(response) {
