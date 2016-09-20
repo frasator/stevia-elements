@@ -197,7 +197,7 @@
             <div id="outlineContent" class="vertical layout"></div>
             <div id="outlineBottomBar" class="horizontal layout end-justified">
                 <i class="fa fa-download download-job" title="Download Job"></i>
-                <i class="fa fa-trash-o delete-job" title="Delete Job"></i>
+                <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
                 <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob"></i>
             </div>
         </div>
@@ -894,21 +894,6 @@
                             width: width
                         });
                     }
-                    // } else {
-                    //     var colCount = lines[0].split('\t').length;
-                    //     for (var i = 0; i < colCount; i++) {
-                    //         var width = 150;
-                    //         if (i === 0) {
-                    //             width = 400;
-                    //         }
-                    //         columns.push({
-                    //             name: i.toString(),
-                    //             title: "Column " + i.toString(),
-                    //             width: width
-                    //         });
-                    //     }
-                    // }
-
                     if (columns.length) {
                         for (var i = 1; i < lines.length; i++) {
                             line = lines[i];
@@ -917,6 +902,9 @@
                                 obj = {};
                                 for (var j = 0; j < fields.length; j++) {
                                     field = fields[j].trim();
+                                    if (window.isNaN != null && !isNaN(field)) {
+                                        field = parseFloat(field).toFixed(3);
+                                    }
                                     column = columns[j];
                                     obj[column.name] = field;
                                 }
@@ -932,6 +920,32 @@
             },
             handleRelaunchJob: function(e) {
                 this.fire('job-relaunched', this.job);
+            },
+            handleDeleteJob: function(e) {
+                var me = this;
+                e.stopPropagation();
+                new StvDialog().confirm("Are you sure?", function(answer) {
+                    if (answer == true) {
+                        SteviaManager.jobs.delete({
+                            query: {
+                                jobId: me.job._id,
+                            },
+                            request: {
+                                success: function(response) {
+                                    if (response.response[0].error == null) {
+                                        console.log('Job deleted');
+                                    } else {
+                                        console.log(response.response[0].error);
+                                    }
+                                    me.fire('need-refresh');
+                                },
+                                error: function() {
+                                    console.log('Server error, try again later.');
+                                }
+                            }
+                        });
+                    }
+                });
             }
         });
     </script>
