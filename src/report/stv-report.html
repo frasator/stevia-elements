@@ -196,7 +196,7 @@
         <div id="outline" class="vertical layout">
             <div id="outlineContent" class="vertical layout"></div>
             <div id="outlineBottomBar" class="horizontal layout end-justified">
-                <i class="fa fa-download download-job" title="Download Job"></i>
+                <i class="fa fa-download download-job" title="Download Job" on-click="handleDownloadJob"></i>
                 <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
                 <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob"></i>
             </div>
@@ -917,6 +917,27 @@
                         data: data
                     };
                 }
+            },
+            handleDownloadJob: function(e) {
+                var me = this;
+                var url = SteviaManager.jobs.download({
+                  id:me.job._id,
+                    query: {
+                        sid: Cookies("bioinfo_sid")
+                    },
+                    request: {
+                        url: true
+                    }
+                });
+
+                var link = document.createElement('a');
+                link.href = url;
+                var event = new MouseEvent('click', {
+                    'view': window,
+                    'bubbles': true,
+                    'cancelable': true
+                });
+                link.dispatchEvent(event);
             },
             handleRelaunchJob: function(e) {
                 this.fire('job-relaunched', this.job);
