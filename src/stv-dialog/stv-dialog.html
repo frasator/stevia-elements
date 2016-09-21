@@ -87,7 +87,8 @@ with a z-index above this value will not be blocked.
                 z-index: 1002;
                 @apply(--modal-window-style);
                 @apply(--layout-vertical);
-                min-height: 160px;
+                min-height: 200px;
+                min-width: 300px;
             }
 
             .buttons {
@@ -95,6 +96,7 @@ with a z-index above this value will not be blocked.
                 @apply(--layout-around-justified);
                 padding: 5px;
                 background-color: #eee;
+                /*height: 40px;*/
             }
 
             .buttons > div,
@@ -175,7 +177,7 @@ with a z-index above this value will not be blocked.
 
                 _hasParent: Boolean
             },
-            
+
             ready: function() {
                 this.hidden = true;
             },
