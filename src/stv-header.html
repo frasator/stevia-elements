@@ -215,14 +215,14 @@
                     <span class="option-text">{{userText}}</span>
                 </div>
 
-                <div title="Profile" id="profile" data-option="profile" on-click="handleMenu" hidden$="{{computeProfile(userText, hideSignup, hideLogin, isLogged)}}">
+                <div title="Edit user settings" id="profile" data-option="profile" on-click="handleMenu" hidden$="{{computeProfile(userText, hideSignup, hideLogin, isLogged)}}">
                     <i class="fa fa-user"></i>
-                    <span class="option-text"> profile </span>
+                    <span class="option-text"> Profile </span>
                 </div>
 
                 <div title="Logout" id="logout" on-click="handleLogoutClick" hidden$="{{computeLogout(hideLogin, isLogged)}}">
                     <i class="fa fa-sign-out"></i>
-                    <span class="option-text"> logout </span>
+                    <span class="option-text"> Logout </span>
                 </div>
 
                 <div title="Login" id="login" data-option="login" on-click="handleMenu" hidden$="{{computeLogin(hideLogin, isLogged)}}">
