@@ -136,7 +136,7 @@
                     var jsonObject = JSON.parse(this.responseText);
                     me.set('_serverStatusObject', jsonObject);
                     me.set('_connexionLatency', new Date() - startRequestTime);
-                    console.log(me._serverStatusObject);
+                    // console.log(me._serverStatusObject);
                 }
 
                 oReq.open("GET", url);
