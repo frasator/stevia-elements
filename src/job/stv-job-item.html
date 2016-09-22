@@ -76,9 +76,10 @@
         .info-job:hover {
             color: #0068cc !important;
         }
-        /*.bug-job:hover {
+
+        .download-job:hover {
             color: #0068cc !important;
-        }*/
+        }
 
         .download {
             color: #000 !important;
@@ -120,7 +121,7 @@
                             <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
                             <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
-                            <!-- <i class="fa fa-download" title="Download" hidden="{{!showInfo}}"></i> -->
+                            <i class="fa fa-download download-job" title="Download" hidden="{{hasError(job)}}" on-click="handleDownloadJob"></i>
                             <i class="fa fa-bug bug-job" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
                         </template>
                     </div>
@@ -245,6 +246,28 @@
                 e.stopPropagation();
                 this.$.filePreview.fileId = this.job.olog;
                 this.$.filePreviewPanel.show();
+            },
+            handleDownloadJob: function(e) {
+                e.stopPropagation();
+                var me = this;
+                var url = SteviaManager.jobs.download({
+                    id: me.job._id,
+                    query: {
+                        sid: Cookies("bioinfo_sid")
+                    },
+                    request: {
+                        url: true
+                    }
+                });
+
+                var link = document.createElement('a');
+                link.href = url;
+                var event = new MouseEvent('click', {
+                    'view': window,
+                    'bubbles': true,
+                    'cancelable': true
+                });
+                link.dispatchEvent(event);
             },
             handleReportError: function(e) {
                 e.stopPropagation();
