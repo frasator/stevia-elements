@@ -1,6 +1,7 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../iron-list/iron-list.html">
+<link rel="import" href="../stv-dialog/stv-dialog.html">
 
 <script src="../../../line-navigator/file-wrapper.js"></script>
 <script src="../../../line-navigator/line-navigator.js"></script>
@@ -329,7 +330,7 @@
                             me.errorCount++;
                             if (me.errorCount == 100) {
                                 me.stop();
-                                alert('File has more than 100 errors, the validation is stopped');
+                                new StvDialog().alert('File has more than 100 errors, the validation has been stopped.');
                             }
                             break;
                         case "warning":
