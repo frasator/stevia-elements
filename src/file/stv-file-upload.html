@@ -178,6 +178,7 @@
         <div id="footer" class="horizontal layout center">
             &nbsp;
             <span id="message">{{message}}</span>
+            <span hidden$="{{!validating}}"><i class="fa fa-spinner fa-spin"></i> Validating...</span>
         </div>
 
     </template>
@@ -373,6 +374,7 @@
             /* Check bioformat */
             if (this.validating == false) {
                 this.validating = true;
+                this.message = "";
                 var selBioformat;
                 if (this.$.bioformatSelect.selectedBioformat != null) {
                     selBioformat = this.$.bioformatSelect.selectedBioformat;
@@ -415,10 +417,9 @@
 
         handleValidatorEnd: function(e) {
             this.validating = false;
+            this._setValidatorStopMessage();
         },
-        handleValidatorStop: function(e) {
-            this.validating = false;
-
+        _setValidatorStopMessage: function() {
             if (this.$.validator.errorCount > 0 && this.$.validator.warningCount > 0) {
                 this.message = "File contains errors and warning messages."
             } else if (this.$.validator.errorCount > 0) {
@@ -426,7 +427,10 @@
             } else if (this.$.validator.warningCount > 0) {
                 this.message = "File contains warning messages."
             }
-
+        },
+        handleValidatorStop: function(e) {
+            this.validating = false;
+            this._setValidatorStopMessage();
             if (this._wantRevalidate == true) {
                 this._wantRevalidate = null;
                 this.revalidate();

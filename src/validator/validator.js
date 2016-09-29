@@ -12,6 +12,7 @@ function Validator(options) {
     this._readBytes = 0;
     this._events = {};
     this.numLines = 0;
+    this.linesToRead = 2000;
 
 }
 
@@ -106,11 +107,12 @@ Validator.prototype = {
     validateEnd: function () {
         return true;
     },
-    addLog: function (type, msg) {
+    addLog: function (type, msg, column) {
         var log = {
             type: type,
             msg: msg,
-            line: this.line
+            line: this.line,
+            column: column
         };
         this.log.push(log);
         this._emit("log", log);
