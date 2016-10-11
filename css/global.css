@@ -123,6 +123,10 @@ input.stv[type=color] {
     background-color: #ebebeb;
 }
 
+.stv-btn:disabled {
+    background-color: #D3D3D3;
+}
+
 .stv-btn[data-checked],
 label.stv-btn > input[type=radio]:checked + span,
 label.stv-btn > input[type=checkbox]:checked + span {

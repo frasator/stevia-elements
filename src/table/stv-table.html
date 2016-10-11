@@ -428,7 +428,7 @@
                 </div>
 
                 <div class="flex"></div>
-
+                <content select=".custom-buttons"></content>
                 <div class="">{{pageFirstItem}}</div>
                 <div class="">-</div>
                 <div class="">{{pageLastItem}}</div>
@@ -664,6 +664,7 @@
                 var columnIndex = this.columns.indexOf(e.model.item);
                 this.set('columns.' + columnIndex + '.visible', e.currentTarget.checked);
                 this.columnsChanged();
+                this.fire('column-visibility-change', e);
             },
             /* LISTENERS */
             handleScroll: function(e) {
@@ -849,6 +850,7 @@
                 this.columns = [];
             },
             refresh: function() {
+                this.updateColumns();
                 this.dataChanged();
             },
             checkRemote: function() {
