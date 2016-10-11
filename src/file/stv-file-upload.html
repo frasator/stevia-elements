@@ -101,6 +101,15 @@
             background-color: var(--light-button-color) !important;
         }
 
+         :host[validating] #uploadButton {
+            background-color: #ddd !important;
+            color: #fff !important;
+        }
+
+         :host[validating] #uploadButton:hover {
+            background-color: #ddd !important;
+        }
+
         #footer {
             box-sizing: border-box;
             height: 30px;
@@ -169,6 +178,7 @@
         <div id="footer" class="horizontal layout center">
             &nbsp;
             <span id="message">{{message}}</span>
+            <span hidden$="{{!validating}}"><i class="fa fa-spinner fa-spin"></i> Validating...</span>
         </div>
 
     </template>
@@ -211,6 +221,7 @@
             },
             validating: {
                 type: Boolean,
+                reflectToAttribute: true,
                 value: false
             }
         },
@@ -274,12 +285,12 @@
                         });
                     }
                 } else if (this.$.validator.warningCount > 0) {
-                    new StvDialog().confirm("File contains warning messages, are you sure?",function(res){
-                        if(res ==true){
+                    new StvDialog().confirm("File contains warning messages, are you sure?", function(res) {
+                        if (res == true) {
                             me.handleForm();
                         }
                     });
-                }else{
+                } else {
                     this.handleForm();
                 }
             }
@@ -294,7 +305,7 @@
                     selBioformat = this.$.bioformatSelect.selectedBioformat;
                 }
                 if (selBioformat == null) {
-                    alert("Please select a bioformat");
+                    new StvDialog().alert("Please select a bioformat");
                     return;
                 }
 
@@ -347,7 +358,7 @@
                     };
                     SteviaManager.files.upload(config);
                 } else {
-                    alert("Please select a file");
+                    new StvDialog().alert("Please select a file");
                     return;
                 }
             }
@@ -363,12 +374,13 @@
             /* Check bioformat */
             if (this.validating == false) {
                 this.validating = true;
+                this.message = "";
                 var selBioformat;
                 if (this.$.bioformatSelect.selectedBioformat != null) {
                     selBioformat = this.$.bioformatSelect.selectedBioformat;
                 }
                 if (selBioformat == null) {
-                    alert("Please select a bioformat");
+                    new StvDialog().alert("Please select a bioformat");
                     this.validating = false;
                     return;
                 }
@@ -385,7 +397,7 @@
                         var bioformatValidator = globalContext[selBioformat.validator];
 
                         if (typeof bioformatValidator !== "function") {
-                            alert("Validator '" + bioformatValidator + "' not recognized.");
+                            new StvDialog().alert("Validator '" + bioformatValidator + "' not recognized.");
                             return;
                         }
                         validator = new bioformatValidator({});
@@ -405,10 +417,20 @@
 
         handleValidatorEnd: function(e) {
             this.validating = false;
+            this._setValidatorStopMessage();
+        },
+        _setValidatorStopMessage: function() {
+            if (this.$.validator.errorCount > 0 && this.$.validator.warningCount > 0) {
+                this.message = "File contains errors and warning messages."
+            } else if (this.$.validator.errorCount > 0) {
+                this.message = "The file contains errors."
+            } else if (this.$.validator.warningCount > 0) {
+                this.message = "File contains warning messages."
+            }
         },
         handleValidatorStop: function(e) {
             this.validating = false;
-
+            this._setValidatorStopMessage();
             if (this._wantRevalidate == true) {
                 this._wantRevalidate = null;
                 this.revalidate();

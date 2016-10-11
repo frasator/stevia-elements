@@ -88,18 +88,18 @@ with a z-index above this value will not be blocked.
                 @apply(--modal-window-style);
                 @apply(--layout-vertical);
                 min-height: 200px;
-                min-width: 300px;
+                width: 350px;
             }
 
             .buttons {
                 @apply(--layout-horizontal);
-                @apply(--layout-around-justified);
+                @apply(--layout-end-justified);
                 padding: 5px;
                 background-color: #eee;
                 /*height: 40px;*/
             }
 
-            .buttons > div,
+            .buttons>div,
             input {
                 font-size: 1.1em;
                 display: block;
@@ -115,15 +115,36 @@ with a z-index above this value will not be blocked.
                 box-shadow: 2px 2px 3px 0px rgba(0, 0, 0, 0.1);
                 transition: background-color 0.3s;
                 @apply(--buttons-style);
+                margin: 0 5px;
+                width: 100px;
+                text-align: center;
             }
 
-            .buttons > div:hover {
+            .buttons>div:hover {
                 background-color: #f8f8f8;
                 box-shadow: 2px 2px 3px 0px rgba(0, 0, 0, 0.3);
             }
 
-            .buttons > div:active {
+            .buttons>div:active {
                 background-color: #eeeeee;
+            }
+
+            #ok {
+                background-color: #188ead !important;
+                color: var(--text-primary-color) !important;
+            }
+
+            #ok:hover {
+                background-color: #20aed4 !important;
+            }
+
+            #cancel {
+                background-color: #bd1a1a !important;
+                color: var(--text-primary-color) !important;
+            }
+
+            #cancel:hover {
+                background-color: #db1e1e !important;
             }
 
             .input-wrapper {
@@ -150,8 +171,8 @@ with a z-index above this value will not be blocked.
                     </div>
                 </div>
                 <div id="buttonsHolder" class="buttons">
-                    <div id="ok" on-click="_handleOk"></div>
                     <div id="cancel" on-click="_handleCancel" hidden>Cancel</div>
+                    <div id="ok" on-click="_handleOk"></div>
                 </div>
             </div>
         </div>
@@ -266,7 +287,7 @@ with a z-index above this value will not be blocked.
                     document.body.appendChild(this)
                 }
                 this._mode = "confirm";
-                this._setElement("Confirm");
+                this._setElement("OK");
                 this.message = msg;
                 this.hidden = false;
                 this._callback = cb;
@@ -284,7 +305,7 @@ with a z-index above this value will not be blocked.
                     document.body.appendChild(this)
                 }
                 this._mode = "alert";
-                this._setElement("Accept");
+                this._setElement("OK");
                 this.message = msg;
                 this.hidden = false;
                 this._callback = cb;
@@ -303,7 +324,7 @@ with a z-index above this value will not be blocked.
                     document.body.appendChild(this)
                 }
                 this._mode = "prompt";
-                this._setElement("Accept");
+                this._setElement("OK");
                 this.message = msg;
                 this.hidden = false;
                 this._callback = cb;
