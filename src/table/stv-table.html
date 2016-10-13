@@ -1803,9 +1803,9 @@
             <input type="checkbox" checked$="{{isColumnVisible(column.visible)}}" on-click="handleColumnVisibilityClick">
             <span>{{column.title}}
                 <template is="dom-if" if="{{column.columns}}">
-                    (<template is="dom-repeat" items="{{column.columns}}">
+                    ,<template is="dom-repeat" items="{{column.columns}}">
                         <stv-table-subcolum-name column="{{item}}"></stv-table-subcolum-name>
-                    </template>)
+                    </template>
                 </template>
             </span>
         </label>
