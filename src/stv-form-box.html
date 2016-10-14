@@ -11,15 +11,22 @@
         #form {
             border: 1px solid rgba(125, 125, 125, 0.4);
             margin: 0 5px 10px 5px;
-            background-color: #FFFFFF;
+            background-color: var(--text-primary-color);
         }
 
         #header {
-            padding: 6px 10px;
-            font-size: 16px;
-            color: #000;
-            background-color: #f5f5f5;
+            padding: 5px 10px;
+            font-size: 15px;
+            background-color: var(--light-secondary-color);
+            /*background-color: #e2e9e9;*/
+            color: var(--secondary-text-color);
             cursor: pointer;
+        }
+
+        #header:hover {
+            font-weight: bold;
+            color: var(--dark-button-color);
+            /*color: #8ba7a7;*/
         }
 
         #container {
@@ -33,22 +40,23 @@
         }
 
         .collapsible > i {
-            color: #2F65F4;
+            color: var(--secondary-text-color);
             font-size: 12px;
         }
 
         .collapsible >i:hover {
             font-weight: bold;
-            color: #445D76;
+            color: var(--dark-button-color);
+            /*color: #8ba7a7;*/
         }
     </style>
     <template>
         <div id="form">
             <div id="header" class="horizontal layout" on-click="handleCollapseAction">
-                <div class="horizontal layout flex center" >
+                <div class="horizontal layout flex center">
                     <content select=".header"></content>
                 </div>
-                <div hidden$="{{!collapsible}}" class="collapsible" >
+                <div hidden$="{{!collapsible}}" class="collapsible">
                     <i class$="{{computeIcon(collapsible,collapsed)}}" title="{{computeTitle(collapsible,collapsed)}}"></i>
                 </div>
             </div>
@@ -75,8 +83,7 @@
                     value: false,
                 },
             },
-            ready: function() {
-            },
+            ready: function() {},
 
             handleCollapseAction: function(e) {
                 if (this.collapsible) {
