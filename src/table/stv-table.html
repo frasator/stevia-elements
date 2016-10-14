@@ -673,7 +673,7 @@
                 }
                 this.async(function() {
                     this._setPageSizeAuto();
-                    var hiddenParent = Utils.closest(this, "[hidden]");
+                    var hiddenParent = stv.utils.closest(this, "[hidden]");
                     if (hiddenParent != null) {
                         var observer = new MutationObserver(function(mutations) {
                             mutations.forEach(function(mutation) {
