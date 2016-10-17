@@ -1,11 +1,11 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../../iron-resizable-behavior/iron-resizable-behavior.html">
-<script src="../../../file-saver.js/FileSaver.js"></script>
+<script src="../../../FileSaver.js/FileSaver.min.js"></script>
 
 <dom-module id="stv-table">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             font-size: 13px;
@@ -25,7 +25,7 @@
             z-index: 1;
         }
 
-        :host[enable-paging] .scrollfix {
+         :host[enable-paging] .scrollfix {
             display: none;
         }
 
@@ -63,7 +63,7 @@
             background-color: inherit;
         }
 
-        :host[enable-paging] .table-header-row {
+         :host[enable-paging] .table-header-row {
             overflow-y: hidden;
         }
 
@@ -124,7 +124,7 @@
             background-color: inherit;
         }
 
-        :host[enable-paging] #filterRow {
+         :host[enable-paging] #filterRow {
             overflow-y: hidden;
         }
 
@@ -154,15 +154,15 @@
             background-color: #fafafa;
         }
 
-        :host>.table-body {
+         :host>.table-body {
             overflow-y: scroll;
         }
 
-        :host[enable-paging]>.table-body {
+         :host[enable-paging]>.table-body {
             overflow-y: hidden;
         }
 
-        :host[enable-filter]>.table-body {
+         :host[enable-filter]>.table-body {
             height: calc(100% - 88px);
         }
 
@@ -297,8 +297,8 @@
             margin-right: 15px;
         }
 
-        :host[enable-paging] .table-filter-field:last-child>.select,
-        :host[enable-paging] .table-filter-field:last-child>input[type=text] {
+         :host[enable-paging] .table-filter-field:last-child>.select,
+         :host[enable-paging] .table-filter-field:last-child>input[type=text] {
             margin-right: 1px;
         }
 
@@ -673,7 +673,7 @@
                 }
                 this.async(function() {
                     this._setPageSizeAuto();
-                    var hiddenParent = Utils.closest(this, "[hidden]");
+                    var hiddenParent = stv.utils.closest(this, "[hidden]");
                     if (hiddenParent != null) {
                         var observer = new MutationObserver(function(mutations) {
                             mutations.forEach(function(mutation) {

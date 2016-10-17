@@ -1,29 +1,30 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../iron-resizable-behavior/iron-resizable-behavior.html">
 <dom-module id="stv-panel">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
             box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
         }
 
-        :host[modal] {
+         :host[modal] {
             z-index: 100 !important;
             position: fixed;
             box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.30);
         }
 
-        :host[movable] {
+         :host[movable] {
             box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.30);
         }
 
-        :host[fixed] {
+         :host[fixed] {
             position: fixed;
         }
 
-        :host[collapsed] {
+         :host[collapsed] {
             height: 32px !important;
             min-height: 32px !important;
         }
@@ -66,62 +67,62 @@
             color: var(--text-primary-color);
         }
 
-        :host[light-header] > #header {
+         :host[light-header]>#header {
             background-color: var(--light-primary-color);
             color: var(--primary-text-color);
         }
 
-        :host[movable] > #header {
+         :host[movable]>#header {
             cursor: move;
         }
 
-        #header > .headeractions > * {
+        #header>.headeractions>* {
             box-sizing: border-box;
             padding: 2px 5px;
             border: 1px solid transparent;
             cursor: pointer;
         }
 
-        #header > .headeractions > *[data-checked] {
+        #header>.headeractions>*[data-checked] {
             background-color: rgba(0, 0, 0, 0.20);
         }
 
-        #header > .headeractions > *:hover {
+        #header>.headeractions>*:hover {
             background-color: rgba(0, 0, 0, 0.20);
         }
 
-        #header > .headeractions > .closable:after {
+        #header>.headeractions>.closable:after {
             font-family: FontAwesome;
             content: '\f00d';
         }
 
-        #header > .headeractions > .collapsible:after {
+        #header>.headeractions>.collapsible:after {
             font-family: FontAwesome;
             content: '\f106';
         }
 
-        :host[collapsed] > #header > .headeractions > .collapsible:after {
+         :host[collapsed]>#header>.headeractions>.collapsible:after {
             font-family: FontAwesome;
             content: '\f107';
         }
 
-        #header > .headeractions > .pin:after {
+        #header>.headeractions>.pin:after {
             font-family: FontAwesome;
             content: '\f08d';
         }
 
-        :host[expandible] .headeractions > .expandible:after {
+         :host[expandible] .headeractions>.expandible:after {
             font-family: FontAwesome;
             content: '\f065';
         }
 
-        :host[expandible][expanded] .headeractions > .expandible:after {
+         :host[expandible][expanded] .headeractions>.expandible:after {
             content: '\f066';
         }
 
         #header,
         .container,
-        ::content .footer {
+         ::content .footer {
             position: relative;
         }
 
@@ -139,8 +140,8 @@
             color: var(--primary-text-color);
         }
 
-        #footer > div,
-        #footer > div > div {
+        #footer>div,
+        #footer>div>div {
             margin-right: 2px;
             margin-left: 2px;
         }
@@ -152,7 +153,7 @@
             height: calc(100% - 32px);
         }
 
-        :host[_hasfooter] .container {
+         :host[_hasfooter] .container {
             height: calc(100% - 64px);
         }
 
@@ -230,9 +231,9 @@
     <script>
         (function() {
             var lastWindow_;
-
             StvPanel = Polymer({
                 is: "stv-panel",
+                behaviors: [Polymer.IronResizableBehavior],
                 properties: {
                     fixed: {
                         type: Boolean,
@@ -314,10 +315,14 @@
                     }
                 },
                 listeners: {
-                    'mousedown': '_updateLastWindow'
+                    'mousedown': '_updateLastWindow',
+                    'iron-resize': 'handleResize'
                 },
                 hostAttributes: {
                     'class': 'vertical layout flex'
+                },
+                handleResize: function() {
+
                 },
                 ready: function() {
                     var me = this;
@@ -396,6 +401,8 @@
                             document.documentElement.removeEventListener('mousemove', doDrag, false);
                             document.documentElement.removeEventListener('mouseup', stopDrag, false);
                             document.body.classList.remove('stv-nosel');
+
+                            me.notifyResize();
                         }
 
                         resizerNW.addEventListener('mousedown', initDrag, false);
@@ -510,6 +517,7 @@
                             }
                             this._center();
                         }
+                        this.notifyResize();
                     }
                     this.fire('expand');
                 },

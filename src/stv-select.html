@@ -125,6 +125,7 @@
                 if (e.target.tagName === 'STV-OPTION') {
                     this.select(e.target);
                     this.hideList();
+                    this.fire('option-click');
                 }
             },
             select: function(option, notify) {
