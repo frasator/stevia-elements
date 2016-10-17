@@ -110,12 +110,12 @@
             ready: function(e) {},
 
             handleValidatorEnd: function(e) {
-                alert('Validation has finished succesfully. Check errors or click on import button');
+                new StvDialog().alert('Validation has finished succesfully. Check errors or click on import button');
                 this.validating = false;
             },
 
             handleValidatorStop: function(e) {
-                alert('Validation has been stopped.');
+                new StvDialog().alert('Validation has been stopped.');
                 this.validating = false;
                 this.stop = true;
                 //
@@ -156,7 +156,7 @@
 
                     if (this.bioformat.validator) {
                         if (typeof this.bioformat.validator !== "function") {
-                            alert("Validator '" + this.bioformat.validator + "' not recognized.");
+                            new StvDialog().alert("Validator '" + this.bioformat.validator + "' not recognized.");
                             return;
                         }
                         validator = new this.bioformat.validator({});
@@ -180,30 +180,34 @@
             handleImport: function(e) {
                 var file = this.$.fileInput.files[0];
                 if (file == null) {
-                    alert("No file selected.")
+                    new StvDialog().alert("No file selected.")
                     return;
                 }
                 if (this.uploading == true) {
-                    alert("Upload already in progress.")
+                    new StvDialog().alert("Upload already in progress.")
                     return;
                 }
                 if (this.validating == false && this.stop == false) {
 
                     if (this.$.validator.errorCount > 0) {
-                        alert("The file contains errors.")
+                        new StvDialog().alert("The file contains errors.")
                         return;
                     }
                     if (this.$.validator.warningCount > 0) {
-                        if (confirm("File contains warning messages, are you sure?")) {
-                            this.fire('importbed');
-                            return;
-                        }
+                        new StvDialog().confirm("Are you sure?", function(answer) {
+                            if (answer == true) {
+                              this.fire('importfile');
+                                 return;
+                            } else {
+                                return;
+                            }
+                        });
                     }
-                    this.fire('importbed');
+                    this.fire('importfile');
                 }
                 // if (this.validating == false && this.stop==false) {
                 //     // this.uploading=true;
-                //     this.fire('importbed');
+                //     this.fire('importfile');
                 // }
             }
         });
