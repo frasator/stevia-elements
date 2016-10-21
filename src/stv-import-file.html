@@ -1,7 +1,7 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 
-<link rel="import" href="../validator/stv-validator.html">
+<link rel="import" href="validator/stv-validator.html">
 
 <dom-module id="stv-import-file">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
@@ -19,16 +19,31 @@
 
         .importBut {
             width: 100px;
-            color: #445D76;
+            color: var(--default-primary-color);
         }
 
         .filename {
-            word-break: break-all;
+            /*word-break: break-all;*/
+            padding: 0 4px;
+            border: 1px solid var(--divider-color);
+            background-color: var(--hover-color);
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: 360px;
         }
 
         stv-validator {
             border: 1px solid var(--divider-color);
-            ;
+        }
+
+        #recheckButton {
+            background-color: var(--dark-button-color) !important;
+            color: var(--text-primary-color) !important;
+        }
+
+        #recheckButton:hover {
+            background-color: var(--light-button-color) !important;
         }
     </style>
     <template>
@@ -40,15 +55,18 @@
                 <div class="flex">
                 </div>
                 <input type="file" hidden id="fileInput" required on-change="handleInputChange" disabled$="{{uploading}}">
-                <div class="stv-btn stv-btn-shdw importBut" on-click="handleValidate"><i class="fa fa-plus-square-o"></i>&nbsp; Import
+                <div class="jso-btn jso-btn-shdw importBut" on-click="handleImport"><i class="fa fa-plus-square-o"></i>&nbsp; Import
                 </div>
             </div>
             <div class="horizontal layout" style="line-height: 22px;margin-top: 5px;">
                 <label class="stv">Selected file name: &nbsp;</label>
-                <div class="filename">{{fileName}}</div>
+                <div class="filename flex">{{fileName}}</div>
+                <div id="recheckButton" class="jso-btn jso-btn-shdw" style="height:24px;" on-click="handleRecheck">
+                    Revalidate
+                </div>
             </div>
             <label class="stv" style="margin-top:15px;">File validation log:</label>
-            <stv-validator id="validator" on-end="handleValidatorEnd"></stv-validator>
+            <stv-validator id="validator" bioformats="{{bioformats}}" on-end="handleValidatorEnd" on-stop="handleValidatorStop"></stv-validator>
         </div>
 
 
@@ -72,17 +90,63 @@
                 fileName: {
                     type: String,
                     value: 'None'
+                },
+                validating: {
+                    type: Boolean,
+                    value: false
+                },
+                bioformats: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                stop: {
+                    type: Boolean,
+                    value: false
                 }
 
             },
             ready: function(e) {},
-            handleValidatorEnd: function() {},
+
+            handleValidatorEnd: function(e) {
+                new StvDialog().alert('Validation has finished succesfully. Check errors or click on import button');
+                this.validating = false;
+            },
+
+            handleValidatorStop: function(e) {
+                new StvDialog().alert('Validation has been stopped.');
+                this.validating = false;
+                this.stop = true;
+                //
+                // if (this._wantRevalidate == true) {
+                //     this._wantRevalidate = null;
+                //     this.revalidate();
+                // }
+            },
+            handleRecheck: function(e) {
+                // this.$.validator.reset();
+                // this.validate();
+                if (this.validating == true) {
+                    this._wantRevalidate = true;
+                    this.$.validator.stop();
+                } else {
+                    this.revalidate(e);
+                }
+            },
+            revalidate: function(e) {
+                this.$.validator.reset();
+                this.handleValidate(e);
+            },
+
             handleBrowseClick: function(e) {
                 if (this.uploading == false) {
                     this.$.fileInput.click();
                 }
             },
             handleValidate: function(e) {
+                this.validating == true;
+                this.stop = false;
                 var file = this.$.fileInput.files[0];
                 if (file != null) {
                     this.$.validator.reset();
@@ -92,7 +156,7 @@
 
                     if (this.bioformat.validator) {
                         if (typeof this.bioformat.validator !== "function") {
-                            alert("Validator '" + this.bioformat.validator + "' not recognized.");
+                            new StvDialog().alert("Validator '" + this.bioformat.validator + "' not recognized.");
                             return;
                         }
                         validator = new this.bioformat.validator({});
@@ -105,12 +169,47 @@
                 }
 
             },
-            handleInputChange: function() {
+            handleInputChange: function(e) {
                 if (this.uploading == false) {
                     this.inputFile = this.$.fileInput.files[0];
-                    this.fileName = this.inputFile.name
+                    this.fileName = this.inputFile.name;
+                    this.handleValidate(e);
+
                 }
             },
+            handleImport: function(e) {
+                var file = this.$.fileInput.files[0];
+                if (file == null) {
+                    new StvDialog().alert("No file selected.")
+                    return;
+                }
+                if (this.uploading == true) {
+                    new StvDialog().alert("Upload already in progress.")
+                    return;
+                }
+                if (this.validating == false && this.stop == false) {
+
+                    if (this.$.validator.errorCount > 0) {
+                        new StvDialog().alert("The file contains errors.")
+                        return;
+                    }
+                    if (this.$.validator.warningCount > 0) {
+                        new StvDialog().confirm("Are you sure?", function(answer) {
+                            if (answer == true) {
+                              this.fire('importfile');
+                                 return;
+                            } else {
+                                return;
+                            }
+                        });
+                    }
+                    this.fire('importfile');
+                }
+                // if (this.validating == false && this.stop==false) {
+                //     // this.uploading=true;
+                //     this.fire('importfile');
+                // }
+            }
         });
     </script>
 </dom-module>
