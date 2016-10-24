@@ -1,7 +1,6 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <dom-module id="stv-variant-effect">
-    <style is="custom-style"
-           include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
+    <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
         :host {
             display: block;
             position: relative;
@@ -24,11 +23,9 @@
         stv-table::shadow .table-header-field > .name.stv-table {
             padding: 4px 0;
         }
-
     </style>
     <template>
-        <stv-table id="table" hidden$="{{isEmpty}}"
-                   on-rowclick="handleRowClick" enable-export></stv-table>
+        <stv-table id="table" hidden$="{{isEmpty}}" on-rowclick="handleRowClick" enable-export></stv-table>
         <div hidden$="{{!isEmpty}}" style="padding:20px 50px;">
             No effect found.
         </div>
@@ -48,30 +45,29 @@
                 type: Boolean
             }
         },
-        ready: function () {
+        ready: function() {
             this.$.table.columns = this._columns;
         },
-        _columns: [
-            {
+        _columns: [{
                 name: "geneName",
-                title: "Gene Name"
-            },
-            {
+                title: "Gene Name",
+                defaultValue: '.'
+            }, {
                 name: "ensemblGeneId",
                 title: "Ensembl Gene Id",
                 cellTemplate: "ensemblGeneIdTemplate",
-                width: 150
-            },
-            {
+                width: 150,
+                defaultValue: '.'
+            }, {
                 name: "ensemblTranscriptId",
                 title: "Ensembl Transcript Id",
                 cellTemplate: 'ensemblTranscriptIdTemplate',
-                width: 150
-            },
-            {
+                width: 150,
+                defaultValue: '.'
+            }, {
                 name: "so",
                 title: "Conseq. type",
-                formula: function (row) {
+                formula: function(row) {
                     var aux = {};
                     if (row.soName && row.soAccession) {
 
@@ -85,31 +81,31 @@
             {
                 name: "codon",
                 title: "Codon",
-                width: 60
-            },
-            {
+                width: 60,
+                defaultValue: '.'
+            }, {
                 name: "strand",
-                title: "Strand"
-            },
-            {
+                title: "Strand",
+                defaultValue: '.'
+            }, {
                 name: "biotype",
-                title: "Biotype"
-            },
-            {
+                title: "Biotype",
+                defaultValue: '.'
+            }, {
                 name: "cdnaPosition",
                 title: "cDna Position",
-                width: 80
-            },
-            {
+                width: 80,
+                defaultValue: '.'
+            }, {
                 name: "cdsPosition",
                 title: "cds Position",
-                width: 80
-            },
-            {
+                width: 80,
+                defaultValue: '.'
+            }, {
                 name: "aaPosition",
                 title: "AA Position",
                 width: 80,
-                formula: function (row) {
+                formula: function(row) {
                     try {
                         var pva = row.proteinVariantAnnotation;
                         var res = (pva.position) ? pva.position : ".";
@@ -118,12 +114,11 @@
                         return ".";
                     }
                 }
-            },
-            {
+            }, {
                 name: "aaChange",
                 title: "AA Change",
                 width: 80,
-                formula: function (row) {
+                formula: function(row) {
                     try {
                         var pva = row.proteinVariantAnnotation;
                         var res = pva.reference + " > " + pva.alternate;
@@ -132,15 +127,14 @@
                         return ".";
                     }
                 }
-            },
-            {
+
+            }, {
                 name: "sift",
                 title: "Sift",
-                formula: function (row) {
-                    try {
-
-                        var pss = row.proteinVariantAnnotation.substitutionScores;
-
+                formula: function(row) {
+                    var pva = row.proteinVariantAnnotation;
+                    if (pva != null && Object.keys(pva).length > 0) {
+                        var pss = pva.substitutionScores;
                         if (pss != null && pss.length > 0) {
                             for (var i = 0; i < pss.length; i++) {
                                 var elem = pss[i];
@@ -149,20 +143,17 @@
                                 }
                             }
                         }
-                        return ".";
-                    } catch (e) {
-                        return ".";
                     }
+                    return ".";
                 },
                 width: 80
-            },
-            {
-                name: "polyphen", title: "Polyphen",
-                formula: function (row) {
-                    try {
-
-                        var pss = row.proteinVariantAnnotation.substitutionScores;
-
+            }, {
+                name: "polyphen",
+                title: "Polyphen",
+                formula: function(row) {
+                    var pva = row.proteinVariantAnnotation;
+                    if (pva != null && Object.keys(pva).length > 0) {
+                        var pss = pva.substitutionScores;
                         if (pss != null && pss.length > 0) {
                             for (var i = 0; i < pss.length; i++) {
                                 var elem = pss[i];
@@ -171,16 +162,15 @@
                                 }
                             }
                         }
-                        return ".";
-                    } catch (e) {
-                        return ".";
                     }
+
+                    return ".";
                 },
                 width: 100
             }
         ],
 
-        rowChanged: function (neo, old) {
+        rowChanged: function(neo, old) {
             var me = this;
             this.$.table.currentPage = 1;
             if (neo) {
@@ -191,9 +181,9 @@
                     subCategory: 'variant',
                     resource: 'annotation',
                     query: variant,
-//                    query: "19:45411941:T:C",
+                    //                    query: "19:45411941:T:C",
                     async: false,
-                    success: function (response) {
+                    success: function(response) {
                         try {
                             me.$.table.data = me.parseFunction(response.response[0].result[0].consequenceTypes);
                             me.isEmpty = (me.$.table.data.length > 0) ? false : true;
@@ -205,7 +195,7 @@
                 });
             }
         },
-        parseFunction: function (data) {
+        parseFunction: function(data) {
             var res = [];
 
             for (var i = 0; i < data.length; i++) {
