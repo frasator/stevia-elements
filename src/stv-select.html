@@ -2,7 +2,7 @@
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-select">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -51,11 +51,11 @@
             box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
         }
 
-        ::content stv-option {
+         ::content stv-option {
             padding: 2px 4px;
         }
 
-        ::content stv-option:hover {
+         ::content stv-option:hover {
             background-color: var(--default-primary-color);
             color: var(--text-primary-color);
         }
@@ -81,6 +81,7 @@
                 },
                 value: {
                     type: String,
+                    notify: true,
                     observer: 'valueChanged'
                 },
                 tabindex: {
@@ -166,7 +167,7 @@
 
 <dom-module id="stv-option">
     <style>
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
