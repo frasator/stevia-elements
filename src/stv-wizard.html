@@ -20,9 +20,15 @@
 
         .file {
             text-align: center;
-            color: #445D76;
-            width: 100px;
             align-self: center;
+            border-radius: 4px;
+            width: 100px;
+            background-color: var(--dark-button-color) !important;
+            color: var(--text-primary-color) !important;
+        }
+
+        .file:hover {
+            background-color: var(--light-button-color) !important;
         }
 
         .next,
@@ -54,7 +60,7 @@
         .init:hover,
         .prev:hover {
             /*background-color: #d3d3d3;*/
-            color: #6B6B6B;
+            color: var(--accent-color);
             cursor: pointer;
             font-weight: bold;
         }
@@ -69,7 +75,7 @@
         }
 
         #container {
-          height: calc(100% - 80px);
+            height: calc(100% - 80px);
         }
 
         #footer {
@@ -80,7 +86,7 @@
 
         #title {
             font-size: 20px;
-            color: #445d76;
+            color: var(--default-primary-color);
         }
 
         #wizard-bottom {
