@@ -11,7 +11,7 @@
 
 <dom-module id="stv-header">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             position: relative;
             display: block;
             box-sizing: border-box;
@@ -36,7 +36,7 @@
         #right,
         #center,
         #menu-wrapper,
-        #menu-wrapper::content > .menu {
+        #menu-wrapper::content>.menu {
             height: 100%;
         }
 
@@ -46,9 +46,9 @@
             width: 100%;
         }
 
-        #left > div,
-        #right > div,
-        #menu-wrapper::content > .menu div.option {
+        #left>div,
+        #right>div,
+        #menu-wrapper::content>.menu div.option {
             box-sizing: border-box;
             cursor: pointer;
             text-align: center;
@@ -59,35 +59,35 @@
             text-overflow: ellipsis;
         }
 
-        #left > div >::content > * {
+        #left>div>::content>* {
             margin-left: 10px;
             padding: 0 0 1px 0;
         }
 
-        #right > div,
-        #menu-wrapper >::content > .menu div.option {
+        #right>div,
+        #menu-wrapper>::content>.menu div.option {
             margin-right: 5px;
             padding: 0 5px 1px 5px;
         }
 
-        :host[small] #left > div,
-        :host[small] #right > div,
-        :host[small] #menu-wrapper >::content > .menu div.option {
+         :host[small] #left>div,
+         :host[small] #right>div,
+         :host[small] #menu-wrapper>::content>.menu div.option {
             border-bottom-width: 1px;
         }
 
-        #right > div:hover,
-        #menu-wrapper >::content > .menu div.option:hover {
+        #right>div:hover,
+        #menu-wrapper>::content>.menu div.option:hover {
             border-bottom-color: var(--divider-color);
         }
 
-        #menu-wrapper >::content > .menu div.option[active] {
+        #menu-wrapper>::content>.menu div.option[active] {
             font-weight: normal;
             border-bottom-color: var(--accent-color);
         }
 
-        :host[small] #right > div:hover,
-        :host[small] #menu-wrapper >::content > .menu div.option:hover {
+         :host[small] #right>div:hover,
+         :host[small] #menu-wrapper>::content>.menu div.option:hover {
             border-bottom-width: 1px;
         }
 
@@ -148,32 +148,32 @@
         }
         /*small*/
 
-        :host[small] .main {
+         :host[small] .main {
             height: 32px;
             font-size: 15px;
             box-shadow: 0 2px 2px 0px rgba(0, 0, 0, 0.3);
         }
 
-        :host[small] #tools {
+         :host[small] #tools {
             top: 32px;
         }
 
-        :host[small] div.title {
+         :host[small] div.title {
             font-size: 22px;
         }
 
-        :host[small] div.description {
+         :host[small] div.description {
             font-size: 15px;
         }
         /*Help menu*/
 
-        :host::content .helpmenu,
-        :host::content .launcher,
-        :host::content .cluster_stats {
+         :host::content .helpmenu,
+         :host::content .launcher,
+         :host::content .cluster_stats {
             margin: 0 10px;
         }
 
-        :host::content .helpmenu > [data-menu] {
+         :host::content .helpmenu>[data-menu] {
             margin-top: 10px;
             padding: 5px;
         }
@@ -394,6 +394,7 @@
                 this.$.helpMenu.classList.remove('help-menu-shown');
             },
             handleLogin: function(e) {
+                e.stopPropagation();
                 if (e.detail.status) {
                     this.sessionInitiated();
                 } else {

@@ -32,8 +32,11 @@
                 value: false,
                 reflectToAttribute: true,
             },
-            _lastLogedRequest: {
+            _lastLoggedPanel: {
                 type: Object
+            },
+            _lastLoggedMenu: {
+                type: String
             }
         },
         observers: [
@@ -107,6 +110,7 @@
                     this.setMenu(option);
                 } else {
                     this.selectedOption = 'login';
+                    this._lastLoggedMenu = option;
                 }
             }
         },
@@ -135,7 +139,7 @@
                     }
                 } else {
                     this.selectedOption = 'login';
-                    this._lastLogedRequest = panel;
+                    this._lastLoggedPanel = panel;
                 }
             }
         },

@@ -208,7 +208,9 @@
                 var me = this;
                 if (Array.isArray(this.jobs) && this.jobs.length > 0) {
                     var jobs;
-                    if (this.toolFilterValue == 'all') {
+                    if (this.allowedTools.length == 1 && this.allowedTools[0] == '*') {
+                        var jobs = this.jobs;
+                    } else if (this.toolFilterValue == 'all') {
                         var jobs = this.jobs.filter(function(item) {
                             if (me.allowedTools.indexOf(item.tool) != -1) {
                                 return true;
