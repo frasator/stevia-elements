@@ -40,7 +40,7 @@
     </style>
     <template>
         <div hidden$="{{isEmpty}}" class="horizontal layout wrap center-justified">
-            <stv-table id="table" enable-export></stv-table>
+            <stv-table id="table" enable-export enable-paging></stv-table>
             <div id="mafChart" hidden></div>
         </div>
         <div hidden$="{{!isEmpty}}" style="padding:20px 50px;">
@@ -146,7 +146,7 @@
                     cat.push(elem.study + "/" + elem.population);
 
                 }
-                
+
                 var polarChart = new Highcharts.Chart({
                     chart: {
                         polar: true,
