@@ -102,11 +102,11 @@
         },
         selectedOptionChanged: function() {},
         handleMenuOption: function(e) {
-            var option = e.currentTarget.dataset['option'];
-            this.setMenu(option);
-        },
-        handleLoggedOnlyMenuOption: function(e) {
-            if (this.$.stvHeader != null) {
+            var menuOption = e.currentTarget;
+            if (menuOption.getAttribute('login-required') == null) {
+                var option = menuOption.dataset['option'];
+                this.setMenu(option);
+            } else if (this.$.stvHeader != null) {
                 var option = e.currentTarget.dataset['option'];
                 if (this.$.stvHeader.isLogged) {
                     this.setMenu(option);
@@ -122,12 +122,11 @@
             }
         },
         handleMenuPanel: function(e) {
-            var panel = this.$[e.currentTarget.dataset.panel];
-            panel.hidden = !panel.hidden;
-        },
-        handleLoggedOnlyMenuPanel: function(e) {
-            var option = e.currentTarget;
-            if (this.$.stvHeader != null) {
+            var menuOption = e.currentTarget;
+            var panel = this.$[menuOption.dataset.panel];
+            if (menuOption.getAttribute('login-required') == null) {
+                panel.hidden = !panel.hidden;
+            } else if (this.$.stvHeader != null) {
                 var panel = this.$[e.currentTarget.dataset.panel];
                 if (panel == null) {
                     panel = document.querySelector(e.currentTarget.dataset.panel);
@@ -135,14 +134,15 @@
                 if (this.$.stvHeader.isLogged) {
                     panel.hidden = !panel.hidden;
                     if (panel.hidden) {
-                        option.removeAttribute('active');
+                        menuOption.removeAttribute('active');
                     } else {
-                        option.setAttribute('active', '');
+                        menuOption.setAttribute('active', '');
                     }
                 } else {
                     this.selectedOption = 'login';
                     this._lastLoggedPanel = panel;
                 }
+
             }
         },
         handlePanelHidden: function(e) {
@@ -217,7 +217,7 @@
             }
         },
         checkShowMenuOnLogin: function() {
-            var menuButtons = this.querySelectorAll("[show-on-login]");
+            var menuButtons = this.querySelectorAll("[login-visible]");
             if (this.$.stvHeader != null) {
                 for (var i = 0; i < menuButtons.length; i++) {
                     var elem = menuButtons[i];
