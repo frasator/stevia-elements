@@ -19,6 +19,12 @@
                 value: ""
             }
         },
+        isEqual: function(value, currentValue) {
+            return value == currentValue;
+        },
+        isNull: function(o) {
+            return o == null;
+        },
         checkSelectedFile: function(fileSelector) {
             return fileSelector.selectedFile !== undefined;
         },

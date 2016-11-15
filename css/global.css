@@ -242,7 +242,6 @@ textarea.stv {
 .stv-note {
     position: relative;
     padding: 10px 10px 10px 40px;
-    margin: 10px 5px;
     border-left: 5px solid transparent;
     color: #444;
 }
@@ -293,6 +292,15 @@ textarea.stv {
 
 .stv-note-tip::after {
     content: '\f249';
+    color: #474747;
+}
+.stv-note-step {
+    border-left-color: #959595;
+    background-color: #e4e4e4;
+}
+
+.stv-note-step::after {
+    content: '\f024';
     color: #474747;
 }
 

@@ -14,8 +14,7 @@
             },
             userData: {
                 type: Object,
-                notify: true,
-                observer: 'userDataChanged'
+                notify: true
             },
             projects: {
                 type: Array,
@@ -41,7 +40,9 @@
         },
         observers: [
             '_selectedOptionChanged(selectedOption)',
-            'selectedOptionChanged(selectedOption)'
+            'selectedOptionChanged(selectedOption)',
+            '_userDataChanged(userData)',
+            'userDataChanged(userData)'
         ],
         ready: function() {
             var me = this;
@@ -74,6 +75,7 @@
                 });
                 Polymer.dom(this.root).appendChild(div);
             }
+            this.checkShowMenuOnLogin();
 
         },
         _selectedOptionChanged: function(neo, old) {
@@ -100,11 +102,11 @@
         },
         selectedOptionChanged: function() {},
         handleMenuOption: function(e) {
-            var option = e.currentTarget.dataset['option'];
-            this.setMenu(option);
-        },
-        handleLoggedOnlyMenuOption: function(e) {
-            if (this.$.stvHeader != null) {
+            var menuOption = e.currentTarget;
+            if (menuOption.getAttribute('login-required') == null) {
+                var option = menuOption.dataset['option'];
+                this.setMenu(option);
+            } else if (this.$.stvHeader != null) {
                 var option = e.currentTarget.dataset['option'];
                 if (this.$.stvHeader.isLogged) {
                     this.setMenu(option);
@@ -120,12 +122,11 @@
             }
         },
         handleMenuPanel: function(e) {
-            var panel = this.$[e.currentTarget.dataset.panel];
-            panel.hidden = !panel.hidden;
-        },
-        handleLoggedOnlyMenuPanel: function(e) {
-            var option = e.currentTarget;
-            if (this.$.stvHeader != null) {
+            var menuOption = e.currentTarget;
+            var panel = this.$[menuOption.dataset.panel];
+            if (menuOption.getAttribute('login-required') == null) {
+                panel.hidden = !panel.hidden;
+            } else if (this.$.stvHeader != null) {
                 var panel = this.$[e.currentTarget.dataset.panel];
                 if (panel == null) {
                     panel = document.querySelector(e.currentTarget.dataset.panel);
@@ -133,14 +134,15 @@
                 if (this.$.stvHeader.isLogged) {
                     panel.hidden = !panel.hidden;
                     if (panel.hidden) {
-                        option.removeAttribute('active');
+                        menuOption.removeAttribute('active');
                     } else {
-                        option.setAttribute('active', '');
+                        menuOption.setAttribute('active', '');
                     }
                 } else {
                     this.selectedOption = 'login';
                     this._lastLoggedPanel = panel;
                 }
+
             }
         },
         handlePanelHidden: function(e) {
@@ -153,12 +155,14 @@
                 el.setAttribute('active', '');
             }
         },
-        userDataChanged: function(neo, old) {
+        _userDataChanged: function(neo, old) {
             var me = this;
             if (this.userData) {} else {
                 console.log("no user data")
             }
+            this.checkShowMenuOnLogin();
         },
+        userDataChanged: function() {},
         checkMaintenance: function(neo) {
             var me = this;
             if (neo != null && neo !== '') {
@@ -213,7 +217,7 @@
             }
         },
         checkShowMenuOnLogin: function() {
-            var menuButtons = this.querySelectorAll("[show-on-login]");
+            var menuButtons = this.querySelectorAll("[login-visible]");
             if (this.$.stvHeader != null) {
                 for (var i = 0; i < menuButtons.length; i++) {
                     var elem = menuButtons[i];

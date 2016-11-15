@@ -17,7 +17,7 @@
         #bar {
             box-sizing: border-box;
             background-color: var(--light-secondary-color);
-            padding: 3px 22px 3px 7px;
+            padding: 3px 7px 3px 7px;
             border-bottom: 1px solid var(--divider-color);
         }
 
@@ -354,6 +354,9 @@
                     month: "short"
                 }) + " " + date.getDate() + ", " + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
 
+                this.fire('fileclick', {
+                    file: e.currentTarget.file
+                });
             },
             handleFileDblClick: function(e) {
                 var file = e.currentTarget.file;

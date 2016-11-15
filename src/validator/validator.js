@@ -45,7 +45,9 @@ Validator.prototype = {
                     splitPattern: /\r/
                 });
             } else {
-                me._navigator = new LineNavigator(me.file);
+                me._navigator = new LineNavigator(me.file, {
+                    chunkSize: 1024 * 50
+                });
             }
             me._totalBytes = me.file.size;
             var indexToStartWith = 0;

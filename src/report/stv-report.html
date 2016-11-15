@@ -776,6 +776,25 @@
                 // this._addTag(el, outEl);
                 return el;
             },
+            _pathactViewerTag: function(outEl) {
+                var el = document.createElement('div');
+
+                var pw = document.createElement('pathway-viewer');
+                pw.style.height = '1000px';
+
+                pw.set('hideAltered', true);
+                pw.set('sessionFileNameMap', this.fileNameMap);
+                pw.set('path', outEl.getAttribute('path'));
+                pw.set('pathType', outEl.getAttribute('path-type'));
+                pw.set('showHipathiaLegend', true);
+
+                // pw.style.border = "1px solid #d3d3d3";
+                // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
+
+                el.appendChild(pw);
+                // this._addTag(el, outEl);
+                return el;
+            },
             _goViewerTag: function(outEl) {
 
                 var el = document.createElement('div');
