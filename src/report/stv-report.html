@@ -19,6 +19,7 @@
 
          :host[toc-fixed]>#outline {
             position: fixed;
+            z-index: 1;
         }
 
         #outline {
@@ -250,6 +251,10 @@
                     table: 'fa-table',
                     boxplot: 'fa-bar-chart',
                     redirection: 'fa-forward',
+                    goViewer: 'fa-share-alt',
+                    interactomeViewer: 'fa-share-alt',
+                    networkMinerPlot: 'fa-bar-chart',
+
                 }
             },
             handleUp: function() {
@@ -409,6 +414,18 @@
                             break;
                         case 'redirection':
                             i.classList.add("fa", this.iconMap['redirection']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'goViewer':
+                            i.classList.add("fa", this.iconMap['goViewer']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'networkMinerPlot':
+                            i.classList.add("fa", this.iconMap['networkMinerPlot']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'interactomeViewer':
+                            i.classList.add("fa", this.iconMap['interactomeViewer']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
                             break;
                         case 'section':
@@ -778,6 +795,7 @@
                 return el;
             },
             _goViewerTag: function(outEl) {
+
                 var el = document.createElement('div');
 
                 var gw = document.createElement('babelomics-go-viewer');
