@@ -65,8 +65,7 @@ stv.utils = {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     endsWithIgnoreCase: function (str, test) {
-        var regex = new RegExp('^.*\\.(' + test + ')$', 'i');
-        return regex.test(str);
+        return this.endsWith(str.toLowerCase(), test.toLowerCase());
     },
     endsWith: function (str, test) {
         return str.length >= test.length && str.substr(str.length - test.length) == test;
