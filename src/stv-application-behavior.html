@@ -44,6 +44,9 @@
             '_userDataChanged(userData)',
             'userDataChanged(userData)'
         ],
+        listeners: {
+            'need-refresh': 'handleNeedRefresh',
+        },
         ready: function() {
             var me = this;
             //cookies
@@ -101,6 +104,12 @@
             }
         },
         selectedOptionChanged: function() {},
+        handleNeedRefresh: function() {
+            console.log('need-refresh');
+            if (this.$.stvHeader != null) {
+                this.$.stvHeader.getUserInfo(true);
+            }
+        },
         handleMenuOption: function(e) {
             var menuOption = e.currentTarget;
             if (menuOption.getAttribute('login-required') == null) {
@@ -160,6 +169,20 @@
             if (this.userData) {} else {
                 console.log("no user data")
             }
+
+            if (this.$.stvHeader != null) {
+                if (this.$.stvHeader.isLogged) {
+                    if (this._lastLoggedPanel) {
+                        this._lastLoggedPanel.show();
+                        this._lastLoggedPanel = null;
+                    }
+                    if (this._lastLoggedMenu) {
+                        this.setMenu(this._lastLoggedMenu);
+                        this._lastLoggedMenu = null;
+                    }
+                }
+            }
+
             this.checkShowMenuOnLogin();
         },
         userDataChanged: function() {},
@@ -217,24 +240,31 @@
             }
         },
         checkShowMenuOnLogin: function() {
-            var menuButtons = this.querySelectorAll("[login-visible]");
             if (this.$.stvHeader != null) {
+                var menuButtons = this.querySelectorAll("[login-visible]");
                 for (var i = 0; i < menuButtons.length; i++) {
-                    var elem = menuButtons[i];
-                    var panel = this.$[elem.dataset.panel];
+                    var menuOption = menuButtons[i];
+                    var panel = this.$[menuOption.dataset.panel];
                     if (!this.$.stvHeader.isLogged) {
-                        elem.hidden = true;
+                        menuOption.hidden = true;
                         if (panel != null) {
                             panel.hide();
                         }
                     } else {
-                        elem.hidden = false;
+                        menuOption.hidden = false;
                     }
-                    /*panels*/
-                    // console.log(panel);
+                }
+                var menuButtons = this.querySelectorAll("[login-required]");
+                for (var i = 0; i < menuButtons.length; i++) {
+                    var menuOption = menuButtons[i];
+                    var panel = this.$[menuOption.dataset.panel];
+                    if (!this.$.stvHeader.isLogged) {
+                        if (panel != null) {
+                            panel.hide();
+                        }
+                    }
                 }
             }
-
         },
         getQueryParam: function(name) {
             var url = window.location.href;
