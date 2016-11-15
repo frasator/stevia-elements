@@ -435,6 +435,7 @@
                             break;
                         default:
                     }
+
                     var text = document.createElement('span');
                     text.innerHTML = title;
 
@@ -779,6 +780,11 @@
 
                 var el = document.createElement('div');
 
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                // a.appendChild(this._createDownloadIcon());
+                // a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
+
                 var gw = document.createElement('babelomics-go-viewer');
                 gw.style.height = '800px';
 
@@ -787,6 +793,7 @@
                 gw.set('all-attributes', outEl.getAttribute('all-attributes'));
                 gw.set('sessionFileNameMap', this.fileNameMap);
 
+                el.appendChild(a);
                 el.appendChild(gw);
                 return el;
             },

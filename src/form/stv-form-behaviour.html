@@ -148,7 +148,12 @@
         },
         prompt: function(msg, cb) {
             new StvDialog().prompt(msg, cb);
+        },
+        checkRadioByValue: function(name, value) {
+            var r = this.querySelector("input[name='" + name + "'][value='" + value + "']");
+            if (r) {
+                r.checked = true;
+            }
         }
-
     };
 </script>
