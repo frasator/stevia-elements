@@ -14,8 +14,7 @@
             },
             userData: {
                 type: Object,
-                notify: true,
-                observer: 'userDataChanged'
+                notify: true
             },
             projects: {
                 type: Array,
@@ -41,7 +40,9 @@
         },
         observers: [
             '_selectedOptionChanged(selectedOption)',
-            'selectedOptionChanged(selectedOption)'
+            'selectedOptionChanged(selectedOption)',
+            '_userDataChanged(userData)',
+            'userDataChanged(userData)'
         ],
         ready: function() {
             var me = this;
@@ -74,6 +75,7 @@
                 });
                 Polymer.dom(this.root).appendChild(div);
             }
+            this.checkShowMenuOnLogin();
 
         },
         _selectedOptionChanged: function(neo, old) {
@@ -153,12 +155,14 @@
                 el.setAttribute('active', '');
             }
         },
-        userDataChanged: function(neo, old) {
+        _userDataChanged: function(neo, old) {
             var me = this;
             if (this.userData) {} else {
                 console.log("no user data")
             }
+            this.checkShowMenuOnLogin();
         },
+        userDataChanged: function() {},
         checkMaintenance: function(neo) {
             var me = this;
             if (neo != null && neo !== '') {
