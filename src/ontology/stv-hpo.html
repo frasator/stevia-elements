@@ -144,6 +144,7 @@
                     <div>is_a &nbsp;<i class="fa fa-long-arrow-right" aria-hidden="true" style="color:#0033cc"></i></div>
                 </div>
             </div>
+        </div>
     </template>
 
     <script>
@@ -178,15 +179,20 @@
                     value: function() {
                         return {};
                     }
+                },
+                readyhp: {
+                    type: Boolean,
+                    value: false
                 }
             },
             ready: function() {
                 var me = this;
                 this.set('hpoList', HPO_ONTOLOGY);
-                for (var i = 0; i < this.hpoList.length; i++) {
-                    this.hpoList[i].id = 'HP:' + this.hpoList[i].id;
+                if (!this.readyhp){
+                    for (var i = 0; i < this.hpoList.length; i++) {
+                        this.hpoList[i].id = 'HP:' + this.hpoList[i].id;
+                    }
                 }
-
                 // this.createJson();
 
                 this.hpoColumns = [{
