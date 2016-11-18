@@ -606,17 +606,19 @@
 
                 });
 
-                el.addEventListener('click', function(e) {
+                var exportBoxPlot = function(e) {
                     var chartElem = chartDiv;
                     var chart = Highcharts.charts[chartElem.dataset["highchartsChart"]];
                     chart.exportChart();
-                })
+                }
+
+                i.addEventListener('click', exportBoxPlot);
+                a.addEventListener('click', exportBoxPlot);
 
                 el.appendChild(i);
                 el.appendChild(a);
                 el.appendChild(chartDiv);
-                // el.appendChild(img);
-                // this._addTag(el, outEl);
+
                 return el;
             },
             _createBoxPlotChart: function(chartDiv, title, data) {
@@ -626,10 +628,15 @@
                         type: 'boxplot',
                         renderTo: chartDiv,
                         width: 700,
-                        height: 500
+                        height: 500,
+                        zoomType: "xy"
                     },
                     title: {
                         text: 'Box Plot'
+                    },
+                    subtitle: {
+                        text: document.ontouchstart === undefined ?
+                            'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
                     },
                     legend: {
                         enabled: false
