@@ -117,34 +117,41 @@
             background-color: var(--light-secondary-color);
             border-top: 1px solid var(--divider-color);
         }
+
+        .stv-note {
+            margin: 10px 0;
+        }
     </style>
     <template>
 
         <div id="main" class="vertical layout">
-            <div class="horizontal layout">
-                <div>
-                    <label class="stv">File upload:</label>
-                    <div id="openFileButton" class="stv-btn stv-btn-shdw" on-click="handleBrowseClick">
-                        Choose file...
-                    </div>
+            <div class="stv-note stv-note-step" style="">
+                1. In order to upload a file first must be selected from your computer.
+                <br> Please press the <b>Choose file...</b> button to open your system dialog window.
+            </div>
+            <div class="horizontal layout center">
+                <div id="openFileButton" class="stv-btn stv-btn-shdw" on-click="handleBrowseClick">
+                    Choose file...
                 </div>
-                <div class="flex" style="margin-left:15px;position:relative;">
-                    <label class="stv">Selected file:</label>
-                    <div class="horizontal layout flex">
-                        <div id="filename" class="flex">{{fileName}}</div>
+                <div id="filename" class="flex" style="margin-left:15px;">{{fileName}}</div>
+                <input type="file" hidden id="fileInput" on-change="handleInputChange" disabled$="{{uploading}}">
+            </div>
+            <br>
+            <br>
+            <div class="stv-note stv-note-step" style="">
+                2. Now the file will be validated according to it's format.
+                <br> Every time you change the <b>Bioformat</b> the file will be validated.
+                <br> Also you can start the validation process using the <b>Revalidate</b> button.
+            </div>
+            <div class="horizontal layout">
+                <div hidden$="{{hideBioformats}}">
+                    <div class="horizontal layout">
+                        <label class="stv">Bioformat:</label>
+                        <div class="flex"></div>
                         <div id="recheckButton" class="stv-btn stv-btn-shdw" on-click="handleRecheck">
                             Revalidate
                         </div>
                     </div>
-                    <input type="file" hidden id="fileInput" on-change="handleInputChange" disabled$="{{uploading}}">
-                </div>
-            </div>
-
-            <br>
-
-            <div class="horizontal layout">
-                <div hidden$="{{hideBioformats}}">
-                    <label class="stv">Bioformat:</label>
                     <div id="bioformatsBox">
                         <stv-file-bioformat id="bioformatSelect" bioformats="{{bioformats}}" on-selected-bioformat-change="handleSelectedBioformatChange"></stv-file-bioformat>
                     </div>
@@ -156,8 +163,11 @@
                     <stv-validator id="validator" bioformats="{{bioformats}}" on-end="handleValidatorEnd" on-stop="handleValidatorStop"></stv-validator>
                 </div>
             </div>
-
             <br>
+            <br>
+            <div class="stv-note stv-note-step" style="">
+                3. After validation process finish, press the <b>Upload</b> button to upload the file.
+            </div>
             <div class="horizontal layout">
                 <div id="uploadButton" class="stv-btn stv-btn-shdw" on-click="handleUpload"><i class="fa fa-cloud-upload"></i> Upload</div>
                 <!-- <div class="stv-btn stv-btn-shdw" on-click="handleValidate" hidden$="{{computeStatusButton(status, 'validation')}}">Validate</div> -->
@@ -426,6 +436,8 @@
                 this.message = "The file contains errors."
             } else if (this.$.validator.warningCount > 0) {
                 this.message = "File contains warning messages."
+            } else {
+                this.message = "Validation finished."
             }
         },
         handleValidatorStop: function(e) {

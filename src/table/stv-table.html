@@ -5,7 +5,7 @@
 
 <dom-module id="stv-table">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-         :host {
+        :host {
             display: block;
             position: relative;
             font-size: 13px;
@@ -25,7 +25,7 @@
             z-index: 1;
         }
 
-         :host[enable-paging] .scrollfix {
+        :host[enable-paging] .scrollfix {
             display: none;
         }
 
@@ -63,7 +63,7 @@
             background-color: inherit;
         }
 
-         :host[enable-paging] .table-header-row {
+        :host[enable-paging] .table-header-row {
             overflow-y: hidden;
         }
 
@@ -124,7 +124,7 @@
             background-color: inherit;
         }
 
-         :host[enable-paging] #filterRow {
+        :host[enable-paging] #filterRow {
             overflow-y: hidden;
         }
 
@@ -154,15 +154,15 @@
             background-color: #fafafa;
         }
 
-         :host>.table-body {
+        :host>.table-body {
             overflow-y: scroll;
         }
 
-         :host[enable-paging]>.table-body {
+        :host[enable-paging]>.table-body {
             overflow-y: hidden;
         }
 
-         :host[enable-filter]>.table-body {
+        :host[enable-filter]>.table-body {
             height: calc(100% - 88px);
         }
 
@@ -297,8 +297,8 @@
             margin-right: 15px;
         }
 
-         :host[enable-paging] .table-filter-field:last-child>.select,
-         :host[enable-paging] .table-filter-field:last-child>input[type=text] {
+        :host[enable-paging] .table-filter-field:last-child>.select,
+        :host[enable-paging] .table-filter-field:last-child>input[type=text] {
             margin-right: 1px;
         }
 
@@ -1273,18 +1273,22 @@
             },
             _columnSort: function(column, a, b) {
                 //checking formula or TODO save calculated value in the item;
-                var aVal, bVal;
-                if (column.formula != null) {
-                    aVal = column.formula(a);
-                    bVal = column.formula(b);
+                if (column.sort != null) {
+                  return column.sort(a,b);
                 } else {
-                    aVal = a[column.name];
-                    bVal = b[column.name];
-                }
-                if (!isNaN(bVal) && !isNaN(aVal)) {
-                    return aVal - bVal;
-                } else {
-                    return (aVal > bVal) - (aVal < bVal);
+                    var aVal, bVal;
+                    if (column.formula != null) {
+                        aVal = column.formula(a);
+                        bVal = column.formula(b);
+                    } else {
+                        aVal = a[column.name];
+                        bVal = b[column.name];
+                    }
+                    if (!isNaN(bVal) && !isNaN(aVal)) {
+                        return aVal - bVal;
+                    } else {
+                        return (aVal > bVal) - (aVal < bVal);
+                    }
                 }
             },
             _getPos: function(row) {

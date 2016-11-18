@@ -19,6 +19,7 @@
 
          :host[toc-fixed]>#outline {
             position: fixed;
+            z-index: 1;
         }
 
         #outline {
@@ -250,6 +251,10 @@
                     table: 'fa-table',
                     boxplot: 'fa-bar-chart',
                     redirection: 'fa-forward',
+                    goViewer: 'fa-share-alt',
+                    interactomeViewer: 'fa-share-alt',
+                    networkMinerPlot: 'fa-bar-chart',
+
                 }
             },
             handleUp: function() {
@@ -411,6 +416,18 @@
                             i.classList.add("fa", this.iconMap['redirection']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
                             break;
+                        case 'goViewer':
+                            i.classList.add("fa", this.iconMap['goViewer']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'networkMinerPlot':
+                            i.classList.add("fa", this.iconMap['networkMinerPlot']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'interactomeViewer':
+                            i.classList.add("fa", this.iconMap['interactomeViewer']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
                         case 'section':
                             el.style.fontWeight = "bold";
                             el.style.marginLeft = level * 10 + "px";
@@ -418,6 +435,7 @@
                             break;
                         default:
                     }
+
                     var text = document.createElement('span');
                     text.innerHTML = title;
 
@@ -758,8 +776,33 @@
                 // this._addTag(el, outEl);
                 return el;
             },
-            _goViewerTag: function(outEl) {
+            _pathactViewerTag: function(outEl) {
                 var el = document.createElement('div');
+
+                var pw = document.createElement('pathway-viewer');
+                pw.style.height = '1000px';
+
+                pw.set('hideAltered', true);
+                pw.set('sessionFileNameMap', this.fileNameMap);
+                pw.set('path', outEl.getAttribute('path'));
+                pw.set('pathType', outEl.getAttribute('path-type'));
+                pw.set('showHipathiaLegend', true);
+
+                // pw.style.border = "1px solid #d3d3d3";
+                // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
+
+                el.appendChild(pw);
+                // this._addTag(el, outEl);
+                return el;
+            },
+            _goViewerTag: function(outEl) {
+
+                var el = document.createElement('div');
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                // a.appendChild(this._createDownloadIcon());
+                // a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
 
                 var gw = document.createElement('babelomics-go-viewer');
                 gw.style.height = '800px';
@@ -769,6 +812,7 @@
                 gw.set('all-attributes', outEl.getAttribute('all-attributes'));
                 gw.set('sessionFileNameMap', this.fileNameMap);
 
+                el.appendChild(a);
                 el.appendChild(gw);
                 return el;
             },

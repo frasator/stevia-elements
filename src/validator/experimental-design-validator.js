@@ -12,8 +12,8 @@ function ExperimentalDesignValidator(options) {
 
 ExperimentalDesignValidator.prototype = Object.create(Validator.prototype);
 
-ExperimentalDesignValidator.prototype.validateLine = function (line) {
-        this.parseData(line);
+ExperimentalDesignValidator.prototype.validateLine = function (line, isLast) {
+    this.parseData(line);
 }
 
 ExperimentalDesignValidator.prototype.validateEnd = function () {
@@ -22,10 +22,11 @@ ExperimentalDesignValidator.prototype.validateEnd = function () {
     }
 }
 
-ExperimentalDesignValidator.prototype.parseData = function (line) {
+ExperimentalDesignValidator.prototype.parseData = function (line, isLast) {
     if (line == "") {
-        this.addLog("warning", "Empty line.");
-    }else{
+        if (!isLast)
+            this.addLog("warning", "Empty line.");
+    } else {
         var columns = line.split("\t");
 
         if (columns.length < 2) {

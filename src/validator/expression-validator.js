@@ -13,12 +13,12 @@ function ExpressionValidator(options) {
 
 ExpressionValidator.prototype = Object.create(Validator.prototype);
 
-ExpressionValidator.prototype.validateLine = function (line) {
+ExpressionValidator.prototype.validateLine = function (line, isLast) {
 
     if (this.isHeaderLine(line)) { // parse Header
         this.parseHeader(line);
     } else {
-        this.parseData(line);
+        this.parseData(line, isLast);
     }
 
 }
@@ -48,11 +48,11 @@ ExpressionValidator.prototype.parseHeader = function (line) {
     }
 }
 
-ExpressionValidator.prototype.parseData = function (line) {
-
+ExpressionValidator.prototype.parseData = function (line, isLast) {
     if (line == "") {
-        this.addLog("warning", "Empty line.");
-    }else{
+        if (!isLast)
+            this.addLog("warning", "Empty line.");
+    } else {
         var columns = line.split("\t");
 
         if (this._columnsSize !== columns.length) {
@@ -76,8 +76,6 @@ ExpressionValidator.prototype.parseData = function (line) {
             }
         }
     }
-
-
 
     // this.addLog("info", "checking line");
 

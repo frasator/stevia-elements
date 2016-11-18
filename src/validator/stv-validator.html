@@ -13,7 +13,7 @@
 
 <dom-module name="stv-validator" noscript>
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -33,8 +33,12 @@
         }
 
         #footer {
-            height: 24px;
+            height: 30px;
             border-top: 1px solid var(--divider-color);
+        }
+
+        #footer>* {
+            margin-left: 3px;
         }
 
         .line {
@@ -90,11 +94,11 @@
             visibility: hidden;
         }
 
-        .item:hover > .view {
+        .item:hover>.view {
             visibility: visible;
         }
 
-        .view > i:hover {
+        .view>i:hover {
             color: var(--dark-button-color);
         }
 
@@ -125,7 +129,7 @@
 
         #log {
             position: relative;
-            height: calc(100% - 54px);
+            height: calc(100% - 60px);
             overflow-y: auto;
             /*background-color: #FAFAFA;*/
             background-color: white;
@@ -135,7 +139,7 @@
             padding: 0 5px;
         }
 
-        .count > span {
+        .count>span {
             color: black;
         }
 
@@ -167,7 +171,7 @@
             width: 100%;
         }
 
-        .header > div {
+        .header>div {
             padding-left: 2px;
         }
 
@@ -208,17 +212,17 @@
         </iron-list>
 
         <div id="footer" class="counts horizontal layout center">
-            <div class="stv-btn stv-btn-shdw but" on-click="handleView" data-value="error" data-checked$="{{computeView(view, 'error')}}">
+            <div class="stv-btn stv-btn-shdw" on-click="handleView" data-value="error" data-checked$="{{computeView(view, 'error')}}">
                 <div class="error-count count">Errors:
                     <span>{{errorCount}}</span>
                 </div>
             </div>
-            <div class="stv-btn stv-btn-shdw but" on-click="handleView" data-value="warning" data-checked$="{{computeView(view, 'warning')}}">
+            <div class="stv-btn stv-btn-shdw" on-click="handleView" data-value="warning" data-checked$="{{computeView(view, 'warning')}}">
                 <div class="warning-count count">Warning:
                     <span>{{warningCount}}</span>
                 </div>
             </div>
-            <div class="stv-btn stv-btn-shdw but" on-click="handleView" data-value="info" data-checked$="{{computeView(view, 'info')}}">
+            <div class="stv-btn stv-btn-shdw" on-click="handleView" data-value="info" data-checked$="{{computeView(view, 'info')}}">
                 <div class="info-count count">Info:
                     <span>{{infoCount}}</span>
                 </div>
@@ -425,11 +429,11 @@
                     }
 
                     if (lines.length > 0) {
-                      var aux = lines[0].split("\t");
-                      aux[me.column] = '<span style="color:red">' + aux[me.column] + '</span>';
-                      me.$.linePreview.innerHTML = aux.join("\t");
-                      // me.linePreview = lines[0];
-                      me.$.linePreviewPanel.show();
+                        var aux = lines[0].split("\t");
+                        aux[me.column] = '<span style="color:red">' + aux[me.column] + '</span>';
+                        me.$.linePreview.innerHTML = aux.join("\t");
+                        // me.linePreview = lines[0];
+                        me.$.linePreviewPanel.show();
                     }
 
                     if (eof) {

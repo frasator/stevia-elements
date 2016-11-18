@@ -45,7 +45,9 @@ Validator.prototype = {
                     splitPattern: /\r/
                 });
             } else {
-                me._navigator = new LineNavigator(me.file);
+                me._navigator = new LineNavigator(me.file, {
+                    chunkSize: 1024 * 50
+                });
             }
             me._totalBytes = me.file.size;
             var indexToStartWith = 0;
@@ -60,14 +62,16 @@ Validator.prototype = {
                 // console.log(lines.length);
                 console.log(progress);
 
+                var isLast = false;
                 for (var i = 0; i < lines.length; i++) {
                     var line = lines[i];
+                    isLast = (i == (lines.length - 1) && eof);
 
                     me.line++;
                     me.numLines++;
                     me._readBytes += line.length;
                     me.progress = (me._readBytes / me._totalBytes) * 100;
-                    me.validateLine(line);
+                    me.validateLine(line, isLast);
                 }
                 me._emit("progress", me.progress);
 
