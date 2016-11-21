@@ -5,10 +5,11 @@
 <script src="../../../network-viewer/conf/config.js"></script>
 <link rel="import" href="../../../network-viewer/network-viewer.html">
 <link rel="import" href="../../../pathway-viewer/pathway-viewer.html">
+<link rel="import" href="../../../pathway-viewer/pathway-drug-viewer.html">
 
 <dom-module id="stv-report">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-     :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -197,7 +198,10 @@
             margin: 10px;
             max-width: 300px;
         }
-    }
+
+        pathway-drug-viewer {
+            background-color: inherit;
+        }
     </style>
     <template>
         <div id="outline" class="vertical layout">
@@ -263,12 +267,9 @@
             jobChanged: function(neo, old) {
                 var me = this;
                 if (neo) {
-                    this.jobDate = new Date(Date.parse(me.job.createdAt)).toLocaleString();
-                    this.fileNameMap = {};
                     while (this.$.main.firstChild) {
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
-
                     while (this.$.outlineContent.firstChild) {
                         this.$.outlineContent.removeChild(this.$.outlineContent.firstChild);
                     }
@@ -276,6 +277,8 @@
                     while (this.$.inputParams.firstChild) {
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
+                    this.jobDate = new Date(Date.parse(me.job.createdAt)).toLocaleString();
+                    this.fileNameMap = {};
 
                     var jobInfoElem = document.createElement('a');
                     jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
@@ -330,7 +333,6 @@
                 });
             },
             processReportFile: function(fileContent) {
-
                 var parser = new DOMParser();
                 var reportXML = parser.parseFromString(fileContent, "text/xml");
 
@@ -760,38 +762,55 @@
             _pathwayViewerTag: function(outEl) {
                 var el = document.createElement('div');
 
-                var pw = document.createElement('pathway-viewer');
-                pw.style.height = '1000px';
+                var pv = document.createElement('pathway-viewer');
+                var minHeight = 700;
+                var height = Math.max((window.innerHeight - 120), minHeight);
+                pv.style.height = height + 'px';
 
-                pw.set('hideAltered', true);
-                pw.set('sessionFileNameMap', this.fileNameMap);
-                pw.set('path', outEl.getAttribute('path'));
-                pw.set('pathType', outEl.getAttribute('path-type'));
-                pw.set('showHipathiaLegend', true);
+                pv.set('hideAltered', true);
+                pv.set('sessionFileNameMap', this.fileNameMap);
+                pv.set('path', outEl.getAttribute('path'));
+                pv.set('pathType', outEl.getAttribute('path-type'));
+                pv.set('showHipathiaLegend', true);
 
                 // pw.style.border = "1px solid #d3d3d3";
                 // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
 
-                el.appendChild(pw);
+                el.appendChild(pv);
                 // this._addTag(el, outEl);
                 return el;
             },
-            _pathactViewerTag: function(outEl) {
+            _pathwayDrugViewerTag: function(outEl) {
                 var el = document.createElement('div');
 
-                var pw = document.createElement('pathway-viewer');
-                pw.style.height = '1000px';
+                var pdv = document.createElement('pathway-drug-viewer');
+                var minHeight = 700;
+                var height = Math.max((window.innerHeight - 120), minHeight);
+                pdv.style.height = height + 'px';
 
-                pw.set('hideAltered', true);
-                pw.set('sessionFileNameMap', this.fileNameMap);
-                pw.set('path', outEl.getAttribute('path'));
-                pw.set('pathType', outEl.getAttribute('path-type'));
-                pw.set('showHipathiaLegend', true);
+                pdv.set('hideBackButton', true);
+                pdv.set('path', outEl.getAttribute('path'));
+                pdv.set('initPath', outEl.getAttribute('path'));
+                // pdv.set('initPath', outEl.getAttribute('path') + '_init');
+                pdv.set('jobUpdateArgs', {
+                    tool: outEl.getAttribute('tool'),
+                    execution: outEl.getAttribute('update-execution'),
+                    executable: outEl.getAttribute('update-executable')
+                });
+                pdv.set('jobClearArgs', {
+                    tool: outEl.getAttribute('tool'),
+                    execution: outEl.getAttribute('clear-execution'),
+                    executable: outEl.getAttribute('clear-executable')
+                });
+
+                pdv.$.pathwayViewer.set('hideAltered', false);
+
+                pdv.set('jobFolder', this.job.folder);
 
                 // pw.style.border = "1px solid #d3d3d3";
                 // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
 
-                el.appendChild(pw);
+                el.appendChild(pdv);
                 // this._addTag(el, outEl);
                 return el;
             },
