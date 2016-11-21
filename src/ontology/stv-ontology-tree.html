@@ -39,22 +39,22 @@
             },
             _initFile: function(file, parent, openIndex) {
                 if (parent == null) {
-                    file.path = file.n;
+                    file.path = file.name;
                 } else {
-                    file.path = parent.path + '/' + file.n;
+                    file.path = parent.path + '/' + file.name;
                     file.parent = parent;
                 }
                 var defaultOpen = (file.open == true) ? file.open : false;
                 file.open = openIndex[file.path] || defaultOpen;
-                for (var i = 0; i < file.f.length; i++) {
-                    this._initFile(file.f[i], file, openIndex);
+                for (var i = 0; i < file.children.length; i++) {
+                    this._initFile(file.children[i], file, openIndex);
                 }
             },
             _createOpenIndex: function(openIndex, file) {
                 if (openIndex[file.path] == null) {
                     openIndex[file.path] = file.open;
-                    for (var i = 0; i < file.f.length; i++) {
-                        this._createOpenIndex(openIndex, file.f[i]);
+                    for (var i = 0; i < file.children.length; i++) {
+                        this._createOpenIndex(openIndex, file.children[i]);
                     }
                 }
             }

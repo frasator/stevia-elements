@@ -49,6 +49,20 @@
             font-weight: bold;
             color: var(--dark-button-color);
         }
+
+        ul.error {
+            background-color: #fcf8f2;
+            border: 1px solid red;
+            border-left: 4px solid red;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        ul.error>li {
+            padding: 3px;
+        }
     </style>
     <template>
         <div id="form">
@@ -63,9 +77,14 @@
             <div id="container" class="horizontal layout" hidden$="{{isContainerHidden(collapsible, collapsed)}}">
                 <content select=".container"></content>
             </div>
+
+            <!-- <ul id="error" class="error"> -->
+            <ul id="error" class="error" hidden$="{{hideErrors}}">
+                <template is="dom-repeat" items="{{errors}}">
+                    <li>{{item.msg}}</li>
+                </template>
+            </ul>
         </div>
-
-
     </template>
 
     <script>
@@ -82,8 +101,24 @@
                     reflectToAttribute: true,
                     value: false,
                 },
+                errors: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                hideErrors: {
+                    type: Boolean,
+                    value: true
+
+                }
             },
-            ready: function() {},
+            observers: [
+                "computeErrors(errors.splices)"
+            ],
+            ready: function() {
+
+            },
 
             handleCollapseAction: function(e) {
                 if (this.collapsible) {
@@ -109,8 +144,20 @@
                 } else {
                     return "Minimize";
                 }
+            },
+            addError: function(msg) {
+                console.log("ADD ERROR");
+                this.push('errors', {
+                    msg: msg
+                });
+                console.log("ADD ERROR: " + this.errors.length)
+            },
+            clearErrors: function() {
+                this.set('errors', []);
+            },
+            computeErrors: function(errors) {
+                this.hideErrors = errors && errors.length == 0;
             }
-
         })
     </script>
 </dom-module>

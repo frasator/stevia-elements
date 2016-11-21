@@ -1,5 +1,7 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../stv-dialog/stv-dialog.html">
+<link rel="import" href="../stv-form-box.html">
+
 <script>
     StvFormBehaviour = {
         properties: {
@@ -160,6 +162,22 @@
             if (r) {
                 r.checked = true;
             }
-        }
+        },
+        setError: function(id, msg) {
+            var parent = stv.utils.closest(id, "stv-form-box");
+            parent.addError(msg);
+            // this.errorMessage = "There are errors in the form. Correct them before launching the job.";
+        },
+        clearAllErrors: function() {
+            var selection = this.querySelectorAll("stv-form-box");
+            for (var i = 0; i < selection.length; i++) {
+                var sfb = selection[i];
+                sfb.clearErrors();
+            }
+        },
+        clearErrors: function(id) {
+            var parent = stv.utils.closest(id, "stv-form-box");
+            parent.clearErrors();
+        },
     };
 </script>
