@@ -50,18 +50,8 @@
             color: var(--dark-button-color);
         }
 
-        ul.error {
-            background-color: #fcf8f2;
-            border: 1px solid red;
-            border-left: 4px solid red;
-            margin-left: 20px;
-            margin-right: 20px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-
-        ul.error>li {
-            padding: 3px;
+        .stv-note {
+            margin: 20px;
         }
     </style>
     <template>
@@ -78,12 +68,11 @@
                 <content select=".container"></content>
             </div>
 
-            <!-- <ul id="error" class="error"> -->
-            <ul id="error" class="error" hidden$="{{hideErrors}}">
+            <div id="error" class="stv-note stv-note-error" hidden$="{{hideErrors}}">
                 <template is="dom-repeat" items="{{errors}}">
-                    <li>{{item.msg}}</li>
+                    <div>{{item.msg}}</div>
                 </template>
-            </ul>
+            </div>
         </div>
     </template>
 
@@ -156,7 +145,11 @@
                 this.set('errors', []);
             },
             computeErrors: function(errors) {
-                this.hideErrors = errors && errors.length == 0;
+                if (errors) {
+                    this.hideErrors = errors.length == 0;
+                } else {
+                    this.hideErrors = true;
+                }
             }
         })
     </script>
