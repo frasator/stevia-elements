@@ -80,6 +80,9 @@
         .download-job:hover {
             color: #0068cc !important;
         }
+        .open-job-folder:hover {
+            color: #0068cc !important;
+        }
 
         .download {
             color: #000 !important;
@@ -122,6 +125,7 @@
                             <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
                             <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
                             <i class="fa fa-download download-job" title="Download" hidden="{{hasError(job)}}" on-click="handleDownloadJob"></i>
+                            <i class="fa fa-folder-open-o open-job-folder" title$="Open job folder: {{job.folder.path}}" on-click="handleOpenJobFolder"></i>
                             <i class="fa fa-bug bug-job" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
                         </template>
                     </div>
@@ -268,6 +272,10 @@
                     'cancelable': true
                 });
                 link.dispatchEvent(event);
+            },
+            handleOpenJobFolder:function(e){
+                e.stopPropagation();
+                this.fire('open-job-folder', this.job);
             },
             handleReportError: function(e) {
                 e.stopPropagation();
