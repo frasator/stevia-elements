@@ -2,7 +2,7 @@
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-select-box">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -45,6 +45,11 @@
                 selected: {
                     type: Object
                 },
+                disableSelection: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
                 selectFirst: {
                     type: Boolean,
                     reflectToAttribute: true,
@@ -70,16 +75,20 @@
                 }
             },
             handleSelect: function(e) {
-                this.set('selected', e.model.option);
-                this.fire('select', this.selected);
+                if (this.disableSelection == false) {
+                    this.set('selected', e.model.option);
+                    this.fire('select', this.selected);
+                }
             },
             isSelected: function(selected, current) {
                 return selected == current;
             },
             selectByIndex: function(index) {
-                if (this.options[index] != null) {
-                    this.set('selected', this.options[index]);
-                    this.fire('select', this.selected);
+                if (this.disableSelection == false) {
+                    if (this.options[index] != null) {
+                        this.set('selected', this.options[index]);
+                        this.fire('select', this.selected);
+                    }
                 }
             },
             selectByName: function(name) {

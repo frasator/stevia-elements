@@ -2,16 +2,15 @@
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-form-box">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
-            display: inline-block;
+         :host {
+            display: block;
             position: relative;
             box-sizing: border-box;
-            width: 100%;
+            margin: 7px 5px;
         }
 
         #form {
             border: 1px solid rgba(125, 125, 125, 0.4);
-            margin: 0 5px 10px 5px;
             background-color: var(--text-primary-color);
         }
 
@@ -19,11 +18,14 @@
             padding: 5px 10px;
             font-size: 15px;
             background-color: var(--light-secondary-color);
-            color: var(--secondary-text-color);
+            color: var(--primary-text-color);
+        }
+
+         :host[collapsible] #header {
             cursor: pointer;
         }
 
-        #header:hover {
+         :host[collapsible] #header:hover {
             font-weight: bold;
             color: var(--dark-button-color);
         }
@@ -38,14 +40,18 @@
             cursor: pointer;
         }
 
-        .collapsible > i {
+        .collapsible>i {
             color: var(--secondary-text-color);
             font-size: 12px;
         }
 
-        .collapsible >i:hover {
+        .collapsible>i:hover {
             font-weight: bold;
             color: var(--dark-button-color);
+        }
+
+        .stv-note {
+            margin: 20px;
         }
     </style>
     <template>
@@ -61,9 +67,13 @@
             <div id="container" class="horizontal layout" hidden$="{{isContainerHidden(collapsible, collapsed)}}">
                 <content select=".container"></content>
             </div>
+
+            <div id="error" class="stv-note stv-note-error" hidden$="{{hideErrors}}">
+                <template is="dom-repeat" items="{{errors}}">
+                    <div>{{item.msg}}</div>
+                </template>
+            </div>
         </div>
-
-
     </template>
 
     <script>
@@ -80,8 +90,24 @@
                     reflectToAttribute: true,
                     value: false,
                 },
+                errors: {
+                    type: Array,
+                    value: function() {
+                        return [];
+                    }
+                },
+                hideErrors: {
+                    type: Boolean,
+                    value: true
+
+                }
             },
-            ready: function() {},
+            observers: [
+                "computeErrors(errors.splices)"
+            ],
+            ready: function() {
+
+            },
 
             handleCollapseAction: function(e) {
                 if (this.collapsible) {
@@ -107,8 +133,22 @@
                 } else {
                     return "Minimize";
                 }
+            },
+            addError: function(msg) {
+                this.push('errors', {
+                    msg: msg
+                });
+            },
+            clearErrors: function() {
+                this.set('errors', []);
+            },
+            computeErrors: function(errors) {
+                if (errors) {
+                    this.hideErrors = errors.length == 0;
+                } else {
+                    this.hideErrors = true;
+                }
             }
-
         })
     </script>
 </dom-module>
