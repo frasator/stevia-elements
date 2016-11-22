@@ -9,7 +9,7 @@ var BiodbManager = {
             return BiodbManager._doRequest(args, 'go', 'info');
         },
         fetch: function (args) {
-            return BiodbManager._doRequest(args, 'hpo', 'fetch');
+            return BiodbManager._doRequest(args, 'go', 'fetch');
         },
 
     },
@@ -60,7 +60,7 @@ var BiodbManager = {
                 var contentType = this.getResponseHeader('Content-Type');
                 if (contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
-                    if (json.error == null) {
+                    if (json.error == null || json.error.msg=="") {
                         args.request.success(json, this);
                     } else {
                         // if (window.BIODB_LOG === true) {
@@ -87,7 +87,7 @@ var BiodbManager = {
                     request.setRequestHeader(header, args.request.headers[header]);
                 }
             }
-          
+
             var body = null;
             if (args.request.body != null) {
                 body = args.request.body;
