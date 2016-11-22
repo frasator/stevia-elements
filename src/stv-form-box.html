@@ -144,18 +144,16 @@
                 }
             },
             addError: function(msg) {
-                console.log("ADD ERROR");
                 this.push('errors', {
                     msg: msg
                 });
-                console.log("ADD ERROR: " + this.errors.length)
             },
             clearErrors: function() {
                 this.set('errors', []);
             },
             computeErrors: function(errors) {
                     this.hideErrors = errors && errors.length == 0;
-                
+
             }
         })
     </script>
