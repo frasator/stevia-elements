@@ -154,12 +154,6 @@
                         return [];
                     }
                 },
-                map: {
-                    type: Object,
-                    value: function() {
-                        return {};
-                    }
-                },
                 mapSelectedHpo: {
                     type: Object,
                     value: function() {
@@ -177,6 +171,7 @@
             ready: function() {
                 var me = this;
                 this.getHPO();
+                this.getFirstHpo();
 
                 this.hpoColumns = [{
                     name: 'id',
@@ -287,6 +282,27 @@
                 }
                 return total;
             },
+            getFirstHpo: function() {
+              var me=this;
+                BiodbManager.hpo.info({
+                    query: {
+                        id : "HP:0000001"
+                    },
+                    request: {
+                      success: function(response) {
+                          if (response.error === '' || response.error.msg == "") {
+                              me.$.treeHPO.tree=response.result;
+                          } else {
+                              console.log(response.error.msg);
+                          }
+                      },
+                      error: function() {
+                          console.log('Server error, try again later.');
+                      }
+                    }
+                });
+
+            }
         });
     </script>
 </dom-module>

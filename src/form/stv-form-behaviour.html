@@ -58,15 +58,12 @@
                 // validated = false;
             }
             if (this.$.inputFile.selectedFile === undefined || this.$.inputFile.selectedFile.type != "FILE") {
-                msg += "Please select an input file.\n";
+                this.setError(this.$.inputFile, "Please select an input file.")
                 validated = false;
             }
             if (this.$.jobName.value == "") {
-                msg += "Please add a job name.\n";
+                this.setError(this.$.jobName, "Please add a job name.")
                 validated = false;
-            }
-            if (!validated) {
-                this.alert(msg)
             }
             return validated;
         },
@@ -186,7 +183,11 @@
                 sfb.clearErrors();
             }
             this.hasErrors = false;
+        },
+        computeHasErrors: function(hasErrors) {
+            return (hasErrors);
         }
+
         // clearErrors: function(id) {
         //     var parent = stv.utils.closest(id, "stv-form-box");
         //     parent.clearErrors();

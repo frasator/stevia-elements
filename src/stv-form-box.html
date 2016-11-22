@@ -53,6 +53,14 @@
         .stv-note {
             margin: 20px;
         }
+
+        :host.error {
+            box-shadow: 0 0 10px 1px rgba(191, 71, 71, 1);
+        }
+
+        :host.error #header {
+            color: #BF4747;
+        }
     </style>
     <template>
         <div id="form">
@@ -135,11 +143,9 @@
                 }
             },
             addError: function(msg) {
-                console.log("ADD ERROR");
                 this.push('errors', {
                     msg: msg
                 });
-                console.log("ADD ERROR: " + this.errors.length)
             },
             clearErrors: function() {
                 this.set('errors', []);
@@ -149,6 +155,12 @@
                     this.hideErrors = errors.length == 0;
                 } else {
                     this.hideErrors = true;
+                }
+
+                if (!this.hideErrors) {
+                    this.classList.add("error");
+                } else {
+                    this.classList.remove("error");
                 }
             }
         })
