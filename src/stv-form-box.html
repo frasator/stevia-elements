@@ -3,15 +3,14 @@
 <dom-module id="stv-form-box">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
          :host {
-            display: inline-block;
+            display: block;
             position: relative;
             box-sizing: border-box;
-            width: 100%;
+            margin: 7px 5px;
         }
 
         #form {
             border: 1px solid rgba(125, 125, 125, 0.4);
-            margin: 0 5px 10px 5px;
             background-color: var(--text-primary-color);
         }
 
@@ -19,11 +18,14 @@
             padding: 5px 10px;
             font-size: 15px;
             background-color: var(--light-secondary-color);
-            color: var(--secondary-text-color);
+            color: var(--primary-text-color);
+        }
+
+         :host[collapsible] #header {
             cursor: pointer;
         }
 
-        #header:hover {
+         :host[collapsible] #header:hover {
             font-weight: bold;
             color: var(--dark-button-color);
         }
@@ -48,18 +50,8 @@
             color: var(--dark-button-color);
         }
 
-        ul.error {
-            background-color: #fcf8f2;
-            border: 1px solid red;
-            border-left: 4px solid red;
-            margin-left: 20px;
-            margin-right: 20px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-        }
-
-        ul.error>li {
-            padding: 3px;
+        .stv-note {
+            margin: 20px;
         }
     </style>
     <template>
@@ -76,12 +68,11 @@
                 <content select=".container"></content>
             </div>
 
-            <!-- <ul id="error" class="error"> -->
-            <ul id="error" class="error" hidden$="{{hideErrors}}">
+            <div id="error" class="stv-note stv-note-error" hidden$="{{hideErrors}}">
                 <template is="dom-repeat" items="{{errors}}">
-                    <li>{{item.msg}}</li>
+                    <div>{{item.msg}}</div>
                 </template>
-            </ul>
+            </div>
         </div>
     </template>
 
@@ -152,8 +143,11 @@
                 this.set('errors', []);
             },
             computeErrors: function(errors) {
-                    this.hideErrors = errors && errors.length == 0;
-
+                if (errors) {
+                    this.hideErrors = errors.length == 0;
+                } else {
+                    this.hideErrors = true;
+                }
             }
         })
     </script>
