@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="selectedDiseases">
-                <stv-table id="selectedDiseases" class="flex" columns="{{diseaseColumns}}" data="{{selectedDisease}}" enable-paging hide-column-selector>
+                <stv-table id="selectedDiseases" class="flex" columns="{{diseaseColumns}}" data="{{selectedDisease}}" enable-paging hide-column-selector on-removerow="handleRemoveElement">
                 </stv-table>
                 <div class="stv-btn stv-btn-shdw but" on-click="handleClearSelectedDiseases">
                     Clear
@@ -189,6 +189,11 @@
             handleAddSelected: function(e) {
                 this.set('diseaseValue', this.selectedDisease);
                 this.fire('added');
+            },
+            handleRemoveElement: function(e){
+              var key=e.detail.row.phenotype;
+              this.mapSelectedDisease[key] = null;
+
             }
         })
     </script>

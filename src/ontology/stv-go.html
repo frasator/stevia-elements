@@ -99,7 +99,7 @@
                     </div>
                 </div>
                 <div class="selectedGO">
-                    <stv-table id="selectedGO" class="flex" columns="{{goSelectedColumns}}" data="{{selectedGO}}" hide-column-selector>
+                    <stv-table id="selectedGO" class="flex" columns="{{goSelectedColumns}}" data="{{selectedGO}}" enable-paging hide-column-selector on-removerow="handleRemoveElement">
                     </stv-table>
                     <div class="stv-btn stv-btn-shdw but" on-click="handleClearSelected">
                         Clear
@@ -236,6 +236,10 @@
                 }
                 this.fire('added');
             },
+            handleRemoveElement: function(e) {
+                var key = e.detail.row.id;
+                this.mapSelectedGo[key] = null;
+            },
             getGO: function() {
                 var me = this;
                 var url = BiodbManager.go.fetch({
@@ -283,23 +287,30 @@
             },
             getFirstGo: function() {
                 var me = this;
-                BiodbManager.go.info({
-                    query: {
-                        id: "GO:0008150,GO:0003674,GO:0016043"
-                    },
-                    request: {
-                        success: function(response) {
-                            if (response.error === '' || response.error.msg == "") {
-                                me.$.treeGO.tree=response.result;
-                            } else {
-                                console.log(response.error.msg);
-                            }
+                if (localStorage.bioinfo_biertool_go) {
+                    //Coger el arbol del local storage
+                    this.$.treeHPO.tree = treeJSON.parse(localStorage.bioinfo_biertool_go);
+                } else {
+                    //Llamar al WS
+                    BiodbManager.go.info({
+                        query: {
+                            id: "GO:0008150,GO:0003674,GO:0016043"
                         },
-                        error: function() {
-                            console.log('Server error, try again later.');
+                        request: {
+                            success: function(response) {
+                                if (response.error === '' || response.error.msg == "") {
+                                    me.$.treeGO.tree = response.result;
+                                    // localStorage.bioinfo_team_diseases = JSON.stringify(response.result);
+                                } else {
+                                    console.log(response.error.msg);
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later.');
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         })
     </script>
