@@ -182,14 +182,14 @@
                     }
                 }
             },
-            handleClearSelectedDiseaSE: function(e) {
+            handleClearSelectedDiseases: function(e) {
                 this.selectedDisease = [];
                 this.mapSelectedDisease = {};
             },
             handleAddSelected: function(e) {
                 this.set('diseaseValue', this.selectedDisease);
                 this.fire('added');
-            },
+            }
         })
     </script>
 </dom-module>
