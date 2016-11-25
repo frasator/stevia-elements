@@ -100,7 +100,7 @@
                     </div>
                 </div>
                 <div class="selectedHPO">
-                    <stv-table id="selectedHPO" class="flex" columns="{{hpoSelectedColumns}}" data="{{selectedHPO}}" hide-column-selector>
+                    <stv-table id="selectedHPO" class="flex" columns="{{hpoSelectedColumns}}" data="{{selectedHPO}}" enable-paging hide-column-selector on-removerow="handleRemoveElement">
                     </stv-table>
                     <div class="stv-btn stv-btn-shdw but" on-click="handleClearSelected">
                         Clear
@@ -237,6 +237,10 @@
                 }
                 this.fire('added');
             },
+            handleRemoveElement: function(e) {
+                var key = e.detail.row.id;
+                this.mapSelectedHpo[key] = null;
+            },
             getHPO: function() {
                 var me = this;
                 var url = BiodbManager.hpo.fetch({
@@ -283,25 +287,31 @@
                 return total;
             },
             getFirstHpo: function() {
-              var me=this;
-                BiodbManager.hpo.info({
-                    query: {
-                        id : "HP:0000001"
-                    },
-                    request: {
-                      success: function(response) {
-                          if (response.error === '' || response.error.msg == "") {
-                              me.$.treeHPO.tree=response.result;
-                          } else {
-                              console.log(response.error.msg);
-                          }
-                      },
-                      error: function() {
-                          console.log('Server error, try again later.');
-                      }
-                    }
-                });
-
+                var me = this;
+                if (localStorage.bioinfo_biertool_hpo) {
+                    //Coger el arbol del local storage
+                    this.$.treeHPO.tree = treeJSON.parse(localStorage.bioinfo_biertool_hpo);
+                } else {
+                    //Llamar al WS
+                    BiodbManager.hpo.info({
+                        query: {
+                            id: "HP:0000001"
+                        },
+                        request: {
+                            success: function(response) {
+                                if (response.error === '' || response.error.msg == "") {
+                                    me.$.treeHPO.tree = response.result;
+                                    // localStorage.bioinfo_team_diseases = JSON.stringify(response.result);
+                                } else {
+                                    console.log(response.error.msg);
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later.');
+                            }
+                        }
+                    });
+                }
             }
         });
     </script>

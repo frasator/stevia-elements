@@ -11,6 +11,9 @@ var BiodbManager = {
         fetch: function (args) {
             return BiodbManager._doRequest(args, 'go', 'fetch');
         },
+        genes: function (args) {
+            return BiodbManager._doRequest(args, 'go', 'genes');
+        }
 
     },
     hpo: {
@@ -21,6 +24,11 @@ var BiodbManager = {
             return BiodbManager._doRequest(args, 'hpo', 'fetch');
         },
 
+    },
+    clinical: {
+      fetch: function(args){
+        return BiodbManager._doRequest(args, 'clinical', 'fetch');
+      }
     },
     _url: function (args, api, action) {
         var host = BiodbManager.host;
@@ -60,14 +68,14 @@ var BiodbManager = {
                 var contentType = this.getResponseHeader('Content-Type');
                 if (contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
-                    if (json.error == null || json.error.msg=="") {
+                    if (json.error == null || json.error.msg == "") {
                         args.request.success(json, this);
                     } else {
                         // if (window.BIODB_LOG === true) {
-                            console.log('! ----    BioDB -------');
-                            console.log(json.error);
-                            console.log(json);
-                            console.log('! ----    BioDB -------');
+                        console.log('! ----    BioDB -------');
+                        console.log(json.error);
+                        console.log(json);
+                        console.log('! ----    BioDB -------');
                         // }
                         args.request.error(json, this);
                     }

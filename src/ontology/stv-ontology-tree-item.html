@@ -155,36 +155,44 @@
                 for (var i = 0; i < children.length; i++) {
                     ids.push(children[i].id);
                 }
+
                 if (ids[0].indexOf("GO") >= 0) {
                     type = "go";
                 }
-                BiodbManager[type].info({
-                    query: {
-                        id: ids.join(",")
-                    },
-                    request: {
-                        success: function(response) {
-                            if (response.error === '' || response.error.msg == "") {
-                                var responseChildrenMap = {};
-                                for (var i = 0; i < response.result.length; i++) {
-                                    responseChildrenMap[response.result[i].id] = response.result[i];
-                                }
-                                for (var i = 0; i < me.file.children.length; i++) {
-                                    var child = me.file.children[i];
-                                    child.children = responseChildrenMap[child.id].children;
 
-                                }
-                                me.set('file.open', !me.file.open);
-                                me.checkFiles();
-                            } else {
-                                console.log(response.error.msg);
-                            }
+                if (localStorage["bioinfo_biertool_" + type]) {
+                    //Coger los hijos del local storage: JSON.parse(localStorage["bioinfo_biertool_" + type]);
+                } else {
+                  //Coger los hijos del WS
+                    BiodbManager[type].info({
+                        query: {
+                            id: ids.join(",")
                         },
-                        error: function() {
-                            console.log('Server error, try again later.');
+                        request: {
+                            success: function(response) {
+                                if (response.error === '' || response.error.msg == "") {
+                                    var responseChildrenMap = {};
+                                    for (var i = 0; i < response.result.length; i++) {
+                                        responseChildrenMap[response.result[i].id] = response.result[i];
+                                    }
+                                    for (var i = 0; i < me.file.children.length; i++) {
+                                        var child = me.file.children[i];
+                                        child.children = responseChildrenMap[child.id].children;
+
+                                    }
+                                    //meter los hijos al local storage JSON.parse(localStorage["bioinfo_biertool_" + type]);
+                                    me.set('file.open', !me.file.open);
+                                    me.checkFiles();
+                                } else {
+                                    console.log(response.error.msg);
+                                }
+                            },
+                            error: function() {
+                                console.log('Server error, try again later.');
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
     </script>

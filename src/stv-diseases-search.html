@@ -49,12 +49,12 @@
     <template>
         <div class="disease horizontal layout">
             <div class="allDiseases">
-                <stv-table id="allDiseases" class="flex" columns="{{allDiseaseColumns}}" data="{{allDiseasesData}}" enable-select enable-filter enable-paging hide-column-selector page-size="15"></stv-table>
+                <stv-table id="allDiseases" class="flex" columns="{{allDiseaseColumns}}" request="{{request}}" enable-remote enable-select enable-filter enable-paging hide-column-selector page-size="15"></stv-table>
                 <div class="stv-btn stv-btn-shdw but" on-click="handleAddSelectedDiseases"><i class="fa fa-plus-square-o"></i>&nbsp; Add
                 </div>
             </div>
             <div class="selectedDiseases">
-                <stv-table id="selectedDiseases" class="flex" columns="{{diseaseColumns}}" data="{{selectedDisease}}" enable-paging hide-column-selector>
+                <stv-table id="selectedDiseases" class="flex" columns="{{diseaseColumns}}" data="{{selectedDisease}}" enable-paging hide-column-selector on-removerow="handleRemoveElement">
                 </stv-table>
                 <div class="stv-btn stv-btn-shdw but" on-click="handleClearSelectedDiseases">
                     Clear
@@ -93,79 +93,46 @@
                         return [];
                     }
                 },
+                url: {
+                    type: String,
+                    value: "",
+                    observer: 'urlChanged'
+                },
+                request: {
+                    type: Object
+                },
+                numTotalResults: {
+                    type: Number,
+                    notify: true
+                },
             },
             ready: function() {
                 var me = this;
-
-                if (localStorage.bioinfo_team_diseases) {
-                    this.allDiseasesData = JSON.parse(localStorage.bioinfo_team_diseases);
-
-                } else {
-                    $.ajax({
-                        url: "http://bioinfodev.hpc.cam.ac.uk/cellbase-legacy/webservices/rest/v3/hsapiens/feature/clinical/phenotype-gene?include=clinvar,gwas",
-                        //only in cellbase v3
-                        dataType: 'json',
-                        async: false,
-                        success: function(response, textStatus, jqXHR) {
-                            try {
-                                var data = response.response;
-                                var clinvar = data[0].result;
-                                var gwas = data[1].result;
-
-                                var diseases = [];
-
-                                for (var i = 0; i < clinvar.length; i++) {
-                                    var dis = clinvar[i];
-                                    dis.source = "clinvar";
-                                    diseases.push(dis);
-                                }
-                                for (var i = 0; i < gwas.length; i++) {
-                                    var dis = gwas[i];
-                                    dis.source = "gwas";
-                                    diseases.push(dis);
-                                }
-
-                                diseases.sort(function(a, b) {
-                                    return a.phenotype.localeCompare(b.phenotype);
-                                });
-
-                                if (diseases.length > 0) {
-                                    me.allDiseasesData = diseases;
-                                    localStorage.bioinfo_team_diseases = JSON.stringify(diseases);
-                                }
-
-                            } catch (e) {
-
-                            }
-
-                        }
-                    });
-
-                }
+                this.getDiseases();
 
                 this.allDiseaseColumns = [{
                     name: 'phenotype',
                     title: 'Phenotype',
                     type: 'text',
-                    width: 325
-                }, {
-                    name: 'source',
-                    title: 'Source',
-                    type: 'select',
-                    options: ["clinvar", "gwas"],
-                    width: 125
+                    width: 450
+                // }, {
+                //     name: 'source',
+                //     title: 'Source',
+                //     type: 'select',
+                //     options: ["clinvar", "cosmic"],
+                //     width: 125
                 }];
                 this.diseaseColumns = [{
                     name: 'phenotype',
                     title: 'Phenotype',
                     type: 'text',
-                    width: 310
-                }, {
-                    name: 'source',
-                    title: 'Source',
-                    type: 'select',
-                    options: ["clinvar", "gwas"],
-                    width: 110
+                    width: 415
+                // }, {
+                //     name: 'source',
+                //     title: 'Source',
+                //     type: 'select',
+                //     options: ["clinvar", "cosmic"],
+                //     width: 110
                 }, {
                     name: '',
                     title: '',
@@ -182,13 +149,63 @@
                     }
                 }
             },
-            handleClearSelectedDiseaSE: function(e) {
+            handleClearSelectedDiseases: function(e) {
                 this.selectedDisease = [];
                 this.mapSelectedDisease = {};
             },
             handleAddSelected: function(e) {
                 this.set('diseaseValue', this.selectedDisease);
                 this.fire('added');
+            },
+            handleRemoveElement: function(e){
+              var key=e.detail.row.phenotype;
+              this.mapSelectedDisease[key] = null;
+
+            },
+            getDiseases: function() {
+                var me = this;
+                var url = BiodbManager.clinical.fetch({
+                    request: {
+                        url: true
+                    }
+                });
+                this.url = url;
+                console.log(url);
+            },
+
+            urlChanged: function(neo, old) {
+                var me = this;
+                if (neo == null || neo == "") {
+                    return;
+                }
+                this.request = {
+                    url: this.url,
+                    parse: function(response) {
+                        return me._parse(response);
+                    },
+                    parseTotal: function(response) {
+                        var total = me._parseTotal(response);
+
+                        me.set('numTotalResults', total);
+                        return total;
+                    },
+                };
+            },
+            _parse: function(response) {
+                var me = this;
+                if (response.result != null) {
+                    data = response.result;
+                } else {
+                    data = [];
+                }
+                return data;
+            },
+            _parseTotal: function(response) {
+                var total = 0;
+                if (response.result != null) {
+                    total = response.numTotalResults;
+                }
+                return total;
             },
         })
     </script>
