@@ -6,9 +6,18 @@
             display: block;
             position: relative;
             box-sizing: border-box;
-            overflow-y: auto;
             border: 1px solid var(--divider-color);
             background-color: #FFF;
+        }
+
+        #box {
+            position: relative;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+         :host[enable-filter] #box {
+             height: calc(100% - 22px);
         }
 
         .item {
@@ -23,13 +32,36 @@
         .item[data-checked] {
             background-color: var(--selected-color);
         }
+
+        #input {
+            display: block;
+            width: 100%;
+            height: 22px;
+            padding-left: 25px;
+            padding-right: 25px;
+            border-width: 0 0 1px 0;
+        }
+
+        #icon {
+            color: var(--secondary-text-color);
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-top: 3px;
+        }
     </style>
     <template>
-        <template is="dom-repeat" items="{{options}}" as="option">
-            <div class="item flex" data-checked$="{{isSelected(selected, option)}}" on-mousedown="handleSelect">
-                <span>{{computeOptionDisplay(option)}}</span>
-            </div>
-        </template>
+        <input hidden$="{{!enableFilter}}" id="input" class="stv" type="text" placeholder="{{placeholder}}" value="{{filterString::input}}">
+        <div hidden$="{{!enableFilter}}" id="icon" class="horizontal layout center">
+            <i style="margin-left:7px;" class="fa fa-search"></i>
+        </div>
+        <div id="box">
+            <template is="dom-repeat" items="{{options}}" as="option" filter="{{computeFilter(filterString)}}">
+                <div class="item flex" data-checked$="{{isSelected(selected, option)}}" on-mousedown="handleSelect">
+                    <span>{{computeOptionDisplay(option)}}</span>
+                </div>
+            </template>
+        </div>
     </template>
     <script>
         Polymer({
@@ -62,6 +94,18 @@
                 titleAttribute: {
                     type: String,
                     value: 'title'
+                },
+                enableFilter: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
+                placeholder: {
+                    type: String,
+                    value: 'Filter...'
+                },
+                filterString: {
+                    type: String
                 }
             },
             computeOptionDisplay: function(option) {
@@ -102,6 +146,25 @@
                 }
                 if (index > -1) {
                     this.selectByIndex(index);
+                }
+            },
+            computeFilter: function(string) {
+                var me = this;
+                if (!string || string == '') {
+                    return null;
+                } else {
+                    string = string.toLowerCase();
+                    return function(item) {
+                        var title = '',
+                            name = ''
+                        if (item[me.titleAttribute] != null) {
+                            title = item[me.titleAttribute].toLowerCase();
+                        }
+                        if (item[me.nameAttribute] != null) {
+                            name = item[me.nameAttribute].toLowerCase();
+                        }
+                        return (title.indexOf(string) != -1 || name.indexOf(string) != -1);
+                    };
                 }
             }
         });

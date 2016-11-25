@@ -96,7 +96,7 @@
             </div>
             <div class="flex">
             </div>
-            <label class="stv-control" style="cursor:pointer; text-align:center;" title="When enabled, an email will be sent every time a job ends.">
+            <label hidden$="{{hideNotificationControl}}" class="stv-control" style="cursor:pointer; text-align:center;" title="When enabled, an email will be sent every time a job ends.">
                 <input id="jobNotificationCheckbox" type="checkbox" name="job" on-click="handleClickJobNotification">
                 <span>Enable job notifications</span>
             </label>
@@ -154,6 +154,11 @@
                     value: false
                 },
                 hideToolFilter: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false
+                },
+                hideNotificationControl:{
                     type: Boolean,
                     reflectToAttribute: true,
                     value: false

@@ -796,9 +796,11 @@
                 pdv.style.height = height + 'px';
 
                 pdv.set('hideBackButton', true);
-                pdv.set('path', outEl.getAttribute('path'));
-                pdv.set('initPath', outEl.getAttribute('path'));
-                // pdv.set('initPath', outEl.getAttribute('path') + '_init');
+                pdv.set('path', outEl.getAttribute('path') + '_init');
+                // pdv.set('initPath', outEl.getAttribute('path'));
+                pdv.set('initPath', outEl.getAttribute('path') + '_init');
+                // pdv.set('validGenesFileName', outEl.getAttribute('valid-genes-file-name'));
+                pdv.set('validGenesFileName', 'valid_hgnc_module_genes.txt');
                 pdv.set('jobUpdateArgs', {
                     tool: outEl.getAttribute('tool'),
                     execution: outEl.getAttribute('update-execution'),
