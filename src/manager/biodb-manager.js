@@ -25,6 +25,11 @@ var BiodbManager = {
         },
 
     },
+    clinical: {
+      fetch: function(args){
+        return BiodbManager._doRequest(args, 'clinical', 'fetch');
+      }
+    },
     _url: function (args, api, action) {
         var host = BiodbManager.host;
         if (typeof args.request.host !== 'undefined' && args.request.host != null) {
