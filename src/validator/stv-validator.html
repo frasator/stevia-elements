@@ -233,7 +233,7 @@
             </div>
         </div>
 
-        <stv-panel modal movable closable hidden id="linePreview" on-close="handleCloseLinePreview">
+        <stv-panel modal movable closable hidden id="linePreviewPanel" on-close="handleCloseLinePreview">
             <div class="header">
                 <i class="fa fa-view"></i> &nbsp; View line
             </div>
@@ -431,8 +431,7 @@
                     if (lines.length > 0) {
                         var aux = lines[0].split("\t");
                         aux[me.column] = '<span style="color:red">' + aux[me.column] + '</span>';
-                        me.$.linePreview.innerHTML = aux.join("\t");
-                        // me.linePreview = lines[0];
+                        me.linePreview = aux;
                         me.$.linePreviewPanel.show();
                     }
 
