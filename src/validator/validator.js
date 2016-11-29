@@ -1,5 +1,4 @@
 function Validator(options) {
-
     if (!(this instanceof Validator)) {
         return new Validator(options);
     }
