@@ -37,8 +37,8 @@
 
         .add-but {
             font-size: 13px;
-            font-weight: bold;
-            color: #2F65F4;
+            background-color: #ed9c33 !important;
+            color: #FFFFFF !important;
             text-align: center;
             height: 30px;
             width: 150px;
@@ -115,24 +115,24 @@
                     title: 'Phenotype',
                     type: 'text',
                     width: 450
-                // }, {
-                //     name: 'source',
-                //     title: 'Source',
-                //     type: 'select',
-                //     options: ["clinvar", "cosmic"],
-                //     width: 125
+                        // }, {
+                        //     name: 'source',
+                        //     title: 'Source',
+                        //     type: 'select',
+                        //     options: ["clinvar", "cosmic"],
+                        //     width: 125
                 }];
                 this.diseaseColumns = [{
                     name: 'phenotype',
                     title: 'Phenotype',
                     type: 'text',
                     width: 415
-                // }, {
-                //     name: 'source',
-                //     title: 'Source',
-                //     type: 'select',
-                //     options: ["clinvar", "cosmic"],
-                //     width: 110
+                        // }, {
+                        //     name: 'source',
+                        //     title: 'Source',
+                        //     type: 'select',
+                        //     options: ["clinvar", "cosmic"],
+                        //     width: 110
                 }, {
                     name: '',
                     title: '',
@@ -157,9 +157,9 @@
                 this.set('diseaseValue', this.selectedDisease);
                 this.fire('added');
             },
-            handleRemoveElement: function(e){
-              var key=e.detail.row.phenotype;
-              this.mapSelectedDisease[key] = null;
+            handleRemoveElement: function(e) {
+                var key = e.detail.row.phenotype;
+                this.mapSelectedDisease[key] = null;
 
             },
             getDiseases: function() {

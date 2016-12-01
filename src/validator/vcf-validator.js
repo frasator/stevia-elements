@@ -193,7 +193,7 @@ VCFValidator.prototype._getDataFromRegExp = function (data, regExpId) {
 }
 
 VCFValidator.prototype.parseData = function (line) {
-    if(line == ""){
+    if (line == "") {
         this.addLog("warning", "Empty line found.");
         return;
     }
@@ -213,211 +213,211 @@ VCFValidator.prototype.parseData = function (line) {
     if (this._columnsSize != columns.length) {
         this.addLog("error", "All ines must have the same number of columns");
     }
-
-    // Chromosome
-    var chr = columns[0];
-    if (chr == "") {
-        this.addLog("error", "Chromosome must not be empty", 0);
-    }
-    if (chr.search(":") >= 0) {
-        this.addLog("error", "Chromosome must not contain colons", 0);
-    }
-    if (chr.search(" ") >= 0) {
-        this.addLog("error", "Chromosome must not contain whitespaces", 0);
-    }
-
-    if (this._contigs[chr] == null) {
-        this.addLog("error", "Chromosome must be present on contig tags in header.", 0)
-    }
-
-    // Position
-    var pos = columns[1]
-    if (pos == "") {
-        this.addLog("error", "Position must not be empty", 1);
-    }
-    pos = parseInt(pos)
-    if (isNaN(pos)) {
-        this.addLog("error", "Position must be numeric", 1);
-    }
-
-    // Check duplicates
-    var chr_pos = chr + "_" + pos;
-    if (chr_pos in this._duplicates) {
-        this.addLog("warning", "There must be no chromosome+position duplicates");
-    }
-
-    this._duplicates[chr_pos] = null;
-
-    // Id
-
-    var id = columns[2];
-
-    if (id != ".") {
-        if (!this._regExp["idSemiColon"].test(id)) {
-            this.addLog("error", "If more than one ID is specified, they must be semi-colon separated", 2);
-            idSplits = id.split(";");
-            for (var i = 0; i < idSplits.length; i++) {
-                if (!this._regExp["alpha"].test(idSplits[i])) {
-                    this.addLog("error", "ID must be alphanumeric", 2);
-                }
-            }
+    if (columns.length >= 8) {
+        // Chromosome
+        var chr = columns[0];
+        if (chr == "") {
+            this.addLog("error", "Chromosome must not be empty", 0);
+        }
+        if (chr.search(":") >= 0) {
+            this.addLog("error", "Chromosome must not contain colons", 0);
+        }
+        if (chr.search(" ") >= 0) {
+            this.addLog("error", "Chromosome must not contain whitespaces", 0);
         }
 
-    }
+        if (this._contigs[chr] == null) {
+            this.addLog("error", "Chromosome must be present on contig tags in header.", 0)
+        }
 
-    // ref
+        // Position
+        var pos = columns[1]
+        if (pos == "") {
+            this.addLog("error", "Position must not be empty", 1);
+        }
+        pos = parseInt(pos)
+        if (isNaN(pos)) {
+            this.addLog("error", "Position must be numeric", 1);
+        }
 
-    var ref = columns[3];
-    if (ref == "") {
-        this.addLog("error", "Reference allele must not be empty", 3);
-    }
+        // Check duplicates
+        var chr_pos = chr + "_" + pos;
+        if (chr_pos in this._duplicates) {
+            this.addLog("warning", "There must be no chromosome+position duplicates");
+        }
 
-    if (!this._regExp["actg"].test(ref)) {
-        this.addLog("error", "Reference allele must match the regular expression /^[ACTGN.]+$/", 3);
-    }
+        this._duplicates[chr_pos] = null;
 
-    // alt
+        // Id
 
-    var alt = columns[4];
+        var id = columns[2];
 
-    if (alt == "") {
-        this.addLog("error", "Alternate allele must not be empty", 4);
-    }
-
-    var altSplits = alt.split(",");
-    var altSplitsUnique = altSplits.filter(function (item, pos) {
-        return altSplits.indexOf(item) == pos;
-    });
-
-    if (altSplits.length != altSplitsUnique.length) {
-        this.addLog("error", "Alternate must contain each allele only once", 4)
-    }
-
-    if (altSplitsUnique.indexOf(ref) >= 0) {
-        this.addLog("error", "The reference allele must not be in the list of alternate alleles", 4)
-    }
-
-    if (alt != "." && alt != "*") {
-        for (var i = 0; i < altSplits.length; i++) {
-            var altElem = altSplits[i];
-
-            if (!this._regExp["actg"].test(altElem)) {
-                if (this._regExp["altID"].test(altElem)) {
-                    if (this._alt[altElem] == null) {
-                        this.addLog("error", "Alternate allele " + altElem + " must be specified in ALT field in header", 4)
+        if (id != ".") {
+            if (!this._regExp["idSemiColon"].test(id)) {
+                this.addLog("error", "If more than one ID is specified, they must be semi-colon separated", 2);
+                idSplits = id.split(";");
+                for (var i = 0; i < idSplits.length; i++) {
+                    if (!this._regExp["alpha"].test(idSplits[i])) {
+                        this.addLog("error", "ID must be alphanumeric", 2);
                     }
-                } else {
-                    this.addLog("error", "Alternate allele must match the regular expression /^[ACTGN]+$/", 4)
-
                 }
             }
-            if (altElem.length != ref.length) { // TODO aaleman: Check this
-                if (altElem.charAt(0) != ref.charAt(0)) {
-                    this.addLog("warning", "The first base of each allele must match the reference if their lengths are different", 4);
+
+        }
+
+        // ref
+
+        var ref = columns[3];
+        if (ref == "") {
+            this.addLog("error", "Reference allele must not be empty", 3);
+        }
+
+        if (!this._regExp["actg"].test(ref)) {
+            this.addLog("error", "Reference allele must match the regular expression /^[ACTGN.]+$/", 3);
+        }
+
+        // alt
+
+        var alt = columns[4];
+
+        if (alt == "") {
+            this.addLog("error", "Alternate allele must not be empty", 4);
+        }
+
+        var altSplits = alt.split(",");
+        var altSplitsUnique = altSplits.filter(function (item, pos) {
+            return altSplits.indexOf(item) == pos;
+        });
+
+        if (altSplits.length != altSplitsUnique.length) {
+            this.addLog("error", "Alternate must contain each allele only once", 4)
+        }
+
+        if (altSplitsUnique.indexOf(ref) >= 0) {
+            this.addLog("error", "The reference allele must not be in the list of alternate alleles", 4)
+        }
+
+        if (alt != "." && alt != "*") {
+            for (var i = 0; i < altSplits.length; i++) {
+                var altElem = altSplits[i];
+
+                if (!this._regExp["actg"].test(altElem)) {
+                    if (this._regExp["altID"].test(altElem)) {
+                        if (this._alt[altElem] == null) {
+                            this.addLog("error", "Alternate allele " + altElem + " must be specified in ALT field in header", 4)
+                        }
+                    } else {
+                        this.addLog("error", "Alternate allele must match the regular expression /^[ACTGN]+$/", 4)
+
+                    }
+                }
+                if (altElem.length != ref.length) { // TODO aaleman: Check this
+                    if (altElem.charAt(0) != ref.charAt(0)) {
+                        this.addLog("warning", "The first base of each allele must match the reference if their lengths are different", 4);
+                    }
                 }
             }
         }
-    }
 
-    // Qual
-    var qual = columns[5];
-    if (qual != ".") {
-        var qualFloat = parseFloat(qual);
-        if (isNaN(qualFloat) || qualFloat < 0) {
-            this.addLog("error", "Quality must be a non-negative float", 5);
+        // Qual
+        var qual = columns[5];
+        if (qual != ".") {
+            var qualFloat = parseFloat(qual);
+            if (isNaN(qualFloat) || qualFloat < 0) {
+                this.addLog("error", "Quality must be a non-negative float", 5);
+            }
+
         }
 
-    }
-
-    // Filter
-    var filter = columns[6];
-    if (filter == "") {
-        this.addLog("error", "Filter status field must not be empty", 6);
-    }
-    if (filter != 'PASS' && filter != ".") {
-        var filterIds = filter.split(";");
-        for (var i = 0; i < filterIds.length; i++) {
-            var id = filterIds[i];
-            if (this._filter[id] == null) {
-                this.addLog("error", "Filter status must be specified in header, be PASS or be set to the missing value '.'", 6);
+        // Filter
+        var filter = columns[6];
+        if (filter == "") {
+            this.addLog("error", "Filter status field must not be empty", 6);
+        }
+        if (filter != 'PASS' && filter != ".") {
+            var filterIds = filter.split(";");
+            for (var i = 0; i < filterIds.length; i++) {
+                var id = filterIds[i];
+                if (this._filter[id] == null) {
+                    this.addLog("error", "Filter status must be specified in header, be PASS or be set to the missing value '.'", 6);
+                }
             }
         }
-    }
 
-    var aggregate = columns.length == 8;
+        var aggregate = columns.length == 8;
 
-    // Info
-    var info = columns[7];
-    if (info == "") {
-        this.addLog("error", "Info field must not be empty", 7);
-    }
-    var infoFields = info.split(";");
-    // if (infoFields.length != Object.keys(this._info).length) {
-    //   this.addLog("error", "Info must have the same number of fields specified in header");
-    // }
+        // Info
+        var info = columns[7];
+        if (info == "") {
+            this.addLog("error", "Info field must not be empty", 7);
+        }
+        var infoFields = info.split(";");
+        // if (infoFields.length != Object.keys(this._info).length) {
+        //   this.addLog("error", "Info must have the same number of fields specified in header");
+        // }
 
-    if (infoFields.length != 1 || infoFields[0] != '.') {
-        for (var i = 0; i < infoFields.length; i++) {
-            var field = infoFields[i];
-            if (field.indexOf("=") > 0) {
-                var key = field.substring(0, field.indexOf("="));
-                var value = field.substring(field.indexOf("=") + 1);
-                if (this._info[key] == null) {
-                    this.addLog("warning", "Info field '" + key + "' must be specified in header", 7);
-                } else {
-                    var v = value.split(",");
-                    if (v.length > 1) {
-                        switch (this._info[key].number) {
-                        case "A":
-                            //'A': one value per alternate
-                            var expected = altSplits.length;
-                            if (expected != v.length) {
-                                this.addLog("warning", "Wrong number of values in INFO field '" + key + " (expected one value per alternate)", 7);
-                            }
-                            break;
-                        case "R":
-                            //'R': one value for each possible allele
-                            var expected = altSplits.length + 1;
-                            if (expected != v.length) {
-                                this.addLog("warning", "Wrong number of values in INFO field '" + key + " (expected one value for each possible  allele, including the reference)", 7);
-                            }
-                            break;
-                        case "G":
-                            //'G': one value for each possible genotype
-                            // var expected = altSplits.length * (altSplits.length + 1) / 2;
-                            // var typeMSG = aggregate ? "warning" : "error";
-                            var typeMSG = "warning";
-                            if (!aggregate) {
-                                var expected = this._binomial(altSplits.length + this._ploidy, this._ploidy);
-                                if (expected != found) {
-
+        if (infoFields.length != 1 || infoFields[0] != '.') {
+            for (var i = 0; i < infoFields.length; i++) {
+                var field = infoFields[i];
+                if (field.indexOf("=") > 0) {
+                    var key = field.substring(0, field.indexOf("="));
+                    var value = field.substring(field.indexOf("=") + 1);
+                    if (this._info[key] == null) {
+                        this.addLog("warning", "Info field '" + key + "' must be specified in header", 7);
+                    } else {
+                        var v = value.split(",");
+                        if (v.length > 1) {
+                            switch (this._info[key].number) {
+                            case "A":
+                                //'A': one value per alternate
+                                var expected = altSplits.length;
+                                if (expected != v.length) {
+                                    this.addLog("warning", "Wrong number of values in INFO field '" + key + " (expected one value per alternate)", 7);
                                 }
-                            }
-                            this.addLog(typeMSG, "Wrong number of values in INFO field '" + key + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each possible genotype", 7);
-                            break;
-                        }
+                                break;
+                            case "R":
+                                //'R': one value for each possible allele
+                                var expected = altSplits.length + 1;
+                                if (expected != v.length) {
+                                    this.addLog("warning", "Wrong number of values in INFO field '" + key + " (expected one value for each possible  allele, including the reference)", 7);
+                                }
+                                break;
+                            case "G":
+                                //'G': one value for each possible genotype
+                                // var expected = altSplits.length * (altSplits.length + 1) / 2;
+                                // var typeMSG = aggregate ? "warning" : "error";
+                                var typeMSG = "warning";
+                                if (!aggregate) {
+                                    var expected = this._binomial(altSplits.length + this._ploidy, this._ploidy);
+                                    if (expected != found) {
 
-                        if (this._info[key].type == 'Flag') {
-                            this.addLog("warning", "Flag type must not have value", 7);
-                        } else {
-                            this._checkFormatDataType(v, this._info[key], 'INFO');
+                                    }
+                                }
+                                this.addLog(typeMSG, "Wrong number of values in INFO field '" + key + " (expected: '" + expected + "', found: '" + found + "'). Must have one value for each possible genotype", 7);
+                                break;
+                            }
+
+                            if (this._info[key].type == 'Flag') {
+                                this.addLog("warning", "Flag type must not have value", 7);
+                            } else {
+                                this._checkFormatDataType(v, this._info[key], 'INFO');
+                            }
                         }
                     }
-                }
-            } else {
-                if (this._info[field] == null) {
-                    this.addLog("warning", "Info field must be specified in header", 7);
-                } else if (this._info[field].type != "Flag") {
-                    this.addLog("warning", "Info field must be a Flag type or have a data value", 7);
                 } else {
-                    if (this._info[field].number != 0) {
-                        this.addLog("warning", "In Info, Number must be 0 for a Flag type", 7);
+                    if (this._info[field] == null) {
+                        this.addLog("warning", "Info field must be specified in header", 7);
+                    } else if (this._info[field].type != "Flag") {
+                        this.addLog("warning", "Info field must be a Flag type or have a data value", 7);
+                    } else {
+                        if (this._info[field].number != 0) {
+                            this.addLog("warning", "In Info, Number must be 0 for a Flag type", 7);
+                        }
                     }
                 }
             }
         }
     }
-
     // if (!(columns.length > 8)) {
     //     return;
     // }
