@@ -178,6 +178,7 @@
                 }
             },
             handleImport: function(e) {
+              var me=this;
                 var file = this.$.fileInput.files[0];
                 if (file == null) {
                     new StvDialog().alert("No file selected.")
@@ -196,14 +197,14 @@
                     if (this.$.validator.warningCount > 0) {
                         new StvDialog().confirm("Are you sure?", function(answer) {
                             if (answer == true) {
-                              this.fire('importfile');
+                              me.fire('importfile');
                                  return;
                             } else {
                                 return;
                             }
                         });
                     }
-                    this.fire('importfile');
+                    // this.fire('importfile');
                 }
                 // if (this.validating == false && this.stop==false) {
                 //     // this.uploading=true;
