@@ -204,7 +204,12 @@
 
         .redirection-btn {
             margin: 10px;
+            max-width: 500px;
+        }
+
+        .redirection-file {
             max-width: 300px;
+            color: #0068cc;
         }
 
         pathway-drug-viewer {
@@ -502,7 +507,7 @@
                 i.classList.add('fa', this.iconMap['redirection']);
 
                 var text = document.createElement('span');
-                text.innerHTML = "Send to " + tool;
+                text.innerHTML = "Send <span class=\"redirection-file\">" + outEl.getAttribute("file") + "</span> to " + tool;
 
                 el.appendChild(i);
                 el.appendChild(text);
