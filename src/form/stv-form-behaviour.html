@@ -67,7 +67,8 @@
             }
             return validated;
         },
-
+        launchJob: function() {
+        },
         createQuery: function() {
             var query = {};
             query.name = this.jobName;
@@ -102,6 +103,8 @@
                             me.message = userId + ' created';
                             me.selectedOption = "jobLaunched";
                             me.fire('need-refresh');
+                            me.fire('job-launched');
+                            console.log("JOB LAUNCHED")
                         } else {
                             me.message = response.response[0].error;
                         }
