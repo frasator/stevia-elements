@@ -316,10 +316,14 @@
                 },
                 listeners: {
                     'mousedown': '_updateLastWindow',
-                    'iron-resize': 'handleResize'
+                    'iron-resize': 'handleResize',
+                    'scroll': 'handleScroll'
                 },
                 hostAttributes: {
                     'class': 'vertical layout flex'
+                },
+                handleScroll: function() {
+                    e.stopPropagation();
                 },
                 handleResize: function() {
 
