@@ -37,6 +37,12 @@
             _lastLoggedMenu: {
                 type: String
             },
+            _lastLoggedTasks: {
+                type: Array,
+                value: function() {
+                    return []
+                }
+            },
             queryParams: {
                 type: Object,
                 value: function() {
@@ -189,6 +195,11 @@
                         this.setMenu(this._lastLoggedMenu);
                         this._lastLoggedMenu = null;
                     }
+                    for (var i = 0; i < this._lastLoggedTasks.length; i++) {
+                        var task = this._lastLoggedTasks[i];
+                        task();
+                    }
+                    this.set('_lastLoggedTasks', []);
                 }
             }
 
@@ -304,20 +315,28 @@
         _handleLoadJobFromQueryParam: function(jobId) {
             var me = this;
             if (jobId != null && jobId != "") {
-                SteviaManager.getJob(jobId, function(job) {
-                    if (job && job.status == "DONE") {
-                        var stvReport = me.querySelector("stv-report");
-                        var stvReportParent = stv.utils.closest(stvReport, ".content");
-                        if (stvReportParent) {
-                            var menuOption = stvReportParent.getAttribute("menu-option");
+                var stvReport = me.querySelector("stv-report");
+                var stvReportParent = stv.utils.closest(stvReport, "[menu-option]");
 
-                            stvReport.job = job;
-                            me.set("selectedOption", menuOption);
-                        }
-
+                if (this.$.stvHeader != null && stvReportParent != null) {
+                    var menuOption = stvReportParent.getAttribute("menu-option");
+                    var goJob = function() {
+                        SteviaManager.getJob(jobId, function(job) {
+                            if (job && job.status == "DONE") {
+                                stvReport.job = job;
+                                me.setMenu(menuOption);
+                            } else {
+                                me.setMenu('home');
+                            }
+                        });
                     }
-                })
-
+                    if (this.$.stvHeader.isLogged) {
+                        goJob();
+                    } else {
+                        this.push('_lastLoggedTasks', goJob);
+                        me.setMenu('login');
+                    }
+                }
             }
         }
     };
