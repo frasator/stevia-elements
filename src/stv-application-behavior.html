@@ -36,13 +36,20 @@
             },
             _lastLoggedMenu: {
                 type: String
+            },
+            queryParams: {
+                type: Object,
+                value: function() {
+                    return {};
+                }
             }
         },
         observers: [
             '_selectedOptionChanged(selectedOption)',
             'selectedOptionChanged(selectedOption)',
             '_userDataChanged(userData)',
-            'userDataChanged(userData)'
+            'userDataChanged(userData)',
+            '_handleLoadJobFromQueryParam(queryParams.job)'
         ],
         listeners: {
             'need-refresh': 'handleNeedRefresh',
@@ -78,6 +85,8 @@
                 });
                 Polymer.dom(this.root).appendChild(div);
             }
+
+            this.queryParams = this._parseQueryParams();
             this.checkShowMenuOnLogin();
 
         },
@@ -266,6 +275,23 @@
                 }
             }
         },
+        _parseQueryParams: function() {
+            var url = window.location.href;
+            var queryParams = {};
+            if (url.indexOf("?") >= 0) {
+                var qp = url.substring(url.indexOf("?") + 1).split("&");
+                for (var i = 0; i < qp.length; i++) {
+                    var elem = qp[i];
+                    var fields = elem.split("=");
+                    if (fields.length == 1) { // key
+                        queryParams[fields[0]] = "";
+                    } else if (fields.length == 2) { // key=value
+                        queryParams[fields[0]] = fields[1];
+                    }
+                }
+            }
+            return queryParams;
+        },
         getQueryParam: function(name) {
             var url = window.location.href;
             name = name.replace(/[\[\]]/g, "\\$&");
@@ -275,5 +301,24 @@
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         },
+        _handleLoadJobFromQueryParam: function(jobId) {
+            var me = this;
+            if (jobId != null && jobId != "") {
+                SteviaManager.getJob(jobId, function(job) {
+                    if (job && job.status == "DONE") {
+                        var stvReport = me.querySelector("stv-report");
+                        var stvReportParent = stv.utils.closest(stvReport, ".content");
+                        if (stvReportParent) {
+                            var menuOption = stvReportParent.getAttribute("menu-option");
+
+                            stvReport.job = job;
+                            me.set("selectedOption", menuOption);
+                        }
+
+                    }
+                })
+
+            }
+        }
     };
 </script>
