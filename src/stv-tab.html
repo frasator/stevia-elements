@@ -19,7 +19,7 @@
             height: 100%;
         }
 
-        .tab {
+        .tabname {
             height: 20px;
             line-height: 20px;
             font-size: 14px;
@@ -30,7 +30,7 @@
             cursor: pointer;
         }
 
-        .tab[data-checked] {
+        .tabname[data-checked] {
             background-color: #fff;
             border-top-left-radius: 7px;
             border-top-right-radius: 7px;
@@ -40,7 +40,7 @@
             box-shadow: 1px -1px 1px rgba(0, 0, 0, 0.1);
         }
 
-        .tab:hover {
+        .tabname:hover {
             color: #8ba7a7;
             font-weight: bold;
         }
@@ -56,7 +56,7 @@
             height: calc(100% - 45px);
         }
 
-         ::content .tabContainer {
+         ::content .tab {
             position: relative;
             height: 100%;
         }
@@ -65,12 +65,12 @@
         <div class="tabwrap">
             <div id="submenu" class="horizontal layout">
                 <template is="dom-repeat" items="{{tabNames}}">
-                    <div class="tab" on-click="handleOptions" data-value$="{{item}}" data-checked$="{{computeOptions(option,item)}}">{{item}}
+                    <div class="tabname" on-click="handleOptions" data-value$="{{item}}" data-checked$="{{computeOptions(option,item)}}">{{item}}
                     </div>
                 </template>
             </div>
             <div id="information">
-                <content select=".tabContainer"></content>
+                <content select=".tab"></content>
             </div>
         </div>
     </template>
@@ -107,7 +107,7 @@
             },
             ready: function() {
                 var tabNames = [];
-                var tabs = Polymer.dom(this).querySelectorAll('.tabContainer');
+                var tabs = Polymer.dom(this).querySelectorAll('.tab');
                 for (var i = 0; i < tabs.length; i++) {
                     var t = tabs[i];
                     t.setAttribute('hidden', "");
