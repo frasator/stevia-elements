@@ -158,7 +158,7 @@
                     reflectToAttribute: true,
                     value: false
                 },
-                hideNotificationControl:{
+                hideNotificationControl: {
                     type: Boolean,
                     reflectToAttribute: true,
                     value: false
@@ -327,6 +327,41 @@
                     }
                 }
                 return jobs;
+            },
+            deleteAllJobs: function() {
+                var me = this;
+                var tasks = [];
+                var createTask = function(id) {
+                    return function(cb) {
+                        SteviaManager.jobs.delete({
+                            query: {
+                                jobId: id,
+                            },
+                            request: {
+                                success: function(response) {
+                                    if (response.response[0].error == null) {
+                                        console.log('Job deleted');
+                                    } else {
+                                        console.log(response.response[0].error);
+                                    }
+                                    cb(null);
+
+                                },
+                                error: function() {
+                                    console.log('Server error, try again later.');
+                                    cb(null);
+                                }
+                            }
+                        });
+                    }
+                }
+
+                for (var i = 0; i < me.jobs.length; i++) {
+                    tasks.push(createTask(me.jobs[i]._id));
+                }
+                async.series(tasks, function(err, results) {
+                    me.fire('need-refresh');
+                })
             }
         });
     </script>

@@ -67,8 +67,7 @@
             }
             return validated;
         },
-        launchJob: function() {
-        },
+        launchJob: function() {},
         createQuery: function() {
             var query = {};
             query.name = this.jobName;
@@ -89,31 +88,37 @@
         },
         createJob: function(args, query) {
             var me = this;
-            SteviaManager.jobs.create({
-                query: query,
-                request: {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(args),
-                    success: function(response) {
-                        if (response.response[0].error == null) {
-                            var userId = response.response[0].results[0].user._id;
-                            me.message = userId + ' created';
-                            me.selectedOption = "jobLaunched";
-                            me.fire('need-refresh');
-                            me.fire('job-launched');
-                            console.log("JOB LAUNCHED")
-                        } else {
-                            me.message = response.response[0].error;
-                        }
-                    },
-                    error: function() {
-                        me.message = 'Server error, try again later.';
-                    }
-                }
-            });
+
+            // Manage diskQuota
+            if ((this.userData.diskQuota - this.userData.diskUsage) > 0) {
+
+              SteviaManager.jobs.create({
+                  query: query,
+                  request: {
+                      method: 'POST',
+                      headers: {
+                          "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify(args),
+                      success: function(response) {
+                          if (response.response[0].error == null) {
+                              var userId = response.response[0].results[0].user._id;
+                              me.message = userId + ' created';
+                              me.selectedOption = "jobLaunched";
+                              me.fire('need-refresh');
+                              me.fire('job-launched');
+                              console.log("JOB LAUNCHED")
+                          } else {
+                              me.message = response.response[0].error;
+                          }
+                      },
+                      error: function() {
+                          me.message = 'Server error, try again later.';
+                      }
+                  }
+              });
+
+            }
         },
         getMode: function(scope) {
             var mode = "id";
@@ -189,11 +194,9 @@
         },
         computeHasErrors: function(hasErrors) {
             return (hasErrors);
-        }
+        },
+        clear: function() {
 
-        // clearErrors: function(id) {
-        //     var parent = stv.utils.closest(id, "stv-form-box");
-        //     parent.clearErrors();
-        // },
+        }
     };
 </script>
