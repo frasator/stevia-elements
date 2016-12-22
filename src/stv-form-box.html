@@ -55,12 +55,22 @@
             margin: 20px;
         }
 
-        :host.error {
+         :host.error {
             box-shadow: 0 0 8px 1px rgba(191, 71, 71, 1);
         }
 
-        :host.error #header {
+         :host.error #header {
             color: #BF4747;
+        }
+
+         :host[disabled] .disabled {
+            position: absolute;
+            box-sizing: border-box;
+            background-color: rgba(125, 125, 125, 0.3);
+            width: 100%;
+            height: 100%;
+            top:0;
+            left:0;
         }
     </style>
     <template>
@@ -83,6 +93,7 @@
                 </template>
             </div>
         </div>
+        <div class="disabled"></div>
     </template>
 
     <script>
@@ -95,6 +106,11 @@
                     value: false
                 },
                 collapsed: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: false,
+                },
+                disabled: {
                     type: Boolean,
                     reflectToAttribute: true,
                     value: false,

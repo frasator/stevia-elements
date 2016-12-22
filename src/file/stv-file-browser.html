@@ -356,7 +356,13 @@
 
                 this.treeIndex = {};
                 this._createTreeIndex(this.treeIndex, this.userData.tree);
+                //Set root open by default
+                var root = this.userData.tree[0];
+                if (root != null) {
+                    root.open = true;
+                }
                 // console.log(this.treeIndex);
+                // console.log(this.userData.tree);
             } else {
                 this.clean();
             }

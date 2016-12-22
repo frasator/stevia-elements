@@ -174,14 +174,21 @@
             },
             handleClickOk: function(e) {
                 var selectedFile = e.currentTarget.selectedFile;
-                this.set('selectedFile', selectedFile);
+                if (selectedFile == null) {
+                    selectedFile = e.currentTarget.folder;
+                    if (selectedFile != null) {
+                        this.set('selectedFile', selectedFile);
+                    }
+                } else {
+                    this.set('selectedFile', selectedFile);
+                }
             },
             selectHandler: function(e) {
                 this.showBrowser = false;
-                this.selectedFile = e.detail.file;
+                this.set('selectedFile', e.detail.file);
             },
             handleCancel: function(e) {
-                this.selectedFile = undefined;
+                this.set('selectedFile', null);
                 this.showBrowser = false;
             },
             handleOriginChange: function(e) {
@@ -202,7 +209,7 @@
                 var me = this;
 
                 SteviaManager.getFile(id, function(file) {
-                    me.selectedFile = file;
+                    me.set('selectedFile', file);
                     cb();
                 });
             }

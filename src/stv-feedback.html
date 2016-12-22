@@ -1,70 +1,67 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="stv-dialog/stv-dialog.html">
+
 <dom-module id="stv-feedback">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
-            position: absolute;
+            position: relative;
             box-sizing: border-box;
-            box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.4);
-            padding: 5px;
         }
 
         #emailPanel {
             width: 500px;
-            height: 500px;
+            /*height: 500px;*/
             min-width: 500px;
-            min-height: 500px;
-            padding: 5px;
-            top: 60px;
-            left: 500px;
-        }
-
-        .send {
-            margin: 0 auto;
-            width: 100px;
-            margin-top: 20px;
+            /*min-height: 500px;*/
         }
 
         #emailContent {
             padding: 20px;
         }
 
-        .data {
-            color: #666;
-            margin: 10px 5px 5px 5px;
+        .send {
+            width: 100px;
+            margin-top: 20px;
         }
 
         textarea {
+            box-sizing: border-box;
+            width: 100%;
             height: 300px;
-            width: 425px;
-            margin-left: 10px
+            resize: none;
         }
     </style>
     <template>
-        <stv-panel id="emailPanel" modal closable on-close="handleFeedback">
+        <stv-panel id="emailPanel" modal fixed closable on-close="handleFeedback">
             <div class="header">
                 <i class="fa fa-envelope-o"></i> Send an email
             </div>
-            <div id="emailContent" class="container">
-                <div class="horizontal layout flex">
-                    <div class="data" for="">Subject &nbsp;</div>
-                    <input style="margin-top: 5px;" type="text" value="{{subject::input}}" />
-
-                    <label class="data" for="">Type &nbsp;</label>
-                    <stv-select id="emailType" style="width:150px; margin-top:5px">
-                        <stv-option value="suggest">Suggest</stv-option>
-                        <stv-option value="question">Question</stv-option>
-                        <stv-option value="error">Error</stv-option>
-                    </stv-select>
+            <div id="emailContent" class="container flex">
+                <div class="horizontal layout">
+                    <div class="flex">
+                        <label class="stv" for="">Subject:</label>
+                        <input class="stv" type="text" value="{{subject::input}}" />
+                    </div>
+                    <div style="margin-left:15px;">
+                        <label class="data" for="">Type:</label>
+                        <stv-select id="emailType" style="width:150px; margin-top:5px">
+                            <stv-option value="suggest">Suggest</stv-option>
+                            <stv-option value="question">Question</stv-option>
+                            <stv-option value="error">Error</stv-option>
+                        </stv-select>
+                    </div>
                 </div>
-
-                <div class="data" for="">Text &nbsp; </div>
-                <textarea class="stv" name="" id="" cols="30" rows="10" value="{{text::input}}"></textarea>
-
-                <div class="stv-btn stv-btn-shdw send" on-click="handleSendEmail">&nbsp; SEND</div>
-                <div id="Sending" hidden$="{{!sending}}">
-                    <i class="fa fa-circle-o-notch fa-spin"></i> Sending...
+                <br>
+                <label class="stv" for="">Text:</label>
+                <textarea class="stv flex" name="" id="" cols="30" rows="10" value="{{text::input}}" required></textarea>
+                <br>
+                <div class="horizontal layout center end-justified">
+                    <div id="Sending" hidden$="{{!sending}}">
+                        <i class="fa fa-circle-o-notch fa-spin"></i> Sending...
+                    </div>
+                    <div class="stv-btn stv-btn-shdw stv-btn-big" on-click="handleSendEmail">&nbsp; Send</div>
                 </div>
             </div>
         </stv-panel>
@@ -85,18 +82,26 @@
                 sending: {
                     type: Boolean,
                     value: false
+                },
+                hidden: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                    observer: 'hiddenChanged'
                 }
             },
-            ready: function() {},
+            hiddenChanged: function() {
+                this.$.emailPanel._center();
+            },
             handleSendEmail: function(e) {
                 e.stopPropagation();
-                this.sending = true;
                 var me = this;
                 var subject = this.subject;
-                var text = this.text;
+                var text = this.text.trim();
                 var type = this.$.emailType.selectedOption.value;
 
-                setTimeout(function() {
+                if (text != null && text != "") {
+                    this.sending = true;
                     SteviaManager.users.feedback({
                         query: {
                             subject: subject,
@@ -106,24 +111,26 @@
                         request: {
                             success: function(response) {
                                 if (response.response[0].error == null) {
-                                    me.sending = false;
                                     me.fire('feedbackend');
-                                    alert(response.response[0].results[0]);
+                                    new StvDialog().alert(response.response[0].results[0]);
+                                    me.set('text', '');
                                 } else {
-                                    alert('Sorry! There was a problem, try again later');
+                                    new StvDialog().alert('Sorry! There was a problem, try again later');
                                 }
+                                me.sending = false;
                             },
                             error: function() {
-                                console.log('Server error, try again later');
+                                new StvDialog().alert('Server error, try again later');
+                                me.sending = false;
                             }
                         }
                     });
-                }, 5000)
+                }
             },
-            handleFeedback: function(e){
-              this.fire('feedbackend');
-              this.$.emailPanel.hidden=false;
-              this.$.emailPanel.style="top: 60px;left: 500px";
+            handleFeedback: function(e) {
+                this.fire('feedbackend');
+                this.$.emailPanel.hidden = false;
+                this.$.emailPanel.style = "top: 60px;left: 500px";
             }
         })
     </script>

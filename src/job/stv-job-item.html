@@ -197,7 +197,10 @@
                 return job.tool;
             },
             hideRelaunch: function(job) {
-                if ((job.status === "DONE" || job.status.indexOf("ERROR") != -1) && this.disableRelaunch == false) {
+                if(this.disableRelaunch == false){
+                    return true;
+                }
+                if ((job.status === "DONE" || job.status.indexOf("ERROR") != -1)) {
                     return false;
                 }
                 return true;
