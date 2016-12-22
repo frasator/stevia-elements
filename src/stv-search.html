@@ -2,7 +2,7 @@
 <link rel="import" href="../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-search">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -12,7 +12,8 @@
         }
 
         #list,
-        #message {
+        #message,
+        #minCharMessage {
             position: absolute;
             background-color: var(--light-primary-color);
             width: 100%;
@@ -28,7 +29,8 @@
             overflow-y: auto;
         }
 
-        #message {
+        #message,
+        #minCharMessage {
             padding: 3px 7px;
         }
 
@@ -86,6 +88,7 @@
             </template>
         </div>
         <div id="message">{{emptyMessage}}</div>
+        <div id="minCharMessage">Please write al least {{minQueryLength}}</div>
     </template>
     <script>
         Polymer({
@@ -153,6 +156,12 @@
             hideEmptyMessage: function() {
                 this.$.message.style.display = '';
             },
+            showMinCharMessage: function(e) {
+                this.$.minCharMessage.style.display = 'block';
+            },
+            hideMinCharMessage: function() {
+                this.$.minCharMessage.style.display = '';
+            },
             handleInputBlur: function(e) {
                 this.hideList();
                 this.$.input.classList.remove("error");
@@ -211,9 +220,11 @@
                         if (results.length >= 0) {
                             me.showList();
                             me.$.input.classList.remove("error");
+                            me.hideMinCharMessage();
                             me.hideEmptyMessage();
                         } else {
                             me.$.input.classList.add("error");
+                            me.hideMinCharMessage();
                             me.showEmptyMessage();
                         }
                         me.set('results', results);
@@ -223,10 +234,12 @@
                 if (query.length == 0) {
                     this.$.input.classList.remove("error");
                     this.hideEmptyMessage();
+                    this.hideMinCharMessage();
                 } else if (query.length < this.minQueryLength) {
                     me.set('count', 0);
                     this.hideList();
-                    this.showEmptyMessage();
+                    this.hideEmptyMessage();
+                    this.showMinCharMessage();
                     this.$.input.classList.add("error");
                 }
             },
@@ -260,7 +273,7 @@
 </dom-module>
 <dom-module id="stv-search-item">
     <style>
-        :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;

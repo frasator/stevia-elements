@@ -279,6 +279,11 @@
             handleUp: function() {
                 this.scrollTop = 0;
             },
+            refresh: function() {
+                if (this.job != null) {
+                    this.jobChanged(this.job);
+                }
+            },
             jobChanged: function(neo, old) {
                 var me = this;
                 if (neo) {
@@ -979,7 +984,7 @@
                 if (this.job.tool === 'hipathia') {
                     pv.set('showHipathiaLegend', true);
                 }
-                if (this.job.tool == 'midas') {
+                if (this.job.tool == 'metabolizer') {
                     pv.set('categoryLabel', 'Pathways');
                     pv.set('circuitLabel', 'Modules');
                 }
@@ -992,6 +997,7 @@
                 return el;
             },
             _pathwayDrugViewerTag: function(outEl) {
+                var me = this;
                 var tool = outEl.getAttribute('tool');
 
                 var el = document.createElement('div');
@@ -1025,14 +1031,25 @@
                 pdv.$.pathwayViewer.set('hideAltered', false);
                 pdv.set('jobFolder', this.job.folder);
 
-                if (this.job.tool == 'midas' && tool == 'midas') {
+                if (this.job.tool == 'metabolizer' && tool == 'metabolizer') {
                     updateArgs.options['species'] = this.job.options.species;
                     updateArgs.options['exp_file'] = this.job.options.exp_file;
                     updateArgs.options['design_file'] = this.job.options.design_file;
-                    updateArgs.options['sample'] = this.job.options.sample;
+                    if (this.job.options.sample) {
+                        updateArgs.options['sample'] = this.job.options.sample;
+                    }
+                    if (this.job.options.simple) {
+                        updateArgs.options['simple'] = this.job.options.simple;
+                    }
                     pdv.set('foldChange', 1);
                     pdv.set('categoryLabel', 'Pathways');
                     pdv.set('circuitLabel', 'Modules');
+                    pdv.addEventListener('job-clear', function(e) {
+                        me.refresh();
+                    });
+                    pdv.addEventListener('job-update', function(e) {
+                        me.refresh();
+                    });
                 }
 
                 // pw.style.border = "1px solid #d3d3d3";
@@ -1226,7 +1243,8 @@
                         var name = field.replace(/ /gi, '_');
                         var width = 150;
                         if (i === 0) {
-                            width = 400;
+                            width = 150;
+                            // width = 400;
                         }
                         columns.push({
                             name: name,
@@ -1244,6 +1262,9 @@
                                     field = fields[j].trim();
                                     if (window.isNaN != null && !isNaN(field)) {
                                         field = parseFloat(field).toFixed(3);
+                                    }
+                                    if(field.indexOf('http') == "0"){
+                                        field = '<a target="_blank" href="'+field+'">'+field+'</a>'
                                     }
                                     column = columns[j];
                                     obj[column.name] = field;
