@@ -80,6 +80,7 @@
         .download-job:hover {
             color: #0068cc !important;
         }
+
         .open-job-folder:hover {
             color: #0068cc !important;
         }
@@ -116,18 +117,19 @@
                     <div style="padding-right:5px;" class$="{{computeStatusClass(job)}}">{{computeStatus(job)}}</div>
                     <div style="padding-right:5px;" class="date flex">{{computeDate(job)}}</div>
                     <div class="bar" id="bar">
-                        <template is="dom-if" if="{{!isRunning(job)}}">
-                            <template is="dom-if" if="{{showLogFile(job)}}">
-                                <i class="fa fa-file-o log-file" title="View log file" on-click="handleViewLogFile"></i>
-                                <span style="margin-right:5px;"></span>
-                            </template>
-                            <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
-                            <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
-                            <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
-                            <i class="fa fa-download download-job" title="Download" hidden="{{hasError(job)}}" on-click="handleDownloadJob"></i>
-                            <i class="fa fa-folder-open-o open-job-folder" title$="Open job folder: {{job.folder.path}}" on-click="handleOpenJobFolder"></i>
-                            <i class="fa fa-bug bug-job" title="Report Error" hidden="{{!hasError(job)}}" on-click="handleReportError"></i>
+                        <!-- <template is="dom-if" if="{{!isRunning(job)}}"> -->
+                        <template is="dom-if" if="{{showLogFile(job)}}">
+                            <i class="fa fa-file-o log-file" title="View log file" on-click="handleViewLogFile"></i>
+                            <!-- <span style="margin-right:5px;"></span> -->
                         </template>
+                        <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob"></i>
+                        <!-- <i class="fa fa-trash-o delete-job" title="Delete Job" on-click="handleDeleteJob" hidden$={{computeDeleteJobIcon(job)}}></i> -->
+                        <i class="fa fa-refresh relaunch-job" title="Relaunch Job" on-click="handleRelaunchJob" hidden$="{{hideRelaunch(job)}}"></i>
+                        <!-- <i class="fa fa-info info-job" title="Job information" on-click="handleJobInformation"></i> -->
+                        <i class="fa fa-download download-job" title="Download" on-click="handleDownloadJob" hidden$="{{computeDownloadJobIcon(job)}}"></i>
+                        <i class="fa fa-folder-open-o open-job-folder" title$="Open job folder: {{job.folder.path}}" on-click="handleOpenJobFolder" hidden$="{{computeOpenJobIcon(job)}}"></i>
+                        <i class="fa fa-bug bug-job" title="Report Error" hidden$="{{!hasError(job)}}" on-click="handleReportError"></i>
+                        <!-- </template> -->
                     </div>
                 </div>
             </div>
@@ -208,6 +210,22 @@
             isRunning: function(job) {
                 return job.status == "RUNNING";
             },
+            computeDeleteJobIcon: function(job) {
+                return job.status != "DONE" && job.status != "RUNNING" && job.status != "";
+            },
+            computeDownloadJobIcon: function(job) {
+                if (job.status.indexOf("ERROR") != -1) {
+                    return true;
+                } else {
+                    return job.status != "DONE";
+                }
+            },
+            computeOpenJobIcon: function(job) {
+                if ((job.status === "DONE" || job.status.indexOf("ERROR") != -1)) {
+                    return false;
+                }
+                return true;
+            },
             showLogFile: function(job) {
                 if (window.STEVIA_SHOW_JOB_ERROR_FILES !== true) {
                     return false;
@@ -276,7 +294,7 @@
                 });
                 link.dispatchEvent(event);
             },
-            handleOpenJobFolder:function(e){
+            handleOpenJobFolder: function(e) {
                 e.stopPropagation();
                 this.fire('open-job-folder', this.job);
             },
@@ -290,10 +308,10 @@
                     request: {
                         success: function(response) {
                             if (response.response[0].error == null) {
-                                alert(response.response[0].results[0]);
+                                new StvDialog().alert(response.response[0].results[0]);
                                 jobItem.disabled = true;
                             } else {
-                                alert('Sorry! There was a problem, try again later');
+                                new StvDialog().alert('Sorry! There was a problem, try again later');
                             }
                             jobItem.classList.remove("fa-spin");
                             jobItem.classList.remove("fa-spin-elem");
