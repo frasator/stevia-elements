@@ -369,6 +369,16 @@ var SteviaManager = {
             }
             chunkId++;
         }
+        if(SIZE == 0){
+            chunkMap[0] = {
+                id: chunkId,
+                start: 0,
+                end: 0,
+                size: 0,
+                done: false,
+                last: true
+            };
+        }
         if (resume) {
             var resumeFormData = new FormData();
             resumeFormData.append('resume_upload', resume);

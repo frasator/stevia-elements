@@ -205,7 +205,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}" columns="{{columns}}">
+                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{filteredFiles}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}" columns="{{columns}}" hide-file-column="{{hideFileColumn}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -295,6 +295,10 @@
                 type: Array,
                 notify: true
             },
+            filteredFiles: {
+                type: Array,
+                notify: true
+            },
             bioformats: {
                 type: Array,
                 value: function() {
@@ -347,6 +351,11 @@
             },
             columns: {
                 type: Array
+            },
+            hideFileColumn: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
             }
         },
         userDataChanged: function(neo, old) {
@@ -385,6 +394,7 @@
             this.set('selectedFile', null);
             this.set('folders', []);
             this.set('files', []);
+            this.set('filteredFiles', []);
             this.set('loading', false);
             this._setInitialSelection();
             // this.set('contentData', '');
@@ -540,8 +550,9 @@
         refreshFolderFiles: function(folderId) {
             var me = this;
             this.set('loading', true);
-            this._getFilesInFolder(folderId, function(file) {
+            this._getFilesInFolder(folderId, function(filteredFiles, file) {
                 me.set('folder', file);
+                me.set('filteredFiles', filteredFiles);
                 me.set('files', file.files);
                 me.set('loading', false);
                 me.$.folderList.set('selected', null);
@@ -562,6 +573,7 @@
             var me = this;
             var folderId = e.currentTarget.folder._id;
             this.files = [];
+            this.filteredFiles = [];
             this.refreshFolderFiles(folderId);
         },
         handleTreeItemClick: function(e) {
@@ -581,6 +593,7 @@
                 folderId = this.userData.home._id;
             }
             this.files = [];
+            this.filteredFiles = [];
             this.refreshFolderFiles(folderId);
         },
 
@@ -610,7 +623,7 @@
             var me = this;
 
             var bfList = [];
-            if (this.bioformats > 0) {
+            if (this.bioformats.length > 0) {
                 var bfList = ['NONE'];
                 for (var i = 0; i < this.bioformats.length; i++) {
                     var bf = this.bioformats[i];
@@ -624,7 +637,7 @@
                 type: 'FILE,FOLDER'
             };
 
-            if (bfList > 0 && (this.mode === 'file' || this.mode === 'folder')) {
+            if (bfList.length > 0 && (this.mode === 'file' || this.mode === 'folder')) {
                 query.bioformat = bfList.join(',');
             }
 
@@ -636,9 +649,8 @@
                     success: function(response) {
                         if (response.response[0].error == null) {
                             var file = response.response[0].results[0];
-                            var files = me._filterFiles(file.files);
-                            file.files = files;
-                            callback(file);
+                            var filteredFiles = me._filterFiles(file.files);
+                            callback(filteredFiles, file);
                         } else {
                             console.log(response.response[0].error);
                         }
