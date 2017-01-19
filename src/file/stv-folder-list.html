@@ -155,6 +155,9 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile" title="Download file">
                     <i class="fa fa-download"></i>
                 </div>
+                <div class="stv-btn stv-btn-shdw" on-click="handleDownloadFile" title="Download file">
+                    <i class="fa fa-download"></i>
+                </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedJob(selected)}}" on-click="handleViewJob" title="View job results">
                     <i class="fa fa-gears"></i>
                 </div>
@@ -177,7 +180,7 @@
 
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
             <div id="header" class="horizontal layout">
-                <div class="flex" data-sortorder$="{{_sortOrder(sort,sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
+                <div hidden="{{hideFileColumn}}" class="flex" data-sortorder$="{{_sortOrder(sort,sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
                 <template is="dom-repeat" items="{{columns}}" as="column">
                     <div style$="width:{{column.width}}px;" class$="col" data-sortorder$="{{_sortOrder(sort,sortASC,column.name)}}" data-sort$="{{column.name}}" on-click="changeSort">{{column.title}}</div>
                 </template>
@@ -186,7 +189,7 @@
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
                 <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}">
-                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" columns="{{columns}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
+                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" columns="{{columns}}" hide-file-column="{{hideFileColumn}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
             </div>
@@ -306,6 +309,11 @@
                             return stv.utils.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
                         }
                     }]
+                },
+                hideFileColumn: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
             created: function() {
@@ -479,6 +487,9 @@
                                 if (response.response[0].error == null) {
                                     console.log("delete:");
                                     console.log(response);
+                                    me.fire('filedelete', {
+                                        file: me.selected
+                                    });
                                     me.set('selected', null);
                                 } else {
                                     console.log(response.response[0].error);
