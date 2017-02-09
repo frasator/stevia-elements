@@ -139,7 +139,7 @@
                     <i class="fa fa-arrow-left"></i>
                 </div>
 
-                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isFolderMode(mode)}}" on-click="handleUploadFile" title="Upload a new file">
+                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isUploadHidden(mode,hideUploadBtn)}}" on-click="handleUploadFile" title="Upload a new file">
                     <i class="fa fa-cloud-upload"></i> Upload
                 </div>
 
@@ -149,13 +149,10 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{computeDelete(selected)}}" on-click="handleDeleteFile" title="Remove file/folder/job">
                     <i class="fa fa-trash"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile" title="View file">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkPreviewFile(selected)}}" on-click="handlePreviewFile" title="View file">
                     <i class="fa fa-eye"></i>
                 </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile" title="Download file">
-                    <i class="fa fa-download"></i>
-                </div>
-                <div class="stv-btn stv-btn-shdw" on-click="handleDownloadFile" title="Download file">
                     <i class="fa fa-download"></i>
                 </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedJob(selected)}}" on-click="handleViewJob" title="View job results">
@@ -314,6 +311,11 @@
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
+                },
+                hideUploadBtn: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
             created: function() {
@@ -424,8 +426,11 @@
                 }
                 // return selected == null;
             },
-            checkSelectedFile: function(selected) {
+            checkPreviewFile: function(selected) {
                 return selected == null || selected.type != "FILE";
+            },
+            checkSelectedFile: function(selected) {
+                return selected == null;
             },
             checkSelectedJob: function(selected) {
                 return selected == null || selected.job == undefined;
@@ -469,8 +474,8 @@
 
                 }
             },
-            isFolderMode: function(mode) {
-                return mode === 'folder';
+            isUploadHidden: function(mode, hideUploadBtn) {
+                return hideUploadBtn || mode === 'folder';
             },
 
             handleDownloadFile: function(e) {

@@ -139,11 +139,15 @@ var SteviaManager = {
         write: function (args) {
             return SteviaManager._doRequest(args, 'files', 'write');
         },
+        setBioformat: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'set-bioformat');
+        },
         upload: function (args) {
             var url = SteviaManager._url({
                 query: {
                     name: args.name,
-                    parentId: args.parentId
+                    parentId: args.parentId,
+                    expand: args.expand
                 },
                 request: {}
             }, 'files', 'upload');
@@ -369,7 +373,7 @@ var SteviaManager = {
             }
             chunkId++;
         }
-        if(SIZE == 0){
+        if (SIZE == 0) {
             chunkMap[0] = {
                 id: chunkId,
                 start: 0,
@@ -580,6 +584,26 @@ var SteviaManager = {
     //Download the file given a file Id.
     downloadFile: function (fileId, getContent) {
         var url = this.getFileURL(fileId);
+        var link = document.createElement('a');
+        link.href = url;
+        var event = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        });
+        link.dispatchEvent(event);
+    },
+    downloadFolderFiles: function (fileId, pattern, getContent) {
+        var url = SteviaManager.files.download({
+            id: fileId,
+            query: {
+                sid: Cookies("bioinfo_sid"),
+                pattern: encodeURIComponent(pattern)
+            },
+            request: {
+                url: true
+            }
+        });
         var link = document.createElement('a');
         link.href = url;
         var event = new MouseEvent('click', {
