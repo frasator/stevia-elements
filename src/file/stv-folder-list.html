@@ -166,7 +166,7 @@
                 <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}" title="Show info ">
                     <i class="fa fa-info"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}" title="Change icon/list view">
+                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}" title="Change icon/list view" style="margin-right: 5px;">
                     <i class$="{{computeViewModeIconClass(viewMode)}}"></i>
                 </div>
                 <!--<div class="stv-btn stv-btn-shdw" on-click="handleIcon">-->
@@ -176,7 +176,8 @@
         </div>
 
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
-            <div id="header" class="horizontal layout">
+            <div id="header" class="horizontal layout center">
+                <i class="fa fa-sort" on-click="changeSort" data-sort="createdAt" title="Date sort" style="margin-right:2px;"></i>
                 <div hidden="{{hideFileColumn}}" class="flex" data-sortorder$="{{_sortOrder(sort,sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
                 <template is="dom-repeat" items="{{columns}}" as="column">
                     <div style$="width:{{column.width}}px;" class$="col" data-sortorder$="{{_sortOrder(sort,sortASC,column.name)}}" data-sort$="{{column.name}}" on-click="changeSort">{{column.title}}</div>

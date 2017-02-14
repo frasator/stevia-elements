@@ -205,7 +205,11 @@
                 }
             },
             hideMenu: function() {
-                this.menu.style.display = "none";
+                if (this.menu != null) {
+                    this.menu.style.display = "none";
+                } else {
+                    console.warn("No menu defined in dropdown element");
+                }
             },
             showMenu: function(x, y) {
                 this.menu.style.display = "block";
@@ -214,7 +218,7 @@
                     this.menu.style.position = 'fixed';
                     this.menu.style.top = y + 'px';
                     this.menu.style.left = x + 'px';
-                }else{
+                } else {
                     this.menu.style.position = '';
                 }
             },

@@ -147,7 +147,10 @@ var SteviaManager = {
                 query: {
                     name: args.name,
                     parentId: args.parentId,
-                    expand: args.expand
+                    extract: args.extract,
+                    deleteCompressed: args.deleteCompressed,
+                    extractFolder: args.extractFolder,
+                    overwriteFiles: args.overwriteFiles
                 },
                 request: {}
             }, 'files', 'upload');
