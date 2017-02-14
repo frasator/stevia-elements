@@ -139,7 +139,7 @@
                     <i class="fa fa-arrow-left"></i>
                 </div>
 
-                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isFolderMode(mode)}}" on-click="handleUploadFile" title="Upload a new file">
+                <div class="stv-btn stv-btn-shdw upload-btn" hidden$="{{isUploadHidden(mode,hideUploadBtn)}}" on-click="handleUploadFile" title="Upload a new file">
                     <i class="fa fa-cloud-upload"></i> Upload
                 </div>
 
@@ -149,13 +149,10 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{computeDelete(selected)}}" on-click="handleDeleteFile" title="Remove file/folder/job">
                     <i class="fa fa-trash"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handlePreviewFile" title="View file">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkPreviewFile(selected)}}" on-click="handlePreviewFile" title="View file">
                     <i class="fa fa-eye"></i>
                 </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile" title="Download file">
-                    <i class="fa fa-download"></i>
-                </div>
-                <div class="stv-btn stv-btn-shdw" on-click="handleDownloadFile" title="Download file">
                     <i class="fa fa-download"></i>
                 </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedJob(selected)}}" on-click="handleViewJob" title="View job results">
@@ -169,7 +166,7 @@
                 <div class="stv-btn stv-btn-shdw" on-click="handleViewInfo" style="margin-right: 5px;" hidden$="{{checkSelected(selected)}}" title="Show info ">
                     <i class="fa fa-info"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}" title="Change icon/list view">
+                <div class="stv-btn stv-btn-shdw" on-click="handleViewMode" hidden$="{{disableIconView}}" title="Change icon/list view" style="margin-right: 5px;">
                     <i class$="{{computeViewModeIconClass(viewMode)}}"></i>
                 </div>
                 <!--<div class="stv-btn stv-btn-shdw" on-click="handleIcon">-->
@@ -179,7 +176,8 @@
         </div>
 
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
-            <div id="header" class="horizontal layout">
+            <div id="header" class="horizontal layout center">
+                <i class="fa fa-sort" on-click="changeSort" data-sort="createdAt" title="Date sort" style="margin-right:2px;"></i>
                 <div hidden="{{hideFileColumn}}" class="flex" data-sortorder$="{{_sortOrder(sort,sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
                 <template is="dom-repeat" items="{{columns}}" as="column">
                     <div style$="width:{{column.width}}px;" class$="col" data-sortorder$="{{_sortOrder(sort,sortASC,column.name)}}" data-sort$="{{column.name}}" on-click="changeSort">{{column.title}}</div>
@@ -314,6 +312,11 @@
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
+                },
+                hideUploadBtn: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
             created: function() {
@@ -424,8 +427,11 @@
                 }
                 // return selected == null;
             },
-            checkSelectedFile: function(selected) {
+            checkPreviewFile: function(selected) {
                 return selected == null || selected.type != "FILE";
+            },
+            checkSelectedFile: function(selected) {
+                return selected == null;
             },
             checkSelectedJob: function(selected) {
                 return selected == null || selected.job == undefined;
@@ -469,8 +475,8 @@
 
                 }
             },
-            isFolderMode: function(mode) {
-                return mode === 'folder';
+            isUploadHidden: function(mode, hideUploadBtn) {
+                return hideUploadBtn || mode === 'folder';
             },
 
             handleDownloadFile: function(e) {

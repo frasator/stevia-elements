@@ -205,7 +205,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{filteredFiles}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}" columns="{{columns}}" hide-file-column="{{hideFileColumn}}">
+                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{filteredFiles}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}" columns="{{columns}}" hide-file-column="{{hideFileColumn}}" hide-upload-btn="{{hideUploadBtn}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -353,6 +353,11 @@
                 type: Array
             },
             hideFileColumn: {
+                type: Boolean,
+                value: false,
+                reflectToAttribute: true
+            },
+            hideUploadBtn: {
                 type: Boolean,
                 value: false,
                 reflectToAttribute: true
@@ -555,7 +560,20 @@
                 me.set('filteredFiles', filteredFiles);
                 me.set('files', file.files);
                 me.set('loading', false);
-                me.$.folderList.set('selected', null);
+
+                if (me.selectedFile != null) {
+                    var foundFile;
+                    for (var i = 0; i < filteredFiles.length; i++) {
+                        var f = filteredFiles[i];
+                        if (f._id == me.selectedFile._id) {
+                            foundFile = f;
+                        }
+                    }
+                    me.set('selectedFile', foundFile);
+                } else {
+                    me.set('selectedFile', null);
+                }
+
                 me.refresFoldersPath();
             });
         },
