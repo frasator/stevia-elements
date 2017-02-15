@@ -5,7 +5,7 @@
 
 <dom-module id="stv-table">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             display: block;
             position: relative;
             font-size: 13px;
@@ -25,7 +25,7 @@
             z-index: 1;
         }
 
-        :host[enable-paging] .scrollfix {
+         :host[enable-paging] .scrollfix {
             display: none;
         }
 
@@ -63,7 +63,7 @@
             background-color: inherit;
         }
 
-        :host[enable-paging] .table-header-row {
+         :host[enable-paging] .table-header-row {
             overflow-y: hidden;
         }
 
@@ -124,7 +124,7 @@
             background-color: inherit;
         }
 
-        :host[enable-paging] #filterRow {
+         :host[enable-paging] #filterRow {
             overflow-y: hidden;
         }
 
@@ -154,15 +154,15 @@
             background-color: #fafafa;
         }
 
-        :host>.table-body {
+         :host>.table-body {
             overflow-y: scroll;
         }
 
-        :host[enable-paging]>.table-body {
+         :host[enable-paging]>.table-body {
             overflow-y: hidden;
         }
 
-        :host[enable-filter]>.table-body {
+         :host[enable-filter]>.table-body {
             height: calc(100% - 88px);
         }
 
@@ -296,8 +296,8 @@
             margin-right: 15px;
         }
 
-        :host[enable-paging] .table-filter-field:last-child>.select,
-        :host[enable-paging] .table-filter-field:last-child>input[type=text] {
+         :host[enable-paging] .table-filter-field:last-child>.select,
+         :host[enable-paging] .table-filter-field:last-child>input[type=text] {
             margin-right: 1px;
         }
 
@@ -697,12 +697,14 @@
             /* LISTENERS */
             handleScroll: function(e) {
                 if (this.enablePaging == true) {
-                    e.preventDefault();
-                    if (e.deltaY > 0) {
-                        this.handleNextClick();
-                    }
-                    if (e.deltaY < 0) {
-                        this.handlePreviousClick();
+                    if (e.shiftKey == false) {
+                        e.preventDefault();
+                        if (e.deltaY > 0) {
+                            this.handleNextClick();
+                        }
+                        if (e.deltaY < 0) {
+                            this.handlePreviousClick();
+                        }
                     }
                 }
             },
@@ -1102,13 +1104,13 @@
             },
             _applyFilters: function() {
                 if (this.enableRemote) {
-                  var filter=[];
-                  for (var key in this.filters) {
-                    var field = key;
-                    var search=this.filters[key].query;
-                    filter.push(field+":"+search);
-                  }
-                  this.set('request.search', filter.join(","));
+                    var filter = [];
+                    for (var key in this.filters) {
+                        var field = key;
+                        var search = this.filters[key].query;
+                        filter.push(field + ":" + search);
+                    }
+                    this.set('request.search', filter.join(","));
                 } else {
                     for (var i = 0; i < this.data.length; i++) {
                         var row = this.data[i];
