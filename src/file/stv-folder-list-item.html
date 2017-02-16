@@ -189,7 +189,11 @@
         computeColumnIcon: function(column, file) {
             if (column.icon != null) {
                 if (file.type == 'FOLDER') {
-                    return 'fa fa-folder';
+                    if (file.job != null) {
+                        return 'fa fa-flask';
+                    } else {
+                        return 'fa fa-folder';
+                    }
                 } else {
                     return 'fa ' + column.icon;
                 }
