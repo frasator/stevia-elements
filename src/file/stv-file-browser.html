@@ -556,11 +556,6 @@
             var me = this;
             this.set('loading', true);
             this._getFilesInFolder(folderId, function(filteredFiles, file) {
-                me.set('folder', file);
-                me.set('filteredFiles', filteredFiles);
-                me.set('files', file.files);
-                me.set('loading', false);
-
                 if (me.selectedFile != null) {
                     var foundFile;
                     for (var i = 0; i < filteredFiles.length; i++) {
@@ -574,8 +569,21 @@
                     me.set('selectedFile', null);
                 }
 
+                me.set('folder', file);
+                me.set('filteredFiles', filteredFiles);
+                me.set('files', file.files);
+                me.fire('openfolder', {
+                    files: file.files,
+                    filteredFiles: filteredFiles
+                });
+
                 me.refresFoldersPath();
+
+                me.set('loading', false);
             });
+        },
+        refreshFolderList: function() {
+            this.$.folderList.refreshFolderList();
         },
         refresFoldersPath: function() {
             var index = this.treeIndex;
@@ -738,10 +746,8 @@
         },
         handleSearchByType: function(e) {
             this.searchByType = e.currentTarget.dataset.value;
-
         },
         computeSearchByType: function(type, value) {
-            // debugger
             return type === value;
         },
         computeSize: function(userData, size) {
