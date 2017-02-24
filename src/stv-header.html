@@ -72,8 +72,10 @@
 
          :host[small] #left>div,
          :host[small] #right>div,
-         :host[small] #menu-wrapper>::content>.menu div.option {
+         :host[small] #menu-wrapper>::content>.menu div.option,
+         :host[small-options] #menu-wrapper>::content>.menu div.option {
             border-bottom-width: 1px;
+            font-size: 14px;
         }
 
         #right>div:hover,
@@ -87,7 +89,8 @@
         }
 
          :host[small] #right>div:hover,
-         :host[small] #menu-wrapper>::content>.menu div.option:hover {
+         :host[small] #menu-wrapper>::content>.menu div.option:hover,
+         :host[small-options] #menu-wrapper>::content>.menu div.option:hover {
             border-bottom-width: 1px;
         }
 

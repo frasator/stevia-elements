@@ -161,7 +161,7 @@
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkPreviewFile(selected)}}" on-click="handlePreviewFile" title="View file">
                     <i class="fa fa-eye"></i>
                 </div>
-                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected)}}" on-click="handleDownloadFile" title="Download file">
+                <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedFile(selected,hideDownloadBtn)}}" on-click="handleDownloadFile" title="Download file">
                     <i class="fa fa-download"></i>
                 </div>
                 <div class="stv-btn stv-btn-shdw" hidden$="{{checkSelectedJob(selected)}}" on-click="handleViewJob" title="View job results">
@@ -330,6 +330,11 @@
                     value: false,
                     reflectToAttribute: true
                 },
+                hideDownloadBtn: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                },
                 _filteredCount: {
                     type: Number
                 }
@@ -455,8 +460,8 @@
             checkPreviewFile: function(selected) {
                 return selected == null || selected.type != "FILE";
             },
-            checkSelectedFile: function(selected) {
-                return selected == null;
+            checkSelectedFile: function(selected, hideDownloadBtn) {
+                return hideDownloadBtn || selected == null;
             },
             checkSelectedJob: function(selected) {
                 return selected == null || selected.job == undefined;
