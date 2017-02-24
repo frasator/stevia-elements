@@ -10,7 +10,6 @@
             max-height: 500px;
             padding: 10px;
         }
-
         .but {
             color: #445D76;
             text-align: center;
@@ -19,13 +18,11 @@
             line-height: 20px;
             margin-top: 5px;
         }
-
         #hpoList {
             margin: 5px;
             height: 80%;
             width: 95%;
         }
-
         #allHPO,
         #selectedHPO {
             width: 95%;
@@ -33,48 +30,38 @@
             height: calc(100vh - 450px);
             border: 1px solid #d3d3d3;
         }
-
         .allHPO {
             width: 50%;
             margin-right: 10px;
         }
-
         .selectedHPO {
             width: 50%;
             margin-left: 10px;
         }
-
         .titlePreview {
             color: #445D76;
             margin-bottom: 5px;
             border-bottom: 1px solid #445D76;
         }
-
         stv-table {
             font-size: 12px;
         }
-
         network-viewer {
             height: 600px;
         }
-
         .legend {
             border: 1px solid #d3d3d3;
             padding: 5px;
         }
-
         .legend div {
             margin-right: 40px;
         }
-
         .legend i {
             font-size: 15px;
         }
-
         #network {
             margin-right: 10px;
         }
-
         .add-but {
             font-size: 13px;
             font-weight: bold;
@@ -85,7 +72,6 @@
             line-height: 30px;
             margin-top: 10px;
         }
-
         .treeHPO {
             overflow-y: auto;
             min-height: 350px;
@@ -180,6 +166,10 @@
                         return {};
                     }
                 },
+                readyhp: {
+                    type: Boolean,
+                    value: false
+                },
                 mapSelectedHpo: {
                     type: Object,
                     value: function() {
@@ -190,12 +180,12 @@
             ready: function() {
                 var me = this;
                 this.set('hpoList', HPO_ONTOLOGY);
-                for (var i = 0; i < this.hpoList.length; i++) {
-                    this.hpoList[i].id = 'HP:' + this.hpoList[i].id;
+                if (!this.readyhp){
+                    for (var i = 0; i < this.hpoList.length; i++) {
+                        this.hpoList[i].id = 'HP:' + this.hpoList[i].id;
+                    }
                 }
-
                 // this.createJson();
-
                 this.hpoColumns = [{
                     name: 'id',
                     title: 'ID',
@@ -294,7 +284,6 @@
                 //     type: "text/plain;charset=utf-8"
                 // });
                 // saveAs(blob, 'hpo_tree.js');
-
                 HPO_TREE[0].open = true;
                 this.$.treeHPO.set('tree', HPO_TREE);
                 this.handleView(e);
@@ -362,7 +351,6 @@
                             }
                         }
                     }
-
                     me.handleView(e);
                     me.$.network.startOver();
                     me.$.network.loadSif(newFile);
@@ -378,7 +366,6 @@
                         }
                     })
                 });
-
             }
         })
     </script>
