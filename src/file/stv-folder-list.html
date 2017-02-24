@@ -30,9 +30,18 @@
         }
 
         #content.list {
-            height: calc(100% - 55px);
+            height: calc(100% - 75px);
             overflow-y: scroll;
             overflow-x: hidden;
+        }
+
+        .content-info-bar {
+            box-sizing: border-box;
+            height: 20px;
+            padding: 0 7px;
+            border-top: 1px solid rgba(130, 130, 130, 0.5);
+            color: var(--secondary-text-color);
+            background-color: var(--hover-color);
         }
 
         #content.list.info {
@@ -186,11 +195,14 @@
         </template>
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
-                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}">
+                <template rendered-item-count="{{_filteredCount}}" is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}">
                     <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" columns="{{columns}}" hide-file-column="{{hideFileColumn}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
             </div>
+        </div>
+        <div class="content-info-bar horizontal layout center start-justified">
+            <span>Showing {{_filteredCount}} items of {{files.length}}</span>
         </div>
 
         <div id="fileInfo" class="vertical layout" hidden="{{!showInfo}}">
@@ -317,6 +329,9 @@
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
+                },
+                _filteredCount: {
+                    type: Number
                 }
             },
             created: function() {

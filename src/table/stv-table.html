@@ -875,6 +875,7 @@
                 this.viewDataChanged();
             },
             clear: function() {
+                this.request = null;
                 this.data = [];
                 this.viewData = [];
                 this.currentPage = 1;
@@ -1599,13 +1600,17 @@
                 this.loading = loading;
             },
             allowDrop: function(e) {
-                console.log("drag!!!")
+                // console.log("drag!!!")
                 e.preventDefault();
             },
             drop: function(e) {
                 e.preventDefault();
-                var data = JSON.parse(e.dataTransfer.getData("rowData"));
-                this.push('data', data);
+                try {
+                    var data = JSON.parse(e.dataTransfer.getData("rowData"));
+                    this.push('data', data);
+                } catch (ex) {
+                    return;
+                }
             },
             drag: function(e) {
                 e.dataTransfer.setData("rowData", JSON.stringify(e.currentTarget._rowData));
