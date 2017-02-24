@@ -2,33 +2,21 @@
 <link rel="import" href="../../../iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="stv-folder-list-item">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-        :host {
+         :host {
             position: relative;
             display: block;
             box-sizing: border-box;
         }
 
-        :host:hover {
+         :host:hover {
             background-color: #ddd;
         }
 
-        :host[selected] {
+         :host[selected] {
             background-color: #ccc;
         }
 
-        #name {
-            width: calc(100% - 160px);
-        }
-
-        #creationDate {
-            color: #444;
-            width: 80px;
-            text-align: center;
-        }
-
-        #size {
-            color: #444;
-            width: 80px;
+        .col {
             text-align: center;
         }
 
@@ -71,15 +59,16 @@
     <template>
         <template is="dom-if" if="{{computeViewMode(viewMode, 'list')}}">
             <div id="list" class="horizontal layout">
-                <div id="name" class="horizontal layout">
+                <div id="name" class="horizontal layout" style$="width:calc(100% - {{colSumW}}px);">
                     <div class="icon"><i class$="{{computeIcon(file)}}"></i></div>
                     <template is="dom-if" if="{{hasJob(file)}}">
                         <div class="icon"><i class$="{{computeJobIcon(file.job)}}"></i></div>
                     </template>
                     <div class="filename" title$="{{file.name}}">{{file.name}}</div>
                 </div>
-                <div id="size">{{computeSize(file)}}</div>
-                <div id="creationDate">{{computeDate(file)}}</div>
+                <template is="dom-repeat" items="{{columns}}" as="column">
+                    <div style$="width:{{column.width}}px;" class="col" title="{{computeColumn(column,file)}}">{{computeColumn(column,file)}}</div>
+                </template>
             </div>
         </template>
         <template is="dom-if" if="{{computeViewMode(viewMode, 'icon')}}">
@@ -102,17 +91,26 @@
                 type: String,
                 value: 'list',
                 reflectToAttribute: true
+            },
+            columns: {
+                type: Array,
+                observer: 'columnsChanged'
+            },
+            colSumW: {
+                type: Number,
+                value: 0
             }
         },
-        computeDate: function(file) {
-            var date = new Date(Date.parse(file.createdAt));
-            return stv.utils.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
-        },
-        computeSize: function(file) {
-            if (file.type == "FILE") {
-                return stv.utils.humanFileSize(file.size);
-            } else {
-                return ".";
+        columnsChanged: function(columns) {
+            if (columns) {
+                var w = 0;
+                for (var i = 0; i < columns.length; i++) {
+                    var c = columns[i];
+                    if (!isNaN(c.width)) {
+                        w += c.width;
+                    }
+                }
+                this.colSumW = w;
             }
         },
         computeIcon: function(file) {
@@ -157,6 +155,13 @@
         },
         hasJob: function(file) {
             return file.job != null;
+        },
+        computeColumn: function(column, file) {
+            if (column.formula == null) {
+                return file[column.name];
+            } else {
+                return column.formula(file);
+            }
         }
     });
 </script>

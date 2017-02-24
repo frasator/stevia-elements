@@ -1,5 +1,7 @@
 <link rel="import" href="../../../polymer/polymer.html">
 <link rel="import" href="../stv-dialog/stv-dialog.html">
+<link rel="import" href="../stv-form-box.html">
+
 <script>
     StvFormBehaviour = {
         properties: {
@@ -17,6 +19,16 @@
             message: {
                 type: String,
                 value: ""
+            },
+            hasErrors: {
+                type: Boolean,
+                value: false
+            },
+            userData: {
+                type: Object
+            },
+            bioformats: {
+                type: Array
             }
         },
         isEqual: function(value, currentValue) {
@@ -46,19 +58,16 @@
                 // validated = false;
             }
             if (this.$.inputFile.selectedFile === undefined || this.$.inputFile.selectedFile.type != "FILE") {
-                msg += "Please select an input file.\n";
+                this.setError(this.$.inputFile, "Please select an input file.")
                 validated = false;
             }
             if (this.$.jobName.value == "") {
-                msg += "Please add a job name.\n";
+                this.setError(this.$.jobName, "Please add a job name.")
                 validated = false;
-            }
-            if (!validated) {
-                this.alert(msg)
             }
             return validated;
         },
-
+        launchJob: function() {},
         createQuery: function() {
             var query = {};
             query.name = this.jobName;
@@ -79,29 +88,37 @@
         },
         createJob: function(args, query) {
             var me = this;
-            SteviaManager.jobs.create({
-                query: query,
-                request: {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(args),
-                    success: function(response) {
-                        if (response.response[0].error == null) {
-                            var userId = response.response[0].results[0].user._id;
-                            me.message = userId + ' created';
-                            me.selectedOption = "jobLaunched";
-                            me.fire('need-refresh');
-                        } else {
-                            me.message = response.response[0].error;
-                        }
-                    },
-                    error: function() {
-                        me.message = 'Server error, try again later.';
-                    }
-                }
-            });
+
+            // Manage diskQuota
+            if ((this.userData.diskQuota - this.userData.diskUsage) > 0) {
+
+              SteviaManager.jobs.create({
+                  query: query,
+                  request: {
+                      method: 'POST',
+                      headers: {
+                          "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify(args),
+                      success: function(response) {
+                          if (response.response[0].error == null) {
+                              var userId = response.response[0].results[0].user._id;
+                              me.message = userId + ' created';
+                              me.selectedOption = "jobLaunched";
+                              me.fire('need-refresh');
+                              me.fire('job-launched');
+                              console.log("JOB LAUNCHED")
+                          } else {
+                              me.message = response.response[0].error;
+                          }
+                      },
+                      error: function() {
+                          me.message = 'Server error, try again later.';
+                      }
+                  }
+              });
+
+            }
         },
         getMode: function(scope) {
             var mode = "id";
@@ -160,6 +177,26 @@
             if (r) {
                 r.checked = true;
             }
+        },
+        setError: function(id, msg) {
+            var parent = stv.utils.closest(id, "stv-form-box");
+            parent.addError(msg);
+            // this.errorMessage = "There are errors in the form. Correct them before launching the job.";
+            this.hasErrors = true;
+        },
+        clearAllErrors: function() {
+            var selection = this.querySelectorAll("stv-form-box");
+            for (var i = 0; i < selection.length; i++) {
+                var sfb = selection[i];
+                sfb.clearErrors();
+            }
+            this.hasErrors = false;
+        },
+        computeHasErrors: function(hasErrors) {
+            return (hasErrors);
+        },
+        clear: function() {
+
         }
     };
 </script>

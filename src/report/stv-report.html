@@ -5,10 +5,11 @@
 <script src="../../../network-viewer/conf/config.js"></script>
 <link rel="import" href="../../../network-viewer/network-viewer.html">
 <link rel="import" href="../../../pathway-viewer/pathway-viewer.html">
+<link rel="import" href="../../../pathway-viewer/pathway-drug-viewer.html">
 
 <dom-module id="stv-report">
     <style is="custom-style" include="iron-flex iron-flex-reverse iron-flex-alignment iron-flex-factors iron-positioning">
-     :host {
+         :host {
             display: block;
             position: relative;
             box-sizing: border-box;
@@ -76,6 +77,8 @@
         .image,
         .table,
         .boxplot,
+        .heatmap,
+        .proteinviewer,
         .message,
         .redirection {
             font-size: 18px;
@@ -85,6 +88,8 @@
         .download>a:hover,
         .image>a:hover,
         .boxplot>a:hover,
+        .heatmap>a:hover,
+        .proteinviewer>a:hover,
         .table>a:hover,
         .redirection>a:hover {
             text-decoration: underline;
@@ -93,6 +98,8 @@
         .download>a,
         .image>a,
         .boxplot>a,
+        .heatmap>a,
+        .proteinviewer>a,
         .table>a,
         .redirection>a {
             color: var(--secondary-text-color);
@@ -103,6 +110,8 @@
         .image>i,
         .table>i,
         .boxplot>i,
+        .heatmap>i,
+        .proteinviewer>i,
         .message>i,
         .redirection>i {
             color: var(--accent-color);
@@ -195,9 +204,17 @@
 
         .redirection-btn {
             margin: 10px;
-            max-width: 300px;
+            max-width: 500px;
         }
-    }
+
+        .redirection-file {
+            max-width: 300px;
+            color: #0068cc;
+        }
+
+        pathway-drug-viewer {
+            background-color: inherit;
+        }
     </style>
     <template>
         <div id="outline" class="vertical layout">
@@ -253,22 +270,26 @@
                     redirection: 'fa-forward',
                     goViewer: 'fa-share-alt',
                     interactomeViewer: 'fa-share-alt',
+                    proteinviewer: 'fa-share-alt',
                     networkMinerPlot: 'fa-bar-chart',
+                    heatmap: 'fa-bar-chart',
 
                 }
             },
             handleUp: function() {
                 this.scrollTop = 0;
             },
+            refresh: function() {
+                if (this.job != null) {
+                    this.jobChanged(this.job);
+                }
+            },
             jobChanged: function(neo, old) {
                 var me = this;
                 if (neo) {
-                    this.jobDate = new Date(Date.parse(me.job.createdAt)).toLocaleString();
-                    this.fileNameMap = {};
                     while (this.$.main.firstChild) {
                         this.$.main.removeChild(this.$.main.firstChild);
                     }
-
                     while (this.$.outlineContent.firstChild) {
                         this.$.outlineContent.removeChild(this.$.outlineContent.firstChild);
                     }
@@ -276,6 +297,8 @@
                     while (this.$.inputParams.firstChild) {
                         this.$.inputParams.removeChild(this.$.inputParams.firstChild);
                     }
+                    this.jobDate = new Date(Date.parse(me.job.createdAt)).toLocaleString();
+                    this.fileNameMap = {};
 
                     var jobInfoElem = document.createElement('a');
                     jobInfoElem.innerHTML = '<i class="fa fa-caret-right"></i><span>Job information</span>';
@@ -330,7 +353,6 @@
                 });
             },
             processReportFile: function(fileContent) {
-
                 var parser = new DOMParser();
                 var reportXML = parser.parseFromString(fileContent, "text/xml");
 
@@ -428,6 +450,14 @@
                             i.classList.add("fa", this.iconMap['interactomeViewer']);
                             el.style.marginLeft = (10 + (level * 10)) + "px";
                             break;
+                        case 'proteinviewer':
+                            i.classList.add("fa", this.iconMap['proteinviewer']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
+                        case 'heatmap':
+                            i.classList.add("fa", this.iconMap['heatmap']);
+                            el.style.marginLeft = (10 + (level * 10)) + "px";
+                            break;
                         case 'section':
                             el.style.fontWeight = "bold";
                             el.style.marginLeft = level * 10 + "px";
@@ -451,7 +481,6 @@
             _sectionTag: function(outEl) {
                 var el = document.createElement('div');
                 el.innerHTML = outEl.getAttribute('title');
-                // this._addTag(el, outEl);
                 return el;
             },
 
@@ -469,7 +498,6 @@
 
                 el.appendChild(i);
                 el.appendChild(a);
-                // this._addTag(el, outEl);
                 return el;
             },
             _redirectionTag: function(outEl) {
@@ -484,7 +512,7 @@
                 i.classList.add('fa', this.iconMap['redirection']);
 
                 var text = document.createElement('span');
-                text.innerHTML = "Send to " + tool;
+                text.innerHTML = "Send <span class=\"redirection-file\">" + outEl.getAttribute("file") + "</span> to " + tool;
 
                 el.appendChild(i);
                 el.appendChild(text);
@@ -606,18 +634,196 @@
 
                 });
 
-                el.addEventListener('click', function(e) {
+                var exportBoxPlot = function(e) {
                     var chartElem = chartDiv;
                     var chart = Highcharts.charts[chartElem.dataset["highchartsChart"]];
                     chart.exportChart();
-                })
+                }
+
+                i.addEventListener('click', exportBoxPlot);
+                a.addEventListener('click', exportBoxPlot);
 
                 el.appendChild(i);
                 el.appendChild(a);
                 el.appendChild(chartDiv);
-                // el.appendChild(img);
-                // this._addTag(el, outEl);
+
                 return el;
+            },
+            _heatmapTag: function(outEl) {
+                var me = this;
+
+                var name = outEl.getAttribute('file');
+                var el = document.createElement('div');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['heatmap']);
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                a.appendChild(this._createDownloadIcon());
+
+                var chartDiv = document.createElement("div");
+
+                SteviaManager.getFileContent(me.getFileFromName(name)._id, function(content) {
+
+                    var data = me._parseHeatMapData(content);
+                    me._createHeatMap(data, chartDiv);
+                });
+
+                var exportHeatMap = function(e) {
+                    var chartElem = chartDiv;
+                    var chart = Highcharts.charts[chartElem.dataset["highchartsChart"]];
+                    chart.exportChart();
+                }
+
+                i.addEventListener('click', exportHeatMap);
+                a.addEventListener('click', exportHeatMap);
+
+                el.appendChild(i);
+                el.appendChild(a);
+                el.appendChild(chartDiv);
+
+                return el;
+            },
+            _createHeatMap: function(elem, div) {
+                var data = elem.data;
+                var cols = elem.cols;
+                var rows = elem.rowNames;
+
+                var height = 200;
+                height = height + rows.length * 15;
+
+                var width = cols.length * 15;
+                if (width < 500) {
+                    width = 500;
+                }
+                var heatMap = new Highcharts.Chart({
+                    chart: {
+                        renderTo: div,
+                        type: 'heatmap',
+
+                        height: height,
+                        width: width
+                    },
+                    title: {
+                        text: 'Heat Map'
+                    },
+
+                    xAxis: {
+                        categories: cols,
+                        opposite: true,
+                        labels: {
+                            rotation: -90
+                        }
+
+                    },
+                    yAxis: {
+                        categories: rows
+
+                    },
+                    colorAxis: {
+                        minColor: '#0000ff',
+                        maxColor: '#ff0000',
+                        stops: [
+                            [0, '#0000ff'],
+                            [0.5, '#ffffff'],
+                            [1, '#ff0000']
+                        ],
+                        min: 0,
+                        max: 1
+
+                    },
+                    exporting: {
+                        buttons: {
+                            contextButton: {
+                                text: 'Download'
+                            }
+                        }
+                    },
+                    plotOptions: {
+                        heatmap: {
+                            turboThreshold: data.length + 1
+                        }
+                    },
+                    tooltip: {
+                        formatter: function() {
+                            return '<b>Row:</b> ' + this.series.yAxis.categories[this.point.y] + '<br><b>' +
+                                '<b>Column:</b> ' + this.series.xAxis.categories[this.point.x] + '<br><b>' +
+                                '<b>Value:</b> ' + this.point.value + '<b>';
+                        }
+                    },
+
+                    series: [{
+                        name: 'DATA',
+                        borderWidth: 1,
+                        borderWidth: 1,
+                        data: data
+                    }]
+
+                });
+            },
+            _parseHeatMapData: function(content) {
+                var cols = [];
+                var data = [];
+                var rows = [];
+                var dataIdx = 1;
+                var rowNames = [];
+
+                var rawData = content.split("\n");
+                var prevLine = null;
+
+                var b = true;
+
+                /** Hack needed for sorting**/
+                var rawDataObj = {};
+                for (var i = 0; i < rawData.length; i++) {
+                    var line = rawData[i];
+                    if (line == "") continue;
+                    if (line.indexOf("#") < 0) {
+                        line = line.split("\t");
+                        rawDataObj[line[0].toString()] = line;
+                        rowNames.push(line[0].toString());
+                        if (b) { // PrevLine == last line of the header
+                            var splits = prevLine.split("\t");
+                            for (var j = 1; j < splits.length; j++) {
+                                cols.push(splits[j]);
+                            }
+                            b = false;
+                        }
+                    }
+                    prevLine = line;
+                }
+                var orderedContent = [];
+                for (var i = 0; i < rowNames.length; i++) {
+                    orderedContent.push(rawDataObj[rowNames[i]]);
+                }
+                /** end sorting **/
+
+                var numberRows = rowNames.length;
+                for (var i = 0; i < orderedContent.length; i++) {
+                    //                    console.log(i)
+                    //                    console.log(orderedContent[i])
+                    var lineData = orderedContent[i];
+                    lineData = lineData.slice(1, lineData.length).map(Number);
+                    var max = Math.max.apply(Math, lineData)
+                    var min = Math.min.apply(Math, lineData)
+                    for (var j = 0; j < lineData.length; j++) {
+                        var value = (lineData[j] - min) / (max - min);
+                        //                        value = lineData[j];
+                        data.push([j, numberRows - dataIdx, value]);
+                        //                        data.push([j, i, value]);
+
+                    }
+                    dataIdx++;
+
+                }
+                // this.createHeatMap(data, cols, this.rowNames.reverse());
+                return {
+                    data: data,
+                    cols: cols,
+                    rowNames: rowNames.reverse()
+                };
+
             },
             _createBoxPlotChart: function(chartDiv, title, data) {
                 var me = this;
@@ -626,10 +832,15 @@
                         type: 'boxplot',
                         renderTo: chartDiv,
                         width: 700,
-                        height: 500
+                        height: 500,
+                        zoomType: "xy"
                     },
                     title: {
                         text: 'Box Plot'
+                    },
+                    subtitle: {
+                        text: document.ontouchstart === undefined ?
+                            'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
                     },
                     legend: {
                         enabled: false
@@ -760,39 +971,91 @@
             _pathwayViewerTag: function(outEl) {
                 var el = document.createElement('div');
 
-                var pw = document.createElement('pathway-viewer');
-                pw.style.height = '1000px';
+                var pv = document.createElement('pathway-viewer');
+                var minHeight = 700;
+                var height = Math.max((window.innerHeight - 120), minHeight);
+                pv.style.height = height + 'px';
 
-                pw.set('hideAltered', true);
-                pw.set('sessionFileNameMap', this.fileNameMap);
-                pw.set('path', outEl.getAttribute('path'));
-                pw.set('pathType', outEl.getAttribute('path-type'));
-                pw.set('showHipathiaLegend', true);
+                pv.set('hideAltered', true);
+                pv.set('sessionFileNameMap', this.fileNameMap);
+                pv.set('path', outEl.getAttribute('path'));
+                pv.set('pathType', outEl.getAttribute('path-type'));
+
+                if (this.job.tool === 'hipathia') {
+                    pv.set('showHipathiaLegend', true);
+                }
+                if (this.job.tool == 'metabolizer') {
+                    pv.set('categoryLabel', 'Pathways');
+                    pv.set('circuitLabel', 'Modules');
+                }
 
                 // pw.style.border = "1px solid #d3d3d3";
                 // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
 
-                el.appendChild(pw);
+                el.appendChild(pv);
                 // this._addTag(el, outEl);
                 return el;
             },
-            _pathactViewerTag: function(outEl) {
+            _pathwayDrugViewerTag: function(outEl) {
+                var me = this;
+                var tool = outEl.getAttribute('tool');
+
                 var el = document.createElement('div');
+                var pdv = document.createElement('pathway-drug-viewer');
+                var minHeight = 700;
+                var height = Math.max((window.innerHeight - 120), minHeight);
+                pdv.style.height = height + 'px';
+                pdv.set('hideBackButton', true);
+                pdv.set('path', outEl.getAttribute('path'));
+                pdv.set('initPath', outEl.getAttribute('path') + '_init');
+                pdv.set('validGenesFileName', outEl.getAttribute('valid-genes-file-name'));
 
-                var pw = document.createElement('pathway-viewer');
-                pw.style.height = '1000px';
+                var updateArgs = {
+                    tool: outEl.getAttribute('tool'),
+                    execution: outEl.getAttribute('update-execution'),
+                    executable: outEl.getAttribute('update-executable'),
+                };
+                var outParam = outEl.getAttribute('out-param');
+                if (outParam != null) {
+                    updateArgs.options = {};
+                    updateArgs.options[outParam] = {
+                        out: true
+                    }
+                }
+                pdv.set('jobUpdateArgs', updateArgs);
+                pdv.set('jobClearArgs', {
+                    tool: outEl.getAttribute('tool'),
+                    execution: outEl.getAttribute('clear-execution'),
+                    executable: outEl.getAttribute('clear-executable')
+                });
+                pdv.$.pathwayViewer.set('hideAltered', false);
+                pdv.set('jobFolder', this.job.folder);
 
-                pw.set('hideAltered', true);
-                pw.set('sessionFileNameMap', this.fileNameMap);
-                pw.set('path', outEl.getAttribute('path'));
-                pw.set('pathType', outEl.getAttribute('path-type'));
-                pw.set('showHipathiaLegend', true);
+                if (this.job.tool == 'metabolizer' && tool == 'metabolizer') {
+                    updateArgs.options['species'] = this.job.options.species;
+                    updateArgs.options['exp_file'] = this.job.options.exp_file;
+                    updateArgs.options['design_file'] = this.job.options.design_file;
+                    if (this.job.options.sample) {
+                        updateArgs.options['sample'] = this.job.options.sample;
+                    }
+                    if (this.job.options.simple) {
+                        updateArgs.options['simple'] = this.job.options.simple;
+                    }
+                    pdv.set('foldChange', 1);
+                    pdv.set('categoryLabel', 'Pathways');
+                    pdv.set('circuitLabel', 'Modules');
+                    pdv.addEventListener('job-clear', function(e) {
+                        me.refresh();
+                    });
+                    pdv.addEventListener('job-update', function(e) {
+                        me.refresh();
+                    });
+                }
 
                 // pw.style.border = "1px solid #d3d3d3";
                 // pw.style.boxShadow = "0px 0px 4px 0px rgba(0, 0, 0, 0.2)";
 
-                el.appendChild(pw);
-                // this._addTag(el, outEl);
+                el.appendChild(pdv);
                 return el;
             },
             _goViewerTag: function(outEl) {
@@ -829,6 +1092,49 @@
 
                 el.appendChild(iw);
                 return el;
+            },
+            _proteinviewerTag: function(outEl) {
+                var me = this;
+                var el = document.createElement('div');
+
+                var name = outEl.getAttribute('file');
+
+                var i = document.createElement('i');
+                i.classList.add('fa', this.iconMap['proteinviewer']);
+
+                var a = document.createElement('a');
+                a.innerHTML = outEl.getAttribute('title');
+                // a.setAttribute('href', SteviaManager.getFileURL(this.getFileFromName(name)._id));
+
+                var proteinViewer = document.createElement('babelomics-protein-viewer');
+                proteinViewer.style.height = '800px';
+
+                SteviaManager.getFileContent(this.getFileFromName(name)._id, function(content) {
+                    var nodes = me._parseProteinNodes(content);
+                    // proteinViewer.set('speciesSelection', "hsapiens");
+                    // proteinViewer.set('nodeSelection', false);
+                    proteinViewer.set('nodes', nodes);
+                });
+
+                el.appendChild(i);
+                el.appendChild(a);
+                el.appendChild(proteinViewer);
+                return el;
+            },
+            _parseProteinNodes: function(content) {
+                var lines = content.split('\n');
+                var line, fields, field, data = [];
+                if (lines.length > 0) {
+
+                    for (var i = 1; i < lines.length; i++) {
+                        line = lines[i];
+                        if (line != '' && line.charAt(0) != '#') {
+                            fields = line.split('\t');
+                            data.push(fields[0]);
+                        }
+                    }
+                }
+                return data;
             },
             _networkMinerPlotTag: function(outEl) {
                 var el = document.createElement('div');
@@ -937,7 +1243,8 @@
                         var name = field.replace(/ /gi, '_');
                         var width = 150;
                         if (i === 0) {
-                            width = 400;
+                            width = 150;
+                            // width = 400;
                         }
                         columns.push({
                             name: name,
@@ -955,6 +1262,9 @@
                                     field = fields[j].trim();
                                     if (window.isNaN != null && !isNaN(field)) {
                                         field = parseFloat(field).toFixed(3);
+                                    }
+                                    if(field.indexOf('http') == "0"){
+                                        field = '<a target="_blank" href="'+field+'">'+field+'</a>'
                                     }
                                     column = columns[j];
                                     obj[column.name] = field;

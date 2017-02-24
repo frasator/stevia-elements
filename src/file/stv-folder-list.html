@@ -49,18 +49,8 @@
             height: calc(100% - 90px);
         }
 
-        .name {}
-
-        .date {
+        .col {
             color: #444;
-            width: 80px;
-            text-align: center;
-            margin-left: 20;
-        }
-
-        .size {
-            color: #444;
-            width: 80px;
             text-align: center;
         }
 
@@ -130,13 +120,13 @@
             margin-right: 5px;
         }*/
 
-        .sort-ASC:after {
+        [data-sortorder=ASC]:after {
             font-family: 'FontAwesome';
             content: '\f107';
             padding-left: 5px;
         }
 
-        .sort-DESC:after {
+        [data-sortorder=DESC]:after {
             font-family: 'FontAwesome';
             content: '\f106';
             padding-left: 5px;
@@ -187,15 +177,16 @@
 
         <template is="dom-if" if="{{computeHeader(viewMode)}}">
             <div id="header" class="horizontal layout">
-                <div class$="{{computeSortClass(sort, sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
-                <div class$="{{computeSortClass(sort, sortASC,'size')}}" data-sort="size" on-click="changeSort">Size</div>
-                <div class$="{{computeSortClass(sort, sortASC, 'date')}}" data-sort="date" on-click="changeSort">Date</div>
+                <div class="flex" data-sortorder$="{{_sortOrder(sort,sortASC,'name')}}" data-sort="name" on-click="changeSort">Name</div>
+                <template is="dom-repeat" items="{{columns}}" as="column">
+                    <div style$="width:{{column.width}}px;" class$="col" data-sortorder$="{{_sortOrder(sort,sortASC,column.name)}}" data-sort$="{{column.name}}" on-click="changeSort">{{column.title}}</div>
+                </template>
             </div>
         </template>
         <div id="content" class$="{{computeContentClass(viewMode,showInfo)}}">
             <div class$="{{computeClassViewMode(viewMode)}}">
-                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}" observe="type">
-                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
+                <template is="dom-repeat" items="{{files}}" filter="{{checkFilters(searchBy,searchByType)}}" sort="{{checkSort(sort,sortASC)}}">
+                    <stv-folder-list-item file="{{item}}" on-dblclick="handleFileDblClick" on-click="handleFileClick" view-mode="{{viewMode}}" columns="{{columns}}" on-dragstart="handleDragStart" draggable="true" on-drop="handleDragDrop" on-dragover="handleDragOver" on-dragleave="handleDragLeave">
                     </stv-folder-list-item>
                 </template>
             </div>
@@ -287,16 +278,40 @@
                 },
                 sort: {
                     type: String,
-                    value: "name"
+                    value: "createdAt"
                 },
                 sortASC: {
                     type: Boolean,
                     value: true
+                },
+                columns: {
+                    type: Array,
+                    value: [{
+                        title: 'Size',
+                        name: 'size',
+                        width: 80,
+                        formula: function(file) {
+                            if (file.type == "FILE") {
+                                return stv.utils.humanFileSize(file.size);
+                            } else {
+                                return ".";
+                            }
+                        }
+                    }, {
+                        title: 'Date',
+                        width: 80,
+                        name: 'createdAt',
+                        formula: function(file) {
+                            var date = new Date(Date.parse(file.createdAt));
+                            return stv.utils.months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+                        }
+                    }]
                 }
             },
             created: function() {
                 this.fileBelongsToJob = {};
             },
+            ready: function() {},
             handleUploadFile: function(e) {
                 this.set('selected', null);
                 this.fire('upload-file');
@@ -636,7 +651,7 @@
                             };
                         }
                         break;
-                    case "date":
+                    case "createdAt":
                         if (sortASC) {
                             return function(a, b) {
                                 return new Date(b.createdAt) - new Date(a.createdAt);
@@ -646,35 +661,30 @@
                                 return new Date(a.createdAt) - new Date(b.createdAt);
                             }
                         }
-
                     default:
-
+                        if (sortASC) {
+                            return function(a, b) {
+                                if (a.size === b.size) return 0;
+                                return a.size < b.size ? -1 : 1;
+                            };
+                        } else {
+                            return function(a, b) {
+                                if (a.size === b.size) return 0;
+                                return a.size < b.size ? 1 : -1;
+                            };
+                        }
                 }
             },
-            computeSortClass: function(sort, sortASC, elem) {
-                var newClass = "";
-
-                switch (elem) {
-                    case 'name':
-                        newClass = "name flex";
-                        break;
-                    case 'size':
-                        newClass = "size";
-                        break;
-                    case 'date':
-                        newClass = "date";
-                        break;
-                    default:
-                }
-
-                if (elem === sort) {
+            _sortOrder: function(sort, sortASC, name) {
+                var order = '';
+                if (sort === name) {
                     if (sortASC) {
-                        newClass += ' sort-ASC';
+                        order = 'ASC'
                     } else {
-                        newClass += " sort-DESC";
+                        order = 'DESC'
                     }
                 }
-                return newClass;
+                return order;
             }
         });
     </script>

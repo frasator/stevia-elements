@@ -87,6 +87,15 @@ label.stv-btn > input[type=checkbox] + span {
     height: 23px;
 }
 
+input.stv[type=text],
+input.stv[type=email],
+input.stv[type=password],
+input.stv[type=file],
+input.stv[type=number],
+input.stv[type=color]{
+    height: auto;
+}
+
 input.stv[type=number] {
     padding-right: 0px;
 }

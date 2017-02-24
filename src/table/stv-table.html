@@ -183,9 +183,8 @@
         .table-row.selected:hover {
             background-color: #bbb !important;
         }
-
         /*div.table-row:last-of-type {*/
-            /*border-bottom-width: 0;*/
+        /*border-bottom-width: 0;*/
         /*}*/
 
         .table-row:nth-child(2n) {
@@ -799,6 +798,7 @@
                     }
                     this.set('viewData', viewData);
                 }
+
             },
             viewDataChanged: function(neo, old) {
                 while (this.$.list.firstChild) {
@@ -923,7 +923,9 @@
                 if (this.request.url && this.request.url != "") {
                     var url = stv.utils.addQueryParamtersToUrl({
                         skip: ((this.currentPage - 1) * this.pageSize),
-                        limit: this.pageSize
+                        limit: this.pageSize,
+                        sort: this.request.sort,
+                        search: this.request.search
                     }, this.request.url);
                     request.open(method, url, true);
                     request.send();
@@ -1099,25 +1101,35 @@
                 rowEl.appendChild(el);
             },
             _applyFilters: function() {
-                for (var i = 0; i < this.data.length; i++) {
-                    var row = this.data[i];
-                    var filtered = true;
-                    for (var key in this.filters) {
-                        var filter = this.filters[key];
-                        var match = false;
-                        switch (filter.type) {
-                            case 'text':
-                                var value = row[filter.colName].toLowerCase();
-                                match = (value.indexOf(filter.query.toLowerCase()) >= 0);
-                                break;
-                            case 'select':
-                                var value = row[filter.colName].toLowerCase();
-                                match = (value === filter.query.toLowerCase());
-                                break;
+                if (this.enableRemote) {
+                  var filter=[];
+                  for (var key in this.filters) {
+                    var field = key;
+                    var search=this.filters[key].query;
+                    filter.push(field+":"+search);
+                  }
+                  this.set('request.search', filter.join(","));
+                } else {
+                    for (var i = 0; i < this.data.length; i++) {
+                        var row = this.data[i];
+                        var filtered = true;
+                        for (var key in this.filters) {
+                            var filter = this.filters[key];
+                            var match = false;
+                            switch (filter.type) {
+                                case 'text':
+                                    var value = row[filter.colName].toLowerCase();
+                                    match = (value.indexOf(filter.query.toLowerCase()) >= 0);
+                                    break;
+                                case 'select':
+                                    var value = row[filter.colName].toLowerCase();
+                                    match = (value === filter.query.toLowerCase());
+                                    break;
+                            }
+                            filtered &= match;
                         }
-                        filtered &= match;
+                        row._filtered = filtered;
                     }
-                    row._filtered = filtered;
                 }
                 this.refreshPagination();
             },
@@ -1253,28 +1265,45 @@
                 var sortedData = this.data.slice(0);
                 var els = this.querySelectorAll('.table-header-field');
                 var isSortDown = e.currentTarget.classList.contains("sort-down");
+
                 for (var i = 0; i < els.length; i++) {
                     var el = els[i];
                     el.classList.remove('sort-down');
                     el.classList.remove('sort-up');
                 }
-                if (isSortDown) {
-                    sortedData.sort(function(a, b) {
-                        return me._columnSort(column, b, a);
-                    });
-                    e.currentTarget.classList.add('sort-up');
+
+                if (this.enableRemote) {
+
+                    // this.request.sort = (isSortDown ? "-" : "") + column.name;
+                    this.set("request.sort", (isSortDown ? "-" : "") + column.name);
+
+                    if (isSortDown) {
+                        e.currentTarget.classList.add('sort-up');
+                    } else {
+                        e.currentTarget.classList.add('sort-down');
+                    }
+                    this.requestChanged();
                 } else {
-                    sortedData.sort(function(a, b) {
-                        return me._columnSort(column, a, b);
-                    });
-                    e.currentTarget.classList.add('sort-down');
+
+                    if (isSortDown) {
+                        sortedData.sort(function(a, b) {
+                            return me._columnSort(column, b, a);
+                        });
+                        e.currentTarget.classList.add('sort-up');
+                    } else {
+                        sortedData.sort(function(a, b) {
+                            return me._columnSort(column, a, b);
+                        });
+                        e.currentTarget.classList.add('sort-down');
+                    }
+                    this.data = sortedData;
                 }
-                this.data = sortedData;
+
             },
             _columnSort: function(column, a, b) {
                 //checking formula or TODO save calculated value in the item;
                 if (column.sort != null) {
-                  return column.sort(a,b);
+                    return column.sort(a, b);
                 } else {
                     var aVal, bVal;
                     if (column.formula != null) {

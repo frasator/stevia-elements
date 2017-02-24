@@ -205,7 +205,7 @@
                 <div class="resizer" id="mainmenuresizer"></div>
             </div>
             <div id="maincontent">
-                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}">
+                <stv-folder-list id="folderList" user-data="{{userData}}" search-by-type="{{searchByType}}" search-by="{{searchBy}}" on-fileselect="handleFileSelect" on-upload-file="handleUploadFile" on-back="handleBackFolder" on-need-refresh="handleNeedRefresh" folder="{{folder}}" files="{{files}}" mode="{{mode}}" on-filedblclick="handleFileDblClick" on-previewfile="handlePreviewFile" disable-icon-view="{{disableIconView}}" columns="{{columns}}">
                 </stv-folder-list>
             </div>
         </div>
@@ -344,6 +344,9 @@
                 type: Boolean,
                 value: false,
                 reflectToAttribute: true
+            },
+            columns: {
+                type: Array
             }
         },
         userDataChanged: function(neo, old) {
@@ -353,7 +356,13 @@
 
                 this.treeIndex = {};
                 this._createTreeIndex(this.treeIndex, this.userData.tree);
+                //Set root open by default
+                var root = this.userData.tree[0];
+                if (root != null) {
+                    root.open = true;
+                }
                 // console.log(this.treeIndex);
+                // console.log(this.userData.tree);
             } else {
                 this.clean();
             }

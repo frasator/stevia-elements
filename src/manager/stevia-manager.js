@@ -56,6 +56,9 @@ var SteviaManager = {
         },
         reportError: function (args) {
             return SteviaManager._doRequest(args, 'jobs', 'report-error');
+        },
+        example: function (args) {
+            return SteviaManager._doRequest(args, 'jobs', 'example');
         }
     },
     util: {
@@ -425,6 +428,27 @@ var SteviaManager = {
             }
         });
     },
+    getFileExampleContent: function (fileName, tool, start, limit, cb) {
+        SteviaManager.files.contentExample({
+            query: {
+                tool: tool,
+                file: fileName,
+                start: start,
+                limit: limit
+            },
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response);
+                },
+                error: function (response) {
+                    cb(null);
+                }
+            }
+        });
+
+    },
+
     getFile: function (fileId, cb) {
         SteviaManager.files.info({
             id: fileId,
