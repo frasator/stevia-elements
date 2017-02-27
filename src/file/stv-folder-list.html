@@ -282,8 +282,7 @@
                     value: ""
                 },
                 searchByType: {
-                    type: String,
-                    value: "all"
+                    type: String
                 },
                 userData: {
                     type: Object,
@@ -467,43 +466,58 @@
                 return selected == null || selected.job == undefined;
             },
 
-            checkFilters: function(searchBy, type) {
-                type = type.toUpperCase();
-                if (!searchBy) {
-                    // set filter to null to disable filtering
+            checkFilters: function(searchBy, searchByType) {
+                // set filter to null to disable filtering
+                var check = function(typeStr) {
+                    return searchByType.indexOf(typeStr.toLowerCase()) != -1;
+                };
+                var fileMatch = function(item) {
+                    var allFlag = false,
+                        jobFlag = false,
+                        fileFlag = false,
+                        folderFlag = false;
+                    if (check("ALL")) {
+                        allFlag = true;
+                    }
+                    if (check("JOB")) {
+                        jobFlag = (item.job != null);
+                    }
+                    if (check("FILE")) {
+                        fileFlag = (item.type == 'FILE');
+                    }
+                    if (check("FOLDER")) {
+                        folderFlag = (item.job == null && item.type == 'FOLDER');
+                    }
+                    return (allFlag || jobFlag || fileFlag || folderFlag);
+                };
+                if (searchBy == "") {
                     return function(item) {
-                        var checkType = true;
-                        if (type === "ALL") {
-                            checkType = true;
-                        } else if (type === "JOB") {
-                            checkType = (item.job != null);
-                        } else if (type === "FILE") {
-                            checkType = (item.type == 'FILE');
-                        } else if (type === "FOLDER") {
-                            checkType = (item.job == null && item.type == 'FOLDER');
-                        } else {
-                            checkType = false;
-                        }
-                        return checkType;
+                        return fileMatch(item);
                     }
                 } else {
                     // return a filter function for the current search string
-                    searchBy = searchBy.toLowerCase();
-                    return function(item) {
-                        var filename = item.name;
-                        var checkType = true;
-                        if (type === "ALL") {
-                            checkType = true;
-                        } else if (type === "JOB") {
-                            checkType = (item.job != null);
-                        } else if (type === "FILE") {
-                            checkType = (item.type == 'FILE');
-                        } else if (type === "FOLDER") {
-                            checkType = (item.job == null && item.type == 'FOLDER');
-                        } else {
-                            checkType = false;
+                    var searchBy = searchBy.toLowerCase();
+
+                    var searchableColmuns = [];
+                    for (var i = 0; i < this.columns.length; i++) {
+                        var c = this.columns[i];
+                        if (c.enableSearch == true) {
+                            searchableColmuns.push(c);
                         }
-                        return filename.indexOf(searchBy) != -1 && checkType;
+                    }
+                    return function(item) {
+                        var matchFlag = fileMatch(item);
+                        var columnFlag = false;
+                        var nameFlag = item.name.toLowerCase().indexOf(searchBy) != -1;
+                        for (var i = 0; i < searchableColmuns.length; i++) {
+                            var c = searchableColmuns[i];
+                            var value = c.formula(item).toLowerCase();
+                            if (value.indexOf(searchBy) != -1) {
+                                columnFlag = true;
+                                break;
+                            }
+                        }
+                        return (nameFlag || columnFlag) && matchFlag;
                     };
 
                 }
