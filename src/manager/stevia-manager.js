@@ -194,7 +194,7 @@ var SteviaManager = {
             var request = new XMLHttpRequest();
             request.onload = function () {
                 var contentType = this.getResponseHeader('Content-Type');
-                if (contentType.indexOf('application/json') != -1) {
+                if (contentType != null && contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
                     if (json.error == null) {
                         args.request.success(json, this);

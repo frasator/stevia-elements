@@ -45,7 +45,7 @@
         }
 
         #content.list.info {
-            height: calc(100% - 115px);
+            height: calc(100% - 135px);
         }
 
         #content.icon {
@@ -206,12 +206,12 @@
         </div>
 
         <div id="fileInfo" class="vertical layout" hidden="{{!showInfo}}">
-            <div class="horizontal layout">
+            <div class="horizontal layout center">
                 <i class="fa fa-file-o" hidden="{{isFile}}"></i>
                 <i class="fa fa-folder" hidden="{{!isFile}}"></i>&nbsp;
                 <span>{{fileName}}</span>
             </div>
-            <div class="horizontal layout">
+            <div class="horizontal layout center">
                 <span class="data">Type: &nbsp;</span>
                 <span class="value lowercase">{{fileType}}</span>
                 <!-- <span class="data">Format: &nbsp;</span>
@@ -219,7 +219,7 @@
                 <span class="data">Bioformat: &nbsp;</span>
                 <span class="value lowercase">{{fileBioformat}}</span>
             </div>
-            <div class="horizontal layout">
+            <div class="horizontal layout center">
                 <span class="data">Creation Date: &nbsp;</span>
                 <span>{{fileDate}}</span>
             </div>

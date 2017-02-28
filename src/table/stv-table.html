@@ -1872,6 +1872,68 @@
                 cEl.classList.add('column-' + column.name.replace(/\s/g, '_'));
                 el.appendChild(cEl);
 
+            },
+
+            /*UTILS*/
+            parseDelimitedSeparatedValues: function(content, columns, delimiter) {
+                if (delimiter == null) {
+                    console.log('No delimiter provided, \\t will be used.');
+                    delimiter = '\t';
+                }
+                var lines = content.split('\n'),
+                    data = [],
+                    line, fields, item;
+                for (var i = 0; i < lines.length; i++) {
+                    line = lines[i].trim();
+                    if (line != "") {
+                        fields = line.split('\t');
+                        item = {};
+                        for (var j = 0; j < columns.length; j++) {
+                            c = columns[j];
+                            item[c.name] = fields[j];
+                        }
+                        data.push(item);
+                    }
+                }
+                return data;
+            },
+            getDelimitedSeparatedValues: function(data, columns, delimiter) {
+                if (!delimiter) {
+                    console.log('No delimiter provided, \\t will be used.');
+                    delimiter = '\t';
+                }
+                // Attribute names
+                var text = '';
+                var lc = columns.length;
+                var lcminus1 = lc - 1;
+                for (var i = 0; i < lc; i++) {
+                    var name = columns[i].name;
+                    if (i < lcminus1) {
+                        text += name + delimiter;
+                    } else {
+                        text += name;
+                    }
+                }
+                text += '\n';
+                var item, attr;
+                for (var i = 0, l = data.length; i < l; i++) {
+                    item = data[i];
+                    for (var j = 0; j < lc; j++) {
+                        var column = columns[j];
+                        var t = ''
+                        if (item[column.name] != null) {
+                            t = item[column.name];
+                        }
+                        if (j < lcminus1) {
+                            text += t + delimiter;
+                        } else {
+                            text += t;
+                        }
+
+                    }
+                    text += '\n';
+                }
+                return text;
             }
         })
     </script>
