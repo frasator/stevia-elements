@@ -561,11 +561,11 @@
                 console.log(e.detail.file);
             }
         },
-        openFolder: function(folderId) {
+        openFolder: function(folderId, cb) {
             this.files = [];
-            this.refreshFolderFiles(folderId);
+            this.refreshFolderFiles(folderId, cb);
         },
-        refreshFolderFiles: function(folderId) {
+        refreshFolderFiles: function(folderId, cb) {
             var me = this;
             this.set('loading', true);
             this._getFilesInFolder(folderId, function(filteredFiles, file) {
@@ -593,6 +593,9 @@
                 me.refresFoldersPath();
 
                 me.set('loading', false);
+                if(cb){
+                    cb();
+                }
             });
         },
         refreshFolderList: function() {
