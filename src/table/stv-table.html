@@ -875,11 +875,14 @@
                 this.viewDataChanged();
             },
             clear: function() {
+                this.clearData();
+                this.columns = [];
+            },
+            clearData: function() {
                 this.request = null;
                 this.data = [];
                 this.viewData = [];
                 this.currentPage = 1;
-                this.columns = [];
             },
             refresh: function() {
                 this.updateColumns();
