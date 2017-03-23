@@ -18,6 +18,9 @@
 
         .col {
             /*text-align: center;*/
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .filename {
@@ -67,8 +70,8 @@
                     <div class="filename" title$="{{file.name}}">{{file.name}}</div>
                 </div>
                 <template is="dom-repeat" items="{{columns}}" as="column">
-                    <div class="icon"><i class$="{{computeColumnIcon(column, file)}}"></i></div>
-                    <div style$="width:{{column.width}}px;" class="col" title="{{computeColumn(column,file)}}">{{computeColumn(column,file)}}</div>
+                    <div class="icon"><i class$="{{computeColumnIcon(column, file, columns)}}"></i></div>
+                    <div style$="width:{{column.width}}px;" class="col" title="{{computeColumn(column,file, columns)}}">{{computeColumn(column,file, columns)}}</div>
                 </template>
             </div>
         </template>
@@ -170,11 +173,11 @@
             }
         },
         computeFileColumn: function(hideFileColumn, file) {
-            if (file.type == 'FOLDER') {
-                return false;
-            } else {
-                return hideFileColumn;
-            }
+            // if (file.type == 'FOLDER') {
+            //     return false;
+            // } else {
+            return hideFileColumn;
+            // }
         },
         computeFileWidth: function(file, colSumW) {
             if (file.type == 'FOLDER') {
@@ -184,10 +187,16 @@
             }
         },
         computeColumnIcon: function(column, file) {
-            if (file.type == 'FOLDER') {
-                return '';
-            } else if (column.icon != null) {
-                return 'fa ' + column.icon;
+            if (column.icon != null) {
+                if (file.type == 'FOLDER') {
+                    if (file.job != null) {
+                        return 'fa fa-flask';
+                    } else {
+                        return 'fa fa-folder';
+                    }
+                } else {
+                    return 'fa ' + column.icon;
+                }
             } else {
                 return '';
             }

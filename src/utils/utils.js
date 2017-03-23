@@ -397,7 +397,7 @@ stv.utils = {
                 document.body.removeChild(div);
                 div = null;
             }
-        }, 4400);
+        }, 5000);
     },
     repeat: function (string, count) {
         if (string == null) {

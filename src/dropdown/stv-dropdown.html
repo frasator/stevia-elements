@@ -181,10 +181,13 @@
                 if (this.button != null) {
                     this.handleShowMenu(e);
                 };
-                if (this.menu.contains(e.target)) {
-                    this.async(function() {
-                        this.hideMenu();
-                    }, 100);
+                var noHideElFlag = this.menu.contains(e.target.closest("[data-nohide]"));
+                if(noHideElFlag == false){
+                    if (this.menu.contains(e.target)) {
+                        this.async(function() {
+                            this.hideMenu();
+                        }, 100);
+                    }
                 }
             },
             handleShowMenu: function(e) {

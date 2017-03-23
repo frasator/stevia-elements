@@ -136,6 +136,9 @@ var SteviaManager = {
         move: function (args) {
             return SteviaManager._doRequest(args, 'files', 'move');
         },
+        rename: function (args) {
+            return SteviaManager._doRequest(args, 'files', 'rename');
+        },
         write: function (args) {
             return SteviaManager._doRequest(args, 'files', 'write');
         },
@@ -194,7 +197,7 @@ var SteviaManager = {
             var request = new XMLHttpRequest();
             request.onload = function () {
                 var contentType = this.getResponseHeader('Content-Type');
-                if (contentType.indexOf('application/json') != -1) {
+                if (contentType != null && contentType.indexOf('application/json') != -1) {
                     var json = JSON.parse(this.response);
                     if (json.error == null) {
                         args.request.success(json, this);
@@ -502,7 +505,24 @@ var SteviaManager = {
             request: {
                 async: true,
                 success: function (response) {
-                    cb(response.response[0].results[0]);
+                    cb(response.response[0].results);
+                },
+                error: function (response) {
+
+                }
+            }
+        });
+    },
+    renameFile: function (fileId, newname, cb) {
+        SteviaManager.files.rename({
+            id: fileId,
+            query: {
+                newname: newname
+            },
+            request: {
+                async: true,
+                success: function (response) {
+                    cb(response);
                 },
                 error: function (response) {
 
