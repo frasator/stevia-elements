@@ -12,7 +12,7 @@
             color: var(--primary-text-color);
         }
 
-         :host::content ul a:hover {
+         :host::content ul>li a:hover {
             text-decoration: none;
         }
 
@@ -45,6 +45,10 @@
             text-transform: none;
             margin: 1px 0 0 0;
             /*transition: all 0.25s;*/
+        }
+
+         :host[no-min-width] ::content ul {
+            min-width: initial;
         }
 
          :host::content ul {
@@ -160,6 +164,11 @@
                 },
                 menu: {
                     type: Object
+                },
+                noMinWidth: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
                 }
             },
             listeners: {
@@ -182,7 +191,7 @@
                     this.handleShowMenu(e);
                 };
                 var noHideElFlag = this.menu.contains(e.target.closest("[data-nohide]"));
-                if(noHideElFlag == false){
+                if (noHideElFlag == false) {
                     if (this.menu.contains(e.target)) {
                         this.async(function() {
                             this.hideMenu();
