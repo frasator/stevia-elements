@@ -115,36 +115,6 @@
             cursor: default;
         }
 
-        @media (max-width: 1250px) {
-            div.title {
-                font-size: 24px;
-            }
-            div.description {
-                font-size: 14px;
-            }
-            .option-text {
-                font-size: 0.9em;
-            }
-        }
-
-        @media (max-width: 1150px) {
-            div.title {
-                font-size: 20px;
-            }
-            div.description {
-                font-size: 13px;
-            }
-            .option-text {
-                font-size: 0.8em;
-            }
-        }
-
-        @media (max-width: 1050px) {
-            .option-text {
-                display: none;
-            }
-        }
-
         #icon {
             margin-top: 0px !important;
             margin-bottom: 0px !important;
@@ -167,6 +137,9 @@
 
          :host[small] div.description {
             font-size: 15px;
+        }
+         :host[small] ::content div.icon img {
+            height: 28px !important;
         }
         /*Help menu*/
 
