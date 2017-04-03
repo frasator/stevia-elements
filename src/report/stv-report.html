@@ -1002,30 +1002,19 @@
 
                 if (this.job.tool === 'hipathia') {
                     pv.set('showHipathiaLegend', true);
-
-                    /*Temporal fix*/
-                    nodeAttrMap = {
-                        'strokeColor': 'exp',
-                        'color': 'diff.exp',
-                        'size': 'width'
-                    }
-                    edgeAttrMap = {
-                        'shape': 'head'
-                    }
                 }
                 if (this.job.tool == 'metabolizer') {
                     pv.set('categoryLabel', 'Pathways');
                     pv.set('circuitLabel', 'Modules');
-
-                    /*Temporal fix*/
-                    nodeAttrMap = {
-                        'strokeColor': 'exp',
-                        'color': 'diff.exp',
-                        'size': 'width'
-                    }
-                    edgeAttrMap = {
-                        'shape': 'head'
-                    }
+                }
+                /*Backward fix*/
+                nodeAttrMap = {
+                    'strokeColor': 'exp',
+                    'color': 'diff.exp',
+                    'size': 'width'
+                }
+                edgeAttrMap = {
+                    'shape': 'head'
                 }
                 pv.nodeAttributeMapping = nodeAttrMap;
                 pv.edgeAttributeMapping = edgeAttrMap;
@@ -1289,8 +1278,8 @@
                         var name = field.replace(/ /gi, '_');
                         var width = 150;
                         if (i === 0) {
-                            width = 150;
-                            // width = 400;
+                            // width = 150;
+                            width = 400;
                         }
                         columns.push({
                             name: name,
