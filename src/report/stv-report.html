@@ -596,6 +596,15 @@
 
                 var img = document.createElement('img');
                 img.setAttribute('src', SteviaManager.getFileURL(this.getFileFromName(name)._id));
+                var width = outEl.getAttribute('width');
+                var height = outEl.getAttribute('height');
+                var reg = new RegExp('^[0-9]+$');
+                if (reg.test(width)) {
+                    img.setAttribute('width', width);
+                }
+                if (reg.test(height)) {
+                    img.setAttribute('height', height);
+                }
 
                 el.appendChild(i);
                 el.appendChild(a);
