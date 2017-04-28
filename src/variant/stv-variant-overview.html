@@ -14,6 +14,7 @@
     <template>
         <div class="horizontal layout">
             <div id="overview" on-rowclick="handleRowClick">
+                <label id="selectMSG">Please, select a row for see variant data.</label>
             </div>
             <div id="legend">
                 <i class="fa fa-lightbulb-o" aria-hidden="true" style="font-size:16px;color:#32b0cd"></i>
@@ -79,6 +80,7 @@
                 }
             },
             _createPolarChart: function(row) {
+                this.$.selectMSG.hidden = true;
                 var me = this;
                 var variant = row.chromosome + ":" + row.start + ":" + row.reference + ":" + row.alternate;
                 var categories = [];

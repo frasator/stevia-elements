@@ -34,7 +34,7 @@ function VCFValidator(options) {
         "alpha": /^(\w+)$/,
         "idSemiColon": /^(\w+(;\w+)?)+$/,
         "integer": /^(-+)?(\d+)$/,
-        "float": /^(-+)?(\d+(\.\d+)?(e-\d+)?)$/,
+        "float": /^(-+)?(\d+(\.\d+)?([eE]-\d+)?)$/,
         "altID": /^[<]+(\w+)+[>]$/
 
     }
