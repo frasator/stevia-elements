@@ -10,5 +10,24 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/frasator/stevia-elements.git"
+    },
+    "dependencies": {
+        "webcomponentsjs": "github:webcomponents/webcomponentsjs#v1.2.3",
+        "polymer": "github:Polymer/polymer#v1.8.1",
+        "iron-flex-layout": "github:PolymerElements/iron-flex-layout#1.3.9",
+        "iron-list": "github:PolymerElements/iron-list#v1.4.6",
+        "iron-overlay-behavior": "github:PolymerElements/iron-overlay-behavior#v1.10.4",
+        "iron-resizable-behavior": "github:PolymerElements/iron-resizable-behavior#v1.0.6",
+        "iron-scroll-target-behavior": "github:PolymerElements/iron-scroll-target-behavior#v1.1.1",
+        "iron-a11y-keys": "github:PolymerElements/iron-a11y-keys#v1.0.9",
+        "iron-a11y-keys-behavior": "github:PolymerElements/iron-a11y-keys-behavior#v1.1.9",
+        "iron-component-page": "github:PolymerElements/iron-component-page#1.1.9",
+        "fontawesome": "github:FortAwesome/Font-Awesome#v4.7.0",
+        "cookies-js": "~1.1.0",
+        "crypto-js": "3.1.6",
+        "pako": "~0.2.8",
+        "line-navigator": "github:anpur/line-navigator",
+        "FileSaver.js": "github:eligrey/FileSaver.js#1.3.3",
+        "async": "^2.1.2"
     }
 }
