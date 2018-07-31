@@ -175,7 +175,7 @@ with a z-index above this value will not be blocked.
         </style>
         <div class="blocking-div">
             <div class="modal-window">
-                <div id="title">{{_mode}}</div>
+                <div id="title">{{titleText}}</div>
                 <div id="content">
                     <div id="message">
                         {{message}}
@@ -233,6 +233,10 @@ with a z-index above this value will not be blocked.
                 defaultText: {
                     type: String,
                     value: ''
+                },
+                titleText: {
+                    type: String,
+                    value: ''
                 }
             },
 
@@ -283,6 +287,9 @@ with a z-index above this value will not be blocked.
              * @param {string} confirmBtnMessage The message that will be displayed inside the ok button
              */
             _setElement: function() {
+                if(this.titleText == ''){
+                    this.titleText = this._mode;
+                }
                 if (this._mode === "prompt") {
                     this.$.text.removeAttribute("hidden");
                     //TODO: Fix -> The user needs to press enter for the focus to work.
